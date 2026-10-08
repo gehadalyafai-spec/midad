@@ -1,3 +1,4 @@
+import 'geometry_lesson_content.dart';
 import 'grade2_math_lesson_content.dart';
 import 'percent_lesson_content.dart';
 import 'proportions_lesson_content.dart';
@@ -15,6 +16,9 @@ LessonContent lessonContentForGrade2Math(String lessonId) {
 
   final percent = percentLessonContent[lessonId];
   if (percent != null) return percent;
+
+  final geometry = geometryLessonContent[lessonId];
+  if (geometry != null) return geometry;
 
   throw StateError('No lesson content registered for $lessonId');
 }
