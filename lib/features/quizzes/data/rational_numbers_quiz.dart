@@ -190,6 +190,44 @@ const divideRationalQuiz = <QuizQuestion>[
   ),
 ];
 
+const addSubtractLikeDenominatorsQuiz = <QuizQuestion>[
+  QuizQuestion(
+    id: 'asl-1',
+    question: 'ما ناتج 3/8 + 2/8؟',
+    options: ['5/8', '5/16', '1/8', '6/8'],
+    correctIndex: 0,
+    explanation: 'المقامات متساوية، لذلك نجمع البسطين فقط: 3+2=5.',
+  ),
+  QuizQuestion(
+    id: 'asl-2',
+    question: 'ما ناتج 5/9 - 7/9؟',
+    options: ['-2/9', '2/9', '-12/9', '2/18'],
+    correctIndex: 0,
+    explanation: '5-7=-2 والمقام يبقى 9.',
+  ),
+  QuizQuestion(
+    id: 'asl-3',
+    question: 'ما ناتج -4/7 + 1/7؟',
+    options: ['-3/7', '3/7', '-5/14', '5/7'],
+    correctIndex: 0,
+    explanation: '-4+1=-3، والمقام يبقى 7.',
+  ),
+  QuizQuestion(
+    id: 'asl-4',
+    question: 'عند جمع كسرين لهما المقام نفسه، ماذا نفعل بالمقام؟',
+    options: ['نجمعه', 'نضربه', 'نبقيه كما هو', 'نطرحه'],
+    correctIndex: 2,
+    explanation: 'عند تساوي المقامات تكون العملية على البسطين ويبقى المقام نفسه.',
+  ),
+  QuizQuestion(
+    id: 'asl-5',
+    question: 'ما ناتج 8/11 - 3/11؟',
+    options: ['5/11', '5/22', '11/5', '5/8'],
+    correctIndex: 0,
+    explanation: '8-3=5 والمقام 11.',
+  ),
+];
+
 const addSubtractRationalQuiz = <QuizQuestion>[
   QuizQuestion(
     id: 'asr-1',
@@ -235,6 +273,44 @@ const addSubtractRationalQuiz = <QuizQuestion>[
     correctIndex: 1,
     explanation:
         'يجب توحيد المقامات أولًا ثم إجراء الجمع أو الطرح على البسطين.',
+  ),
+];
+
+const patternStrategyQuiz = <QuizQuestion>[
+  QuizQuestion(
+    id: 'ps-1',
+    question: 'ما العدد التالي في 3، 6، 9، 12؟',
+    options: ['13', '14', '15', '16'],
+    correctIndex: 2,
+    explanation: 'النمط يزيد 3 كل مرة، لذلك العدد التالي 15.',
+  ),
+  QuizQuestion(
+    id: 'ps-2',
+    question: 'ما القاعدة في 2، 6، 10، 14؟',
+    options: ['+2', '+4', '×2', '-4'],
+    correctIndex: 1,
+    explanation: 'الفرق بين كل حدين متتاليين يساوي 4.',
+  ),
+  QuizQuestion(
+    id: 'ps-3',
+    question: 'ما أول خطوة مفيدة عند البحث عن نمط؟',
+    options: ['ترتيب الحالات ومقارنتها', 'حذف المعطيات', 'تخمين عشوائي', 'تغيير السؤال'],
+    correctIndex: 0,
+    explanation: 'ترتيب المعلومات يساعد على رؤية التغير المتكرر.',
+  ),
+  QuizQuestion(
+    id: 'ps-4',
+    question: 'أي عدد يكمل النمط 20، 17، 14، 11؟',
+    options: ['7', '8', '9', '10'],
+    correctIndex: 1,
+    explanation: 'النمط ينقص 3 كل مرة، لذلك 11-3=8.',
+  ),
+  QuizQuestion(
+    id: 'ps-5',
+    question: 'بعد اكتشاف قاعدة النمط، ماذا ينبغي أن تفعل؟',
+    options: ['تتحقق أنها تعمل على الحالات', 'تغير القاعدة', 'تتجاهلها', 'تحذف أول حد'],
+    correctIndex: 0,
+    explanation: 'التحقق من أكثر من حالة يثبت أن القاعدة مناسبة.',
   ),
 ];
 
@@ -352,8 +428,12 @@ List<QuizQuestion> quizForLesson(String lessonId) {
       return multiplyRationalQuiz;
     case 'divide-rational':
       return divideRationalQuiz;
+    case 'add-subtract-like-denominators':
+      return addSubtractLikeDenominatorsQuiz;
     case 'add-subtract-rational':
       return addSubtractRationalQuiz;
+    case 'pattern-strategy':
+      return patternStrategyQuiz;
     case 'powers':
       return powersQuiz;
     case 'scientific-notation':
@@ -369,7 +449,9 @@ const allRationalNumbersQuestions = <QuizQuestion>[
   ...compareRationalQuiz,
   ...multiplyRationalQuiz,
   ...divideRationalQuiz,
+  ...addSubtractLikeDenominatorsQuiz,
   ...addSubtractRationalQuiz,
+  ...patternStrategyQuiz,
   ...powersQuiz,
   ...scientificNotationQuiz,
 ];
