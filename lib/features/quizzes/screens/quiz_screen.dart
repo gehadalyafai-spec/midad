@@ -182,7 +182,6 @@ class _QuizScreenState extends State<QuizScreen> {
                       correct: _selectedIndex == _question.correctIndex,
                       text: _question.explanation,
                       surface: surface,
-                      textColor: text,
                       mutedColor: muted,
                     ).animate().fadeIn(duration: 250.ms),
                   ],
@@ -298,7 +297,6 @@ class _FocusOption extends StatelessWidget {
     required this.answered,
     required this.correctIndex,
     required this.surface,
-    required this.textColor,
     required this.mutedColor,
     required this.onTap,
   });
@@ -309,7 +307,6 @@ class _FocusOption extends StatelessWidget {
   final bool answered;
   final int correctIndex;
   final Color surface;
-  final Color textColor;
   final Color mutedColor;
   final VoidCallback onTap;
 
