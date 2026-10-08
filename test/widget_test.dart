@@ -4,21 +4,16 @@ import 'package:midad/features/lessons/data/grade2_math_lesson_registry.dart';
 import 'package:midad/features/quizzes/data/grade2_math_quiz_registry.dart';
 
 void main() {
-  test('grade 2 math contains the first two curriculum chapters', () {
-    expect(grade2MathChapters.length, greaterThanOrEqualTo(2));
+  test('grade 2 math contains the first three curriculum chapters', () {
+    expect(grade2MathChapters, hasLength(3));
     expect(grade2MathChapters[0].title, 'الأعداد النسبية');
-    expect(
-      grade2MathChapters[1].title,
-      'الأعداد الحقيقية ونظرية فيثاغورس',
-    );
+    expect(grade2MathChapters[1].title, 'الأعداد الحقيقية ونظرية فيثاغورس');
+    expect(grade2MathChapters[2].title, 'التناسب والتشابه');
   });
 
-  test('every available lesson has content, practice and five quiz questions', () {
+  test('every lesson has content, practice and five quiz questions', () {
     for (final chapter in grade2MathChapters) {
-      final availableLessons =
-          chapter.lessons.where((lesson) => lesson.isAvailable);
-
-      for (final lesson in availableLessons) {
+      for (final lesson in chapter.lessons.where((lesson) => lesson.isAvailable)) {
         final content = lessonContentForGrade2Math(lesson.id);
         final quiz = quizForGrade2MathLesson(lesson.id);
 
@@ -46,6 +41,6 @@ void main() {
       expect(ids.add(question.id), isTrue);
     }
 
-    expect(allGrade2MathQuestions, hasLength(75));
+    expect(allGrade2MathQuestions, hasLength(115));
   });
 }
