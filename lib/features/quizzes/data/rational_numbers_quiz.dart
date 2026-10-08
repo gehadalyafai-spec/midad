@@ -94,10 +94,110 @@ const compareRationalQuiz = <QuizQuestion>[
   ),
 ];
 
+const multiplyRationalQuiz = <QuizQuestion>[
+  QuizQuestion(
+    id: 'mr-1',
+    question: 'ما إشارة ناتج (-2/3) × (5/7)؟',
+    options: ['موجب', 'سالب', 'صفر', 'لا يمكن تحديدها'],
+    correctIndex: 1,
+    explanation:
+        'الإشارتان مختلفتان، لذلك ناتج الضرب سالب.',
+  ),
+  QuizQuestion(
+    id: 'mr-2',
+    question: 'ما ناتج (2/5) × (3/4)؟',
+    options: ['5/9', '6/20', '6/9', '5/20'],
+    correctIndex: 1,
+    explanation:
+        'نضرب البسطين 2×3=6 والمقامين 5×4=20، فيكون الناتج 6/20 ويساوي 3/10 بعد التبسيط.',
+  ),
+  QuizQuestion(
+    id: 'mr-3',
+    question: 'ما ناتج (-1/2) × (-4/3)؟',
+    options: ['-2/3', '2/3', '-4/6', '1/6'],
+    correctIndex: 1,
+    explanation:
+        'الإشارتان متماثلتان فالناتج موجب، و4/6 تبسّط إلى 2/3.',
+  ),
+  QuizQuestion(
+    id: 'mr-4',
+    question: 'أي عبارة صحيحة عند ضرب كسرين؟',
+    options: [
+      'نجمع البسطين',
+      'نوحّد المقامات أولًا',
+      'نضرب البسطين والمقامين',
+      'نقلب الكسر الثاني دائمًا'
+    ],
+    correctIndex: 2,
+    explanation:
+        'في ضرب الكسور نضرب البسط في البسط والمقام في المقام ثم نبسّط.',
+  ),
+  QuizQuestion(
+    id: 'mr-5',
+    question: 'ما ناتج (-3/8) × 0؟',
+    options: ['-3/8', '0', '3/8', '-3'],
+    correctIndex: 1,
+    explanation:
+        'أي عدد مضروبًا في صفر يساوي صفرًا.',
+  ),
+];
+
+const divideRationalQuiz = <QuizQuestion>[
+  QuizQuestion(
+    id: 'dr-1',
+    question: 'ما الخطوة الصحيحة عند قسمة 2/3 على 4/5؟',
+    options: [
+      '2/3 × 4/5',
+      '2/3 × 5/4',
+      '3/2 × 4/5',
+      '3/2 × 5/4'
+    ],
+    correctIndex: 1,
+    explanation:
+        'نثبت الكسر الأول ونضربه في مقلوب الكسر الثاني، أي 2/3 × 5/4.',
+  ),
+  QuizQuestion(
+    id: 'dr-2',
+    question: 'ما ناتج (3/4) ÷ (1/2)؟',
+    options: ['3/8', '3/2', '2/3', '1/6'],
+    correctIndex: 1,
+    explanation:
+        '3/4 ÷ 1/2 تصبح 3/4 × 2/1 = 6/4 = 3/2.',
+  ),
+  QuizQuestion(
+    id: 'dr-3',
+    question: 'ما إشارة ناتج (-5/6) ÷ (2/3)؟',
+    options: ['موجب', 'سالب', 'صفر', 'غير معرّف'],
+    correctIndex: 1,
+    explanation:
+        'الإشارتان مختلفتان، لذلك الناتج سالب.',
+  ),
+  QuizQuestion(
+    id: 'dr-4',
+    question: 'أي عملية غير معرّفة؟',
+    options: ['3/4 ÷ 2', '3/4 ÷ 1/2', '3/4 ÷ 0', '0 ÷ 3/4'],
+    correctIndex: 2,
+    explanation:
+        'القسمة على صفر غير معرّفة.',
+  ),
+  QuizQuestion(
+    id: 'dr-5',
+    question: 'ما ناتج (2/5) ÷ (-4/3)؟',
+    options: ['-3/10', '3/10', '-8/15', '8/15'],
+    correctIndex: 0,
+    explanation:
+        '2/5 × (-3/4) = -6/20، وبالتبسيط يساوي -3/10.',
+  ),
+];
+
 List<QuizQuestion> quizForLesson(String lessonId) {
   switch (lessonId) {
     case 'compare-rational':
       return compareRationalQuiz;
+    case 'multiply-rational':
+      return multiplyRationalQuiz;
+    case 'divide-rational':
+      return divideRationalQuiz;
     case 'rational-numbers-intro':
     default:
       return rationalNumbersIntroQuiz;
@@ -107,4 +207,6 @@ List<QuizQuestion> quizForLesson(String lessonId) {
 const allRationalNumbersQuestions = <QuizQuestion>[
   ...rationalNumbersIntroQuiz,
   ...compareRationalQuiz,
+  ...multiplyRationalQuiz,
+  ...divideRationalQuiz,
 ];
