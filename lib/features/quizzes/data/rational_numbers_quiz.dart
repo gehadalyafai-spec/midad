@@ -238,6 +238,112 @@ const addSubtractRationalQuiz = <QuizQuestion>[
   ),
 ];
 
+const powersQuiz = <QuizQuestion>[
+  QuizQuestion(
+    id: 'pw-1',
+    question: 'ما قيمة 2⁴؟',
+    options: ['8', '16', '6', '12'],
+    correctIndex: 1,
+    explanation:
+        '2⁴ تعني 2×2×2×2، والناتج 16.',
+  ),
+  QuizQuestion(
+    id: 'pw-2',
+    question: 'في التعبير 5³، ما الأس؟',
+    options: ['5', '3', '15', '125'],
+    correctIndex: 1,
+    explanation:
+        'الأس هو العدد الصغير المكتوب أعلى الأساس، وهو 3.',
+  ),
+  QuizQuestion(
+    id: 'pw-3',
+    question: 'ما قيمة (-2)⁴؟',
+    options: ['-16', '16', '-8', '8'],
+    correctIndex: 1,
+    explanation:
+        'الأس زوجي، وحاصل ضرب أربعة عوامل سالبة يكون موجبًا: 16.',
+  ),
+  QuizQuestion(
+    id: 'pw-4',
+    question: 'أي تعبير يساوي 3×3×3؟',
+    options: ['3²', '3³', '9³', '6³'],
+    correctIndex: 1,
+    explanation:
+        'تكرار ضرب العدد 3 ثلاث مرات يكتب 3³.',
+  ),
+  QuizQuestion(
+    id: 'pw-5',
+    question: 'ما قيمة (-4)³؟',
+    options: ['64', '-64', '12', '-12'],
+    correctIndex: 1,
+    explanation:
+        'الأس فردي، لذلك يبقى الناتج سالبًا: (-4)×(-4)×(-4) = -64.',
+  ),
+];
+
+const scientificNotationQuiz = <QuizQuestion>[
+  QuizQuestion(
+    id: 'sn-1',
+    question: 'أي صيغة علمية تمثل 320000؟',
+    options: [
+      '3.2 × 10⁵',
+      '32 × 10⁴',
+      '3.2 × 10⁻⁵',
+      '0.32 × 10⁶'
+    ],
+    correctIndex: 0,
+    explanation:
+        'نحرك الفاصلة خمس خانات إلى اليسار لنحصل على 3.2، لذلك الأس 5.',
+  ),
+  QuizQuestion(
+    id: 'sn-2',
+    question: 'أي صيغة علمية تمثل 0.0007؟',
+    options: [
+      '7 × 10⁴',
+      '7 × 10⁻⁴',
+      '0.7 × 10⁻³',
+      '70 × 10⁻⁵'
+    ],
+    correctIndex: 1,
+    explanation:
+        'نحرك الفاصلة أربع خانات إلى اليمين للوصول إلى 7، لذلك الأس -4.',
+  ),
+  QuizQuestion(
+    id: 'sn-3',
+    question: 'أي عدد مكتوب بالصيغة العلمية القياسية؟',
+    options: [
+      '12 × 10³',
+      '0.8 × 10⁵',
+      '4.6 × 10⁷',
+      '45 × 10²'
+    ],
+    correctIndex: 2,
+    explanation:
+        'في الصيغة العلمية يجب أن تكون القيمة الأولى من 1 إلى أقل من 10، وهذا ينطبق على 4.6.',
+  ),
+  QuizQuestion(
+    id: 'sn-4',
+    question: 'ما الصورة العادية للعدد 2.5 × 10³؟',
+    options: ['250', '2500', '25000', '0.0025'],
+    correctIndex: 1,
+    explanation:
+        'نحرك الفاصلة ثلاث خانات إلى اليمين: 2.5 تصبح 2500.',
+  ),
+  QuizQuestion(
+    id: 'sn-5',
+    question: 'ماذا يعني الأس السالب في الصيغة العلمية غالبًا؟',
+    options: [
+      'أن العدد سالب',
+      'أن العدد بين صفر وواحد من حيث المقدار',
+      'أن العدد أكبر من مليون',
+      'أن المعامل يساوي صفرًا'
+    ],
+    correctIndex: 1,
+    explanation:
+        'الأس السالب يظهر عند كتابة أعداد صغيرة مقدارها أقل من 1 بالصورة العلمية.',
+  ),
+];
+
 List<QuizQuestion> quizForLesson(String lessonId) {
   switch (lessonId) {
     case 'compare-rational':
@@ -248,6 +354,10 @@ List<QuizQuestion> quizForLesson(String lessonId) {
       return divideRationalQuiz;
     case 'add-subtract-rational':
       return addSubtractRationalQuiz;
+    case 'powers':
+      return powersQuiz;
+    case 'scientific-notation':
+      return scientificNotationQuiz;
     case 'rational-numbers-intro':
     default:
       return rationalNumbersIntroQuiz;
@@ -260,4 +370,6 @@ const allRationalNumbersQuestions = <QuizQuestion>[
   ...multiplyRationalQuiz,
   ...divideRationalQuiz,
   ...addSubtractRationalQuiz,
+  ...powersQuiz,
+  ...scientificNotationQuiz,
 ];
