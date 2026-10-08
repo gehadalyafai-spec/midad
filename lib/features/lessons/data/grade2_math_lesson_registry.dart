@@ -3,6 +3,7 @@ import 'grade2_math_lesson_content.dart';
 import 'percent_lesson_content.dart';
 import 'proportions_lesson_content.dart';
 import 'real_numbers_lesson_content.dart';
+import 'statistics_lesson_content.dart';
 
 LessonContent lessonContentForGrade2Math(String lessonId) {
   final rational = grade2MathLessonContent[lessonId];
@@ -19,6 +20,9 @@ LessonContent lessonContentForGrade2Math(String lessonId) {
 
   final geometry = geometryLessonContent[lessonId];
   if (geometry != null) return geometry;
+
+  final statistics = statisticsLessonContent[lessonId];
+  if (statistics != null) return statistics;
 
   throw StateError('No lesson content registered for $lessonId');
 }
