@@ -89,15 +89,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return grade2MathChapters.last;
   }
 
-  Future<void> _openChapter(Chapter chapter) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => ChapterScreen(chapter: chapter),
-      ),
-    );
-    await _loadProgress();
-  }
-
   Future<void> _continueLearning(Chapter chapter) async {
     final lastLesson = _findLesson(chapter, _lastLessonId);
     final lesson = lastLesson == null ||
