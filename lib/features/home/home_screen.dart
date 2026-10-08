@@ -88,6 +88,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return grade2MathChapters.last;
   }
 
+  bool get _isCourseComplete =>
+      grade2MathChapters.every(_isChapterComplete);
+
   Future<void> _continueLearning(Chapter chapter) async {
     final lastLesson = _findLesson(chapter, _lastLessonId);
     final lesson = lastLesson == null ||
@@ -150,6 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final chapter = _activeChapter();
+    final courseComplete = _isCourseComplete;
     final available =
         chapter.lessons.where((lesson) => lesson.isAvailable).toList();
     final completed = available
@@ -187,10 +191,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   total: available.length,
                   mistakeCount: _mistakeQuestionIds.length,
                   lastLessonTitle: continueLesson.title,
+                  courseComplete: courseComplete,
                   overallProgress: overallProgress,
                   overallCompleted: overallCompleted,
                   overallTotal: allLessons.length,
-                  onContinue: () => _continueLearning(chapter),
+                  onContinue: courseComplete
+                      ? _openCourseOverview
+                      : () => _continueLearning(chapter),
                   onOpenCourse: _openCourseOverview,
                   onQuiz: () => _openQuiz(chapter),
                   onMistakes: () => _openMistakes(chapter),
@@ -211,6 +218,7 @@ class _StudyCanvas extends StatelessWidget {
     required this.total,
     required this.mistakeCount,
     required this.lastLessonTitle,
+    required this.courseComplete,
     required this.overallProgress,
     required this.overallCompleted,
     required this.overallTotal,
@@ -227,6 +235,7 @@ class _StudyCanvas extends StatelessWidget {
   final int total;
   final int mistakeCount;
   final String? lastLessonTitle;
+  final bool courseComplete;
   final double overallProgress;
   final int overallCompleted;
   final int overallTotal;
@@ -302,6 +311,7 @@ class _StudyCanvas extends StatelessWidget {
             _ContinuePanel(
               progress: progress,
               lastLessonTitle: lastLessonTitle,
+              courseComplete: courseComplete,
               onContinue: onContinue,
               onOpenCourse: onOpenCourse,
             )
@@ -566,12 +576,14 @@ class _ContinuePanel extends StatelessWidget {
   const _ContinuePanel({
     required this.progress,
     required this.lastLessonTitle,
+    required this.courseComplete,
     required this.onContinue,
     required this.onOpenCourse,
   });
 
   final double progress;
   final String? lastLessonTitle;
+  final bool courseComplete;
   final VoidCallback onContinue;
   final VoidCallback onOpenCourse;
 
@@ -624,16 +636,20 @@ class _ContinuePanel extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'واصل من حيث توقفت',
-                        style: TextStyle(
+                      Text(
+                        courseComplete
+                            ? 'تم إكمال المسار'
+                            : 'واصل من حيث توقفت',
+                        style: const TextStyle(
                           color: Colors.white70,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        lastLessonTitle ?? 'الأعداد النسبية',
+                        courseComplete
+                            ? 'رياضيات ثاني متوسط'
+                            : (lastLessonTitle ?? 'الأعداد النسبية'),
                         style:
                             Theme.of(context).textTheme.headlineSmall?.copyWith(
                                   color: Colors.white,
@@ -678,9 +694,13 @@ class _ContinuePanel extends StatelessWidget {
                               backgroundColor: Colors.white,
                               foregroundColor: AppColors.primaryDark,
                             ),
-                            child: const Text(
-                              'متابعة الدرس',
-                              style: TextStyle(fontWeight: FontWeight.w900),
+                            child: Text(
+                              courseComplete
+                                  ? 'مراجعة الفصول'
+                                  : 'متابعة الدرس',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w900,
+                              ),
                             ),
                           ),
                           TextButton(
