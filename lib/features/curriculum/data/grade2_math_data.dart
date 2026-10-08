@@ -99,4 +99,18 @@ const grade2MathChapters = <Chapter>[
       Lesson(id: 'sampling-prediction', title: 'استعمال المعاينة في التنبؤ', subtitle: 'استخدام عينة ممثلة لتقدير خصائص مجتمع أكبر.'),
     ],
   ),
+  Chapter(
+    id: 'measurement-area-volume',
+    title: 'القياس: المساحة والحجم',
+    subtitle: 'المساحات المركبة والمجسمات والحجوم ومساحات السطوح.',
+    lessons: [
+      Lesson(id: 'composite-areas', title: 'مساحات الأشكال المركبة', subtitle: 'تقسيم الأشكال المعقدة إلى أجزاء بسيطة وحساب مساحاتها.'),
+      Lesson(id: 'simpler-problem-strategy', title: 'استراتيجية حل المسألة: حل مسألة أبسط', subtitle: 'استخدام حالة أبسط لاكتشاف طريقة الحل.'),
+      Lesson(id: 'three-dimensional-shapes', title: 'الأشكال الثلاثية الأبعاد', subtitle: 'فهم الأوجه والأحرف والرؤوس وخصائص المجسمات.'),
+      Lesson(id: 'prism-cylinder-volume', title: 'حجم المنشور والأسطوانة', subtitle: 'استخدام مساحة القاعدة والارتفاع لإيجاد الحجم.'),
+      Lesson(id: 'pyramid-cone-volume', title: 'حجم الهرم والمخروط', subtitle: 'إيجاد الحجم باستخدام ثلث مساحة القاعدة في الارتفاع.'),
+      Lesson(id: 'prism-cylinder-surface-area', title: 'مساحة سطح المنشور والأسطوانة', subtitle: 'جمع مساحات الأسطح الخارجية للمجسم.'),
+      Lesson(id: 'pyramid-surface-area', title: 'مساحة سطح الهرم', subtitle: 'مساحة القاعدة والأوجه المثلثة الجانبية.'),
+    ],
+  ),
 ];
