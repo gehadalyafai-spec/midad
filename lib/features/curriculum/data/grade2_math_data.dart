@@ -30,7 +30,6 @@ const grade2MathChapters = <Chapter>[
         id: 'add-subtract-rational',
         title: 'جمع الأعداد النسبية وطرحها',
         subtitle: 'تدريب تدريجي على الجمع والطرح.',
-        isAvailable: false,
       ),
       Lesson(
         id: 'powers',
