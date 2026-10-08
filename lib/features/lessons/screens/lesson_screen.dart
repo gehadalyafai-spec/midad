@@ -4,9 +4,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../services/progress_service.dart';
 import '../../curriculum/models/curriculum_models.dart';
-import '../../quizzes/data/rational_numbers_quiz.dart';
+import '../../quizzes/data/grade2_math_quiz_registry.dart';
 import '../../quizzes/screens/quiz_screen.dart';
-import '../data/grade2_math_lesson_content.dart';
+import '../data/grade2_math_lesson_registry.dart';
 
 class LessonScreen extends StatefulWidget {
   const LessonScreen({super.key, required this.lesson});
@@ -43,7 +43,7 @@ class _LessonScreenState extends State<LessonScreen> {
       MaterialPageRoute<bool>(
         builder: (_) => QuizScreen(
           lesson: widget.lesson,
-          questions: quizForLesson(widget.lesson.id),
+          questions: quizForGrade2MathLesson(widget.lesson.id),
         ),
       ),
     );
@@ -72,7 +72,7 @@ class _LessonScreenState extends State<LessonScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final lessonData = lessonContentFor(widget.lesson.id);
+    final lessonData = lessonContentForGrade2Math(widget.lesson.id);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final text = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
     final muted =
