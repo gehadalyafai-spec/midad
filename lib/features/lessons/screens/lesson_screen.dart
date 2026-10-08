@@ -116,12 +116,19 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppColors.darkSurface : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE5EAE7)),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.07)
+              : const Color(0xFFE5EAE7),
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,10 +137,10 @@ class _SectionCard extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: AppColors.surfaceSoft,
+              color: colors.primaryContainer,
               borderRadius: BorderRadius.circular(13),
             ),
-            child: Icon(icon, color: AppColors.primary),
+            child: Icon(icon, color: colors.onPrimaryContainer),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -144,16 +151,16 @@ class _SectionCard extends StatelessWidget {
                   title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
+                        color: colors.onSurface,
                       ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   text,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
-                    height: 1.7,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: colors.onSurfaceVariant,
+                        height: 1.7,
+                      ),
                 ),
               ],
             ),
@@ -169,12 +176,19 @@ class _ExampleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final background =
+        isDark ? const Color(0xFF2A251B) : const Color(0xFFFFF8E8);
+    final border =
+        isDark ? const Color(0xFF4A3D22) : const Color(0xFFF0DDAE);
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF8E8),
+        color: background,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFF0DDAE)),
+        border: Border.all(color: border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,15 +201,18 @@ class _ExampleCard extends StatelessWidget {
                 'مثال سريع',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
+                      color: colors.onSurface,
                     ),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             'العدد 3/4 عدد نسبي؛ لأنه مكتوب على صورة كسر بسطه ومقامه عددان صحيحان، والمقام لا يساوي صفرًا.',
-            style: TextStyle(color: AppColors.textSecondary, height: 1.7),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  height: 1.7,
+                ),
           ),
         ],
       ),
