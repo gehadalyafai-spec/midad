@@ -35,22 +35,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadProgress({bool showSkeleton = false}) async {
-    if (showSkeleton && mounted) {
-      setState(() => _isLoading = true);
-    }
+    if (showSkeleton && mounted) setState(() => _isLoading = true);
 
-    final completedFuture = _progressService.getCompletedLessonIds();
-    final mistakesFuture = _progressService.getMistakeQuestionIds();
-    final lastIdFuture = _progressService.getLastLessonId();
-    final lastTitleFuture = _progressService.getLastLessonTitle();
-
-    final completed = await completedFuture;
-    final mistakes = await mistakesFuture;
-    final lastId = await lastIdFuture;
-    final lastTitle = await lastTitleFuture;
+    final completed = await _progressService.getCompletedLessonIds();
+    final mistakes = await _progressService.getMistakeQuestionIds();
+    final lastId = await _progressService.getLastLessonId();
+    final lastTitle = await _progressService.getLastLessonTitle();
 
     if (showSkeleton) {
-      await Future<void>.delayed(const Duration(milliseconds: 700));
+      await Future<void>.delayed(const Duration(milliseconds: 650));
     }
 
     if (!mounted) return;
@@ -65,11 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Lesson? _findLesson(Chapter chapter, String? lessonId) {
     if (lessonId == null) return null;
-
     for (final lesson in chapter.lessons) {
-      if (lesson.id == lessonId && lesson.isAvailable) {
-        return lesson;
-      }
+      if (lesson.id == lessonId && lesson.isAvailable) return lesson;
     }
     return null;
   }
@@ -84,24 +74,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _continueLearning(Chapter chapter) async {
-    final lastLesson = _findLesson(chapter, _lastLessonId);
-
-    if (lastLesson == null) {
+    final lesson = _findLesson(chapter, _lastLessonId);
+    if (lesson == null) {
       await _openChapter(chapter);
       return;
     }
 
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => LessonScreen(lesson: lastLesson),
+        builder: (_) => LessonScreen(lesson: lesson),
       ),
     );
     await _loadProgress();
   }
 
-  Future<void> _openStarterQuiz(Chapter chapter) async {
+  Future<void> _openQuiz(Chapter chapter) async {
     final lesson = chapter.lessons.firstWhere((item) => item.isAvailable);
-
     await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
         builder: (_) => QuizScreen(
@@ -115,7 +103,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _openMistakes(Chapter chapter) async {
     final lesson = chapter.lessons.firstWhere((item) => item.isAvailable);
-
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => MistakesScreen(
@@ -129,628 +116,658 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final firstChapter = grade2MathChapters.first;
-    final availableLessons =
-        firstChapter.lessons.where((lesson) => lesson.isAvailable).toList();
-    final completedCount = availableLessons
+    final chapter = grade2MathChapters.first;
+    final available =
+        chapter.lessons.where((lesson) => lesson.isAvailable).toList();
+    final completed = available
         .where((lesson) => _completedLessonIds.contains(lesson.id))
         .length;
-    final progress =
-        availableLessons.isEmpty ? 0.0 : completedCount / availableLessons.length;
-
-    final colors = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final progress = available.isEmpty ? 0.0 : completed / available.length;
 
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 78,
-        leadingWidth: 76,
-        leading: Padding(
-          padding: const EdgeInsetsDirectional.only(start: 18),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: colors.outlineVariant.withValues(alpha: 0.55),
-              ),
-            ),
-            child: CircleAvatar(
-              backgroundColor: colors.primaryContainer,
-              child: Icon(
-                Icons.person_rounded,
-                color: colors.onPrimaryContainer,
-              ),
-            ),
-          ),
+      body: SafeArea(
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 320),
+          child: _isLoading
+              ? const _StudySkeleton(key: ValueKey('loading'))
+              : _StudyCanvas(
+                  key: const ValueKey('canvas'),
+                  chapter: chapter,
+                  progress: progress,
+                  completed: completed,
+                  total: available.length,
+                  mistakeCount: _mistakeQuestionIds.length,
+                  lastLessonTitle: _lastLessonTitle,
+                  onContinue: () => _continueLearning(chapter),
+                  onOpenCourse: () => _openChapter(chapter),
+                  onQuiz: () => _openQuiz(chapter),
+                  onMistakes: () => _openMistakes(chapter),
+                ),
         ),
-        titleSpacing: 6,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'مداد',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.4,
-                  ),
-            ),
-            Text(
-              'تعلّم بهدوء، وتقدّم بثبات',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colors.onSurfaceVariant,
-                  ),
-            ),
-          ],
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsetsDirectional.only(end: 16),
-            child: IconButton.filledTonal(
-              tooltip: 'الإشعارات',
-              onPressed: () => _showComingSoon(context, 'الإشعارات'),
-              icon: const Icon(Icons.notifications_none_rounded),
-            ),
-          ),
-        ],
       ),
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 350),
-        switchInCurve: Curves.easeOutCubic,
-        switchOutCurve: Curves.easeInCubic,
-        child: _isLoading
-            ? const _HomeSkeleton(key: ValueKey('loading'))
-            : ListView(
-                key: const ValueKey('content'),
-                padding: const EdgeInsets.fromLTRB(18, 10, 18, 32),
-                children: [
-                  _WelcomeCard(
-                    isDark: isDark,
-                    lastLessonTitle: _lastLessonTitle,
-                    onContinue: () => _continueLearning(firstChapter),
-                  )
-                      .animate()
-                      .fadeIn(duration: 420.ms)
-                      .slideY(
-                        begin: 0.08,
-                        end: 0,
-                        duration: 420.ms,
-                        curve: Curves.easeOutCubic,
-                      ),
-                  const SizedBox(height: 26),
-                  _SectionHeader(
-                    title: 'مساحتك التعليمية',
-                    subtitle: 'كل ما تحتاجه لتتقدم في مكان واحد',
-                    trailing: 'ثاني متوسط',
-                  )
-                      .animate(delay: 80.ms)
-                      .fadeIn(duration: 380.ms)
-                      .slideX(begin: 0.04, end: 0),
-                  const SizedBox(height: 14),
-                  _LearningGrid(
-                    progress: progress,
-                    mistakeCount: _mistakeQuestionIds.length,
-                    onOpenMath: () => _openChapter(firstChapter),
-                    onOpenQuiz: () => _openStarterQuiz(firstChapter),
-                    onReviewMistakes: () => _openMistakes(firstChapter),
-                    onShowProgress: () {
-                      final percent = (progress * 100).round();
-                      _showMessage(
-                        context,
-                        'أنجزت $completedCount من ${availableLessons.length} درس • $percent%',
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 26),
-                  const _SectionHeader(
-                    title: 'تقدمك',
-                    subtitle: 'يُحفظ تلقائيًا على جهازك',
-                  )
-                      .animate(delay: 220.ms)
-                      .fadeIn(duration: 380.ms)
-                      .slideX(begin: 0.04, end: 0),
-                  const SizedBox(height: 14),
-                  _ProgressCard(
-                    chapterTitle: firstChapter.title,
-                    progress: progress,
-                    completed: completedCount,
-                    total: availableLessons.length,
-                    lastLessonTitle: _lastLessonTitle,
-                  )
-                      .animate(delay: 280.ms)
-                      .fadeIn(duration: 420.ms)
-                      .slideY(begin: 0.06, end: 0),
-                ],
-              ),
-      ),
-    );
-  }
-
-  void _showComingSoon(BuildContext context, String feature) {
-    _showMessage(context, '$feature سيُضاف قريبًا بإذن الله.');
-  }
-
-  void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
     );
   }
 }
 
-class _WelcomeCard extends StatelessWidget {
-  const _WelcomeCard({
-    required this.isDark,
+class _StudyCanvas extends StatelessWidget {
+  const _StudyCanvas({
+    super.key,
+    required this.chapter,
+    required this.progress,
+    required this.completed,
+    required this.total,
+    required this.mistakeCount,
     required this.lastLessonTitle,
     required this.onContinue,
+    required this.onOpenCourse,
+    required this.onQuiz,
+    required this.onMistakes,
   });
 
-  final bool isDark;
+  final Chapter chapter;
+  final double progress;
+  final int completed;
+  final int total;
+  final int mistakeCount;
   final String? lastLessonTitle;
   final VoidCallback onContinue;
+  final VoidCallback onOpenCourse;
+  final VoidCallback onQuiz;
+  final VoidCallback onMistakes;
 
   @override
   Widget build(BuildContext context) {
-    final hasLastLesson = lastLessonTitle != null;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final text = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final muted =
+        isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+    final surface = isDark ? AppColors.darkSurface : const Color(0xFFFFFDF8);
 
-    return Container(
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        gradient: LinearGradient(
-          colors: isDark
-              ? const [Color(0xFF1B6658), Color(0xFF103F37)]
-              : const [Color(0xFF1E7A68), Color(0xFF125649)],
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: isDark ? 0.10 : 0.20),
-            blurRadius: 28,
-            offset: const Offset(0, 12),
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: CustomPaint(
+            painter: _CanvasDotsPainter(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.035)
+                  : const Color(0xFF2D2D39).withValues(alpha: 0.045),
+            ),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: const Icon(
-                  Icons.auto_stories_rounded,
-                  color: Colors.white,
-                ),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 7,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.12),
+        ),
+        ListView(
+          padding: const EdgeInsets.fromLTRB(22, 18, 22, 122),
+          children: [
+            _TopBar(
+              textColor: text,
+              mutedColor: muted,
+              surface: surface,
+            ).animate().fadeIn(duration: 300.ms),
+            const SizedBox(height: 34),
+            Text(
+              'جاهز لدرس\nجديد اليوم؟',
+              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                    color: text,
+                    fontWeight: FontWeight.w900,
+                    height: 1.08,
+                    letterSpacing: -1.5,
                   ),
-                ),
-                child: const Text(
-                  'رياضيات • ثاني متوسط',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
+            )
+                .animate(delay: 70.ms)
+                .fadeIn(duration: 360.ms)
+                .slideY(begin: 0.10, end: 0),
+            const SizedBox(height: 10),
+            Text(
+              'ثاني متوسط • الرياضيات • ' + chapter.title,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: muted,
                     fontWeight: FontWeight.w700,
                   ),
+            ).animate(delay: 110.ms).fadeIn(),
+            const SizedBox(height: 28),
+            _ContinuePanel(
+              progress: progress,
+              lastLessonTitle: lastLessonTitle,
+              onContinue: onContinue,
+              onOpenCourse: onOpenCourse,
+            )
+                .animate(delay: 150.ms)
+                .fadeIn(duration: 420.ms)
+                .slideY(begin: 0.08, end: 0),
+            const SizedBox(height: 28),
+            _LearningPath(
+              progress: progress,
+              onCourse: onOpenCourse,
+              onQuiz: onQuiz,
+            ).animate(delay: 220.ms).fadeIn(duration: 400.ms),
+            const SizedBox(height: 28),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 6,
+                  child: _QuizTile(onTap: onQuiz),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Text(
-            hasLastLesson ? 'واصل من حيث توقفت' : 'مرحبًا بك في مداد',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 27,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.5,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            hasLastLesson
-                ? 'آخر درس فتحته: $lastLessonTitle'
-                : 'ابدأ أول درس، وافهم الفكرة ثم اختبر نفسك بخطوات قصيرة وواضحة.',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.82),
-              height: 1.65,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 22),
-          FilledButton.icon(
-            onPressed: onContinue,
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: AppColors.primaryDark,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 18,
-                vertical: 14,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-            icon: Icon(
-              hasLastLesson
-                  ? Icons.play_arrow_rounded
-                  : Icons.arrow_back_rounded,
-            ),
-            label: Text(
-              hasLastLesson ? 'أكمل التعلّم' : 'ابدأ الآن',
-              style: const TextStyle(fontWeight: FontWeight.w800),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.title,
-    required this.subtitle,
-    this.trailing,
-  });
-
-  final String title;
-  final String subtitle;
-  final String? trailing;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.3,
-                    ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colors.onSurfaceVariant,
-                    ),
-              ),
-            ],
+                const SizedBox(width: 14),
+                Expanded(
+                  flex: 5,
+                  child: Column(
+                    children: [
+                      _MistakesTile(
+                        count: mistakeCount,
+                        onTap: onMistakes,
+                        surface: surface,
+                        textColor: text,
+                        mutedColor: muted,
+                      ),
+                      const SizedBox(height: 14),
+                      _ProgressTile(
+                        progress: progress,
+                        completed: completed,
+                        total: total,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            )
+                .animate(delay: 300.ms)
+                .fadeIn(duration: 420.ms)
+                .slideY(begin: 0.08, end: 0),
+          ],
+        ),
+        Positioned(
+          left: 22,
+          right: 22,
+          bottom: 18,
+          child: _FloatingNav(
+            surface: surface,
+            onCourse: onOpenCourse,
+            onQuiz: onQuiz,
           ),
         ),
-        if (trailing != null)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: colors.secondaryContainer.withValues(alpha: 0.55),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(
-              trailing!,
-              style: TextStyle(
-                color: colors.onSecondaryContainer,
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
       ],
     );
   }
 }
 
-class _LearningGrid extends StatelessWidget {
-  const _LearningGrid({
-    required this.progress,
-    required this.mistakeCount,
-    required this.onOpenMath,
-    required this.onOpenQuiz,
-    required this.onReviewMistakes,
-    required this.onShowProgress,
+class _TopBar extends StatelessWidget {
+  const _TopBar({
+    required this.textColor,
+    required this.mutedColor,
+    required this.surface,
   });
 
-  final double progress;
-  final int mistakeCount;
-  final VoidCallback onOpenMath;
-  final VoidCallback onOpenQuiz;
-  final VoidCallback onReviewMistakes;
-  final VoidCallback onShowProgress;
+  final Color textColor;
+  final Color mutedColor;
+  final Color surface;
 
   @override
   Widget build(BuildContext context) {
-    final tasks = <_LearningTask>[
-      _LearningTask(
-        icon: Icons.calculate_rounded,
-        title: 'الرياضيات',
-        subtitle: 'الأعداد النسبية',
-        badge: 'ابدأ الآن',
-        enabled: true,
-        onTap: onOpenMath,
-      ),
-      _LearningTask(
-        icon: Icons.fact_check_outlined,
-        title: 'اختبر نفسك',
-        subtitle: '5 أسئلة مع شرح الإجابة',
-        badge: 'متاح',
-        enabled: true,
-        onTap: onOpenQuiz,
-      ),
-      _LearningTask(
-        icon: Icons.replay_rounded,
-        title: 'راجع أخطاءك',
-        subtitle: 'صحح الأسئلة التي أخطأت فيها',
-        badge: mistakeCount == 0 ? 'لا أخطاء' : '$mistakeCount أخطاء',
-        enabled: true,
-        onTap: onReviewMistakes,
-      ),
-      _LearningTask(
-        icon: Icons.insights_rounded,
-        title: 'تقدمك',
-        subtitle: 'نسبة الإتقان المحفوظة',
-        badge: '${(progress * 100).round()}%',
-        enabled: true,
-        onTap: onShowProgress,
-      ),
-    ];
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final columns = constraints.maxWidth >= 760 ? 4 : 2;
-        final ratio = constraints.maxWidth >= 760 ? 1.12 : 0.94;
-
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: tasks.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: columns,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: ratio,
-          ),
-          itemBuilder: (context, index) {
-            return _LearningTaskCard(task: tasks[index])
-                .animate(delay: (120 + index * 70).ms)
-                .fadeIn(duration: 380.ms)
-                .slideY(
-                  begin: 0.08,
-                  end: 0,
-                  duration: 380.ms,
-                  curve: Curves.easeOutCubic,
-                );
-          },
-        );
-      },
-    );
-  }
-}
-
-class _LearningTask {
-  const _LearningTask({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.badge,
-    required this.onTap,
-    this.enabled = false,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final String badge;
-  final VoidCallback onTap;
-  final bool enabled;
-}
-
-class _LearningTaskCard extends StatelessWidget {
-  const _LearningTaskCard({required this.task});
-
-  final _LearningTask task;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Material(
-      color: isDark ? AppColors.darkSurface : Colors.white,
-      borderRadius: BorderRadius.circular(22),
-      child: InkWell(
-        onTap: task.onTap,
-        borderRadius: BorderRadius.circular(22),
-        child: Container(
-          padding: const EdgeInsets.all(16),
+    return Row(
+      children: [
+        Container(
+          width: 48,
+          height: 48,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.07)
-                  : const Color(0xFFE4EAE6),
+            color: AppColors.primary,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: const Text(
+            'م',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: task.enabled
-                          ? colors.primaryContainer
-                          : colors.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(
-                      task.icon,
-                      size: 21,
-                      color: task.enabled
-                          ? colors.onPrimaryContainer
-                          : colors.onSurfaceVariant,
-                    ),
+        ),
+        const SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'مِداد',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: textColor,
+                    fontWeight: FontWeight.w900,
                   ),
-                  const Spacer(),
-                  Text(
-                    task.badge,
-                    style: TextStyle(
-                      color: task.enabled
-                          ? colors.primary
-                          : colors.onSurfaceVariant,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                    ),
+            ),
+            Text(
+              'رحلتك الدراسية',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: mutedColor,
                   ),
-                ],
-              ),
-              const Spacer(),
-              Text(
-                task.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w900,
-                    ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                task.subtitle,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colors.onSurfaceVariant,
-                      height: 1.45,
-                    ),
-              ),
-            ],
+            ),
+          ],
+        ),
+        const Spacer(),
+        Container(
+          decoration: BoxDecoration(
+            color: surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: mutedColor.withValues(alpha: 0.14),
+            ),
+          ),
+          child: IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.notifications_none_rounded, color: textColor),
           ),
         ),
-      ),
+      ],
     );
   }
 }
 
-class _ProgressCard extends StatelessWidget {
-  const _ProgressCard({
-    required this.chapterTitle,
+class _ContinuePanel extends StatelessWidget {
+  const _ContinuePanel({
     required this.progress,
-    required this.completed,
-    required this.total,
     required this.lastLessonTitle,
+    required this.onContinue,
+    required this.onOpenCourse,
   });
 
-  final String chapterTitle;
   final double progress;
-  final int completed;
-  final int total;
   final String? lastLessonTitle;
+  final VoidCallback onContinue;
+  final VoidCallback onOpenCourse;
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final percent = (progress * 100).round();
 
     return Container(
+      constraints: const BoxConstraints(minHeight: 230),
+      decoration: BoxDecoration(
+        color: AppColors.primaryDark,
+        borderRadius: BorderRadius.circular(32),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          PositionedDirectional(
+            end: -30,
+            top: -18,
+            child: Container(
+              width: 170,
+              height: 170,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.secondary,
+              ),
+            ),
+          ),
+          PositionedDirectional(
+            end: 42,
+            bottom: -54,
+            child: Transform.rotate(
+              angle: -0.24,
+              child: Container(
+                width: 150,
+                height: 150,
+                decoration: BoxDecoration(
+                  color: AppColors.accent,
+                  borderRadius: BorderRadius.circular(42),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 7,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'واصل من حيث توقفت',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        lastLessonTitle ?? 'الأعداد النسبية',
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1.2,
+                                ),
+                      ),
+                      const SizedBox(height: 18),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(99),
+                              child: LinearProgressIndicator(
+                                value: progress,
+                                minHeight: 8,
+                                backgroundColor: Colors.white24,
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                  AppColors.secondary,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            '$percent%',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 22),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          FilledButton(
+                            onPressed: onContinue,
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: AppColors.primaryDark,
+                            ),
+                            child: const Text(
+                              'متابعة الدرس',
+                              style: TextStyle(fontWeight: FontWeight.w900),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: onOpenCourse,
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text('عرض الفصل'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(flex: 2),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LearningPath extends StatelessWidget {
+  const _LearningPath({
+    required this.progress,
+    required this.onCourse,
+    required this.onQuiz,
+  });
+
+  final double progress;
+  final VoidCallback onCourse;
+  final VoidCallback onQuiz;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final text = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final muted =
+        isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+
+    final steps = [
+      _PathStep('افهم', Icons.menu_book_rounded, true, onCourse),
+      _PathStep('جرّب', Icons.edit_rounded, progress > 0, onCourse),
+      _PathStep('اختبر', Icons.bolt_rounded, progress >= 1, onQuiz),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'مسار اليوم',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: text,
+                fontWeight: FontWeight.w900,
+              ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'ثلاث خطوات قصيرة بدل جلسة طويلة.',
+          style: TextStyle(color: muted),
+        ),
+        const SizedBox(height: 18),
+        Row(
+          children: List.generate(steps.length * 2 - 1, (index) {
+            if (index.isOdd) {
+              return Expanded(
+                child: Container(
+                  height: 2,
+                  color: AppColors.primary.withValues(alpha: 0.18),
+                ),
+              );
+            }
+            return _PathNode(step: steps[index ~/ 2]);
+          }),
+        ),
+      ],
+    );
+  }
+}
+
+class _PathStep {
+  const _PathStep(this.label, this.icon, this.done, this.onTap);
+
+  final String label;
+  final IconData icon;
+  final bool done;
+  final VoidCallback onTap;
+}
+
+class _PathNode extends StatelessWidget {
+  const _PathNode({required this.step});
+
+  final _PathStep step;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return InkWell(
+      onTap: step.onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Column(
+        children: [
+          Container(
+            width: 54,
+            height: 54,
+            decoration: BoxDecoration(
+              color: step.done ? AppColors.primary : colors.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: step.done
+                    ? AppColors.primary
+                    : colors.outlineVariant,
+              ),
+            ),
+            child: Icon(
+              step.done ? Icons.check_rounded : step.icon,
+              color: step.done ? Colors.white : colors.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            step.label,
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _QuizTile extends StatelessWidget {
+  const _QuizTile({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(28),
+      child: Container(
+        height: 290,
+        padding: const EdgeInsets.all(22),
+        decoration: BoxDecoration(
+          color: AppColors.secondary,
+          borderRadius: BorderRadius.circular(28),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(
+              Icons.bolt_rounded,
+              size: 34,
+              color: AppColors.primaryDark,
+            ),
+            const Spacer(),
+            Text(
+              'اختبار\nسريع',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    color: AppColors.primaryDark,
+                    fontWeight: FontWeight.w900,
+                    height: 1.0,
+                  ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              '5 أسئلة • مع شرح لكل إجابة',
+              style: TextStyle(
+                color: AppColors.primaryDark,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MistakesTile extends StatelessWidget {
+  const _MistakesTile({
+    required this.count,
+    required this.onTap,
+    required this.surface,
+    required this.textColor,
+    required this.mutedColor,
+  });
+
+  final int count;
+  final VoidCallback onTap;
+  final Color surface;
+  final Color textColor;
+  final Color mutedColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(24),
+      child: Container(
+        height: 138,
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: mutedColor.withValues(alpha: 0.14)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.refresh_rounded, color: AppColors.accent),
+            const Spacer(),
+            Text(
+              count == 0 ? 'لا أخطاء' : '$count أخطاء',
+              style: TextStyle(
+                color: textColor,
+                fontSize: 19,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            Text('للمراجعة', style: TextStyle(color: mutedColor)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProgressTile extends StatelessWidget {
+  const _ProgressTile({
+    required this.progress,
+    required this.completed,
+    required this.total,
+  });
+
+  final double progress;
+  final int completed;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    final percent = (progress * 100).round();
+
+    return Container(
+      height: 138,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.07)
-              : const Color(0xFFE4EAE6),
-        ),
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
         children: [
           SizedBox(
-            width: 62,
-            height: 62,
+            width: 58,
+            height: 58,
             child: Stack(
               alignment: Alignment.center,
               children: [
                 CircularProgressIndicator(
                   value: progress,
-                  strokeWidth: 7,
-                  strokeCap: StrokeCap.round,
-                  backgroundColor: colors.surfaceContainerHighest,
-                  color: progress >= 1 ? Colors.green : colors.primary,
+                  strokeWidth: 6,
+                  backgroundColor: Colors.white24,
+                  valueColor:
+                      const AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
                 Text(
                   '$percent%',
-                  style: TextStyle(
-                    color: colors.onSurface,
-                    fontSize: 12,
+                  style: const TextStyle(
+                    color: Colors.white,
                     fontWeight: FontWeight.w900,
+                    fontSize: 11,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  chapterTitle,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w900,
-                      ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  '$completed من $total درس مكتمل',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: colors.primary,
-                        fontWeight: FontWeight.w800,
-                      ),
-                ),
-                if (lastLessonTitle != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    'آخر درس: $lastLessonTitle',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colors.onSurfaceVariant,
-                        ),
-                  ),
-                ],
-              ],
+            child: Text(
+              '$completed من $total\nمكتمل',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                height: 1.35,
+              ),
             ),
-          ),
-          Icon(
-            progress >= 1
-                ? Icons.verified_rounded
-                : Icons.arrow_back_ios_new_rounded,
-            size: progress >= 1 ? 22 : 16,
-            color: progress >= 1 ? Colors.green : colors.onSurfaceVariant,
           ),
         ],
       ),
@@ -758,73 +775,214 @@ class _ProgressCard extends StatelessWidget {
   }
 }
 
-class _HomeSkeleton extends StatelessWidget {
-  const _HomeSkeleton({super.key});
+class _FloatingNav extends StatelessWidget {
+  const _FloatingNav({
+    required this.surface,
+    required this.onCourse,
+    required this.onQuiz,
+  });
+
+  final Color surface;
+  final VoidCallback onCourse;
+  final VoidCallback onQuiz;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 72,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: surface.withValues(alpha: 0.96),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.10),
+            blurRadius: 28,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _NavItem(
+              icon: Icons.home_rounded,
+              label: 'الرئيسية',
+              active: true,
+              onTap: () {},
+            ),
+          ),
+          Expanded(
+            child: _NavItem(
+              icon: Icons.route_rounded,
+              label: 'المسار',
+              onTap: onCourse,
+            ),
+          ),
+          Expanded(
+            child: _NavItem(
+              icon: Icons.bolt_rounded,
+              label: 'اختبر',
+              onTap: onQuiz,
+            ),
+          ),
+          Expanded(
+            child: _NavItem(
+              icon: Icons.bar_chart_rounded,
+              label: 'تقدمي',
+              onTap: () {},
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.active = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 9),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 21,
+              color: active ? AppColors.primary : colors.onSurfaceVariant,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: active ? FontWeight.w900 : FontWeight.w700,
+                color: active ? AppColors.primary : colors.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CanvasDotsPainter extends CustomPainter {
+  const _CanvasDotsPainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = color;
+    const gap = 24.0;
+    for (double y = 10; y < size.height; y += gap) {
+      for (double x = 10; x < size.width; x += gap) {
+        canvas.drawCircle(Offset(x, y), 1.1, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _CanvasDotsPainter oldDelegate) {
+    return oldDelegate.color != color;
+  }
+}
+
+class _StudySkeleton extends StatelessWidget {
+  const _StudySkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final base = isDark ? const Color(0xFF1D2623) : const Color(0xFFE6EBE8);
+    final base =
+        isDark ? const Color(0xFF20212C) : const Color(0xFFE2DED6);
     final highlight =
-        isDark ? const Color(0xFF2C3935) : const Color(0xFFF6F8F7);
+        isDark ? const Color(0xFF30313F) : const Color(0xFFF7F4EE);
 
     return Shimmer.fromColors(
       baseColor: base,
       highlightColor: highlight,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(18, 10, 18, 32),
+        padding: const EdgeInsets.fromLTRB(22, 18, 22, 110),
         children: const [
-          _SkeletonBox(height: 208, radius: 28),
-          SizedBox(height: 26),
-          _SkeletonBox(height: 22, widthFactor: 0.42),
-          SizedBox(height: 14),
           Row(
             children: [
-              Expanded(child: _SkeletonBox(height: 150, radius: 22)),
+              _Skeleton(width: 48, height: 48, radius: 14),
               SizedBox(width: 12),
-              Expanded(child: _SkeletonBox(height: 150, radius: 22)),
+              _Skeleton(width: 110, height: 42, radius: 10),
             ],
           ),
-          SizedBox(height: 12),
+          SizedBox(height: 34),
+          _Skeleton(height: 90, radius: 18),
+          SizedBox(height: 28),
+          _Skeleton(height: 230, radius: 32),
+          SizedBox(height: 28),
+          _Skeleton(height: 116, radius: 24),
+          SizedBox(height: 28),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: _SkeletonBox(height: 150, radius: 22)),
-              SizedBox(width: 12),
-              Expanded(child: _SkeletonBox(height: 150, radius: 22)),
+              Expanded(
+                flex: 6,
+                child: _Skeleton(height: 290, radius: 28),
+              ),
+              SizedBox(width: 14),
+              Expanded(
+                flex: 5,
+                child: Column(
+                  children: [
+                    _Skeleton(height: 138, radius: 24),
+                    SizedBox(height: 14),
+                    _Skeleton(height: 138, radius: 24),
+                  ],
+                ),
+              ),
             ],
           ),
-          SizedBox(height: 26),
-          _SkeletonBox(height: 22, widthFactor: 0.32),
-          SizedBox(height: 14),
-          _SkeletonBox(height: 98, radius: 22),
         ],
       ),
     );
   }
 }
 
-class _SkeletonBox extends StatelessWidget {
-  const _SkeletonBox({
+class _Skeleton extends StatelessWidget {
+  const _Skeleton({
     required this.height,
-    this.radius = 14,
-    this.widthFactor = 1,
+    this.width = double.infinity,
+    this.radius = 18,
   });
 
   final double height;
+  final double width;
   final double radius;
-  final double widthFactor;
 
   @override
   Widget build(BuildContext context) {
-    return FractionallySizedBox(
-      widthFactor: widthFactor,
-      alignment: AlignmentDirectional.centerStart,
-      child: Container(
-        height: height,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(radius),
-        ),
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(radius),
       ),
     );
   }
