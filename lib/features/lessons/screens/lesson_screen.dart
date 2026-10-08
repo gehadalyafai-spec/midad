@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../../app/theme/app_theme.dart';
 import '../../../services/progress_service.dart';
+import '../../curriculum/data/grade2_math_data.dart';
 import '../../curriculum/models/curriculum_models.dart';
 import '../../quizzes/data/grade2_math_quiz_registry.dart';
 import '../../quizzes/screens/quiz_screen.dart';
@@ -70,6 +71,53 @@ class _LessonScreenState extends State<LessonScreen> {
     });
   }
 
+  Lesson? _nextLessonInCourse() {
+    for (var chapterIndex = 0;
+        chapterIndex < grade2MathChapters.length;
+        chapterIndex++) {
+      final lessons = grade2MathChapters[chapterIndex]
+          .lessons
+          .where((lesson) => lesson.isAvailable)
+          .toList();
+
+      final lessonIndex =
+          lessons.indexWhere((lesson) => lesson.id == widget.lesson.id);
+
+      if (lessonIndex == -1) continue;
+
+      if (lessonIndex < lessons.length - 1) {
+        return lessons[lessonIndex + 1];
+      }
+
+      if (chapterIndex < grade2MathChapters.length - 1) {
+        final nextChapterLessons = grade2MathChapters[chapterIndex + 1]
+            .lessons
+            .where((lesson) => lesson.isAvailable)
+            .toList();
+
+        if (nextChapterLessons.isNotEmpty) {
+          return nextChapterLessons.first;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  Future<void> _openNextLesson() async {
+    final nextLesson = _nextLessonInCourse();
+    if (nextLesson == null) {
+      Navigator.of(context).pop();
+      return;
+    }
+
+    await Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(
+        builder: (_) => LessonScreen(lesson: nextLesson),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final lessonData = lessonContentForGrade2Math(widget.lesson.id);
@@ -78,6 +126,7 @@ class _LessonScreenState extends State<LessonScreen> {
     final muted =
         isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
     final paper = isDark ? AppColors.darkSurface : const Color(0xFFFFFDF8);
+    final nextLesson = _nextLessonInCourse();
 
     return Scaffold(
       body: SafeArea(
@@ -233,7 +282,9 @@ class _LessonScreenState extends State<LessonScreen> {
               bottom: 18,
               child: _LessonActionBar(
                 completed: _isCompleted,
+                hasNextLesson: nextLesson != null,
                 onQuiz: _openQuiz,
+                onNext: _openNextLesson,
               ),
             ),
           ],
@@ -754,11 +805,15 @@ class _CompletedNote extends StatelessWidget {
 class _LessonActionBar extends StatelessWidget {
   const _LessonActionBar({
     required this.completed,
+    required this.hasNextLesson,
     required this.onQuiz,
+    required this.onNext,
   });
 
   final bool completed;
+  final bool hasNextLesson;
   final VoidCallback onQuiz;
+  final VoidCallback onNext;
 
   @override
   Widget build(BuildContext context) {
@@ -780,24 +835,43 @@ class _LessonActionBar extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              completed ? 'أتقنت الدرس' : 'جاهز للاختبار؟',
+              completed
+                  ? (hasNextLesson ? 'جاهز للخطوة التالية؟' : 'أكملت المسار')
+                  : 'جاهز للاختبار؟',
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w900,
               ),
             ),
           ),
+          if (completed) ...[
+            IconButton(
+              onPressed: onQuiz,
+              tooltip: 'إعادة الاختبار',
+              icon: const Icon(
+                Icons.replay_rounded,
+                color: Colors.white70,
+              ),
+            ),
+            const SizedBox(width: 4),
+          ],
           FilledButton.icon(
-            onPressed: onQuiz,
+            onPressed: completed ? onNext : onQuiz,
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.secondary,
               foregroundColor: AppColors.primaryDark,
             ),
             icon: Icon(
-              completed ? Icons.replay_rounded : Icons.bolt_rounded,
+              completed
+                  ? (hasNextLesson
+                      ? Icons.arrow_back_rounded
+                      : Icons.flag_rounded)
+                  : Icons.bolt_rounded,
             ),
             label: Text(
-              completed ? 'أعد الاختبار' : 'ابدأ',
+              completed
+                  ? (hasNextLesson ? 'الدرس التالي' : 'إنهاء')
+                  : 'ابدأ',
               style: const TextStyle(fontWeight: FontWeight.w900),
             ),
           ),
