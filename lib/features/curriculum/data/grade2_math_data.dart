@@ -57,4 +57,19 @@ const grade2MathChapters = <Chapter>[
       Lesson(id: 'percent-change', title: 'التغير المئوي', subtitle: 'حساب الزيادة والنقصان كنسبة من القيمة الأصلية.'),
     ],
   ),
+  Chapter(
+    id: 'geometry-spatial-reasoning',
+    title: 'الهندسة والاستدلال المكاني',
+    subtitle: 'الزوايا والمضلعات والتطابق والتحويلات الهندسية.',
+    lessons: [
+      Lesson(id: 'angles-lines', title: 'علاقات الزوايا والمستقيمات', subtitle: 'فهم التوازي والتعامد وعلاقات الزوايا.'),
+      Lesson(id: 'logical-reasoning', title: 'استراتيجية حل المسألة: التبرير المنطقي', subtitle: 'بناء استنتاجات صحيحة من المعطيات والقواعد.'),
+      Lesson(id: 'polygons-angles', title: 'المضلعات والزوايا', subtitle: 'إيجاد مجموع الزوايا الداخلية للمضلعات.'),
+      Lesson(id: 'congruent-polygons', title: 'تطابق المضلعات', subtitle: 'مطابقة الأضلاع والزوايا المتناظرة.'),
+      Lesson(id: 'symmetry', title: 'التماثل', subtitle: 'التعرف على محاور التماثل في الأشكال.'),
+      Lesson(id: 'reflection', title: 'الانعكاس', subtitle: 'إنشاء صورة مرآة على المستوى الإحداثي.'),
+      Lesson(id: 'translation', title: 'الانسحاب', subtitle: 'تحريك الأشكال بمقدار واتجاه ثابتين.'),
+      Lesson(id: 'rotation', title: 'الدوران', subtitle: 'تدوير الأشكال حول مركز وبزاوية محددة.'),
+    ],
+  ),
 ];
