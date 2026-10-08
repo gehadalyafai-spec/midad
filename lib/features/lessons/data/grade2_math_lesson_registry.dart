@@ -1,3 +1,4 @@
+import 'equations_inequalities_lesson_content.dart';
 import 'geometry_lesson_content.dart';
 import 'grade2_math_lesson_content.dart';
 import 'measurement_lesson_content.dart';
@@ -31,6 +32,9 @@ LessonContent lessonContentForGrade2Math(String lessonId) {
 
   final measurement = measurementLessonContent[lessonId];
   if (measurement != null) return measurement;
+
+  final equations = equationsInequalitiesLessonContent[lessonId];
+  if (equations != null) return equations;
 
   throw StateError('No lesson content registered for $lessonId');
 }
