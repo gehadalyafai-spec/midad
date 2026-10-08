@@ -35,13 +35,11 @@ const grade2MathChapters = <Chapter>[
         id: 'powers',
         title: 'القوى والأسس',
         subtitle: 'فهم الأساس والأس والتعبير بالقوى.',
-        isAvailable: false,
       ),
       Lesson(
         id: 'scientific-notation',
         title: 'الصيغة العلمية',
         subtitle: 'كتابة الأعداد الكبيرة والصغيرة بصورة مختصرة.',
-        isAvailable: false,
       ),
     ],
   ),
