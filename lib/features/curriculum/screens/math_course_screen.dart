@@ -220,7 +220,7 @@ class _CourseSummary extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${percent}%',
+                  '$percent%',
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w900,
@@ -245,7 +245,7 @@ class _CourseSummary extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  '${completed} من ${total} درسًا',
+                  '$completed من $total درسًا',
                   style: const TextStyle(
                     color: Colors.white70,
                     fontWeight: FontWeight.w700,
