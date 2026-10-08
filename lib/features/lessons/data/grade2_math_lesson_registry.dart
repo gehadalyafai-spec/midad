@@ -1,4 +1,5 @@
 import 'grade2_math_lesson_content.dart';
+import 'percent_lesson_content.dart';
 import 'proportions_lesson_content.dart';
 import 'real_numbers_lesson_content.dart';
 
@@ -11,6 +12,9 @@ LessonContent lessonContentForGrade2Math(String lessonId) {
 
   final proportions = proportionsLessonContent[lessonId];
   if (proportions != null) return proportions;
+
+  final percent = percentLessonContent[lessonId];
+  if (percent != null) return percent;
 
   throw StateError('No lesson content registered for $lessonId');
 }
