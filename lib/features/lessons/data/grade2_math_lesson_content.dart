@@ -80,6 +80,48 @@ const grade2MathLessonContent = <String, LessonContent>{
     practiceFeedback:
         'صحيح: -3/4 يقع إلى يسار -1/4 على خط الأعداد، ولذلك هو أصغر.',
   ),
+  'multiply-rational': LessonContent(
+    conceptLabel: 'قاعدة الإشارات',
+    conceptMain: 'نفس الإشارة = موجب',
+    conceptHint: 'مختلفتان = سالب',
+    sectionOneTitle: 'الفكرة الأساسية',
+    sectionOneBody:
+        'لضرب عددين نسبيين نضرب البسطين معًا والمقامين معًا، ثم نبسّط الناتج. وتُحدد إشارة الناتج من إشارات العددين.',
+    sectionTwoTitle: 'كيف أحدد الإشارة؟',
+    sectionTwoBody:
+        'إذا كانت الإشارتان متماثلتين فالناتج موجب، وإذا كانتا مختلفتين فالناتج سالب. بعد ذلك نفذ الضرب كالمعتاد ثم بسّط الكسر.',
+    exampleFormula: '(-2/3) × (3/5) = -2/5',
+    exampleBody:
+        'الإشارتان مختلفتان إذن الناتج سالب. نضرب 2×3=6 و3×5=15 فنحصل على -6/15، وبالتبسيط يساوي -2/5.',
+    warning:
+        'لا تجمع البسطين أو المقامين عند الضرب. في الضرب نضرب بسطًا في بسط ومقامًا في مقام.',
+    practiceQuestion: 'ما ناتج (-3/4) × (2/5)؟',
+    practiceOptions: ['-6/20', '6/9', '-5/8', '6/20'],
+    practiceCorrectIndex: 0,
+    practiceFeedback:
+        'صحيح: الإشارتان مختلفتان فالناتج سالب، و3×2=6 و4×5=20، أي -6/20 ويمكن تبسيطه إلى -3/10.',
+  ),
+  'divide-rational': LessonContent(
+    conceptLabel: 'قاعدة القسمة',
+    conceptMain: 'اقلب واضرب',
+    conceptHint: 'مقلوب المقسوم عليه',
+    sectionOneTitle: 'الفكرة الأساسية',
+    sectionOneBody:
+        'لقسمة عدد نسبي على عدد نسبي آخر غير الصفر، نضرب العدد الأول في مقلوب العدد الثاني.',
+    sectionTwoTitle: 'كيف أطبقها؟',
+    sectionTwoBody:
+        'ثبت الكسر الأول، وحوّل القسمة إلى ضرب، ثم اقلب الكسر الثاني. بعدها طبق قواعد ضرب الأعداد النسبية وبسّط الناتج.',
+    exampleFormula: '(2/3) ÷ (-4/5) = -5/6',
+    exampleBody:
+        'نحوّل القسمة إلى ضرب: 2/3 × (-5/4) = -10/12، وبالتبسيط نحصل على -5/6.',
+    warning:
+        'لا يجوز القسمة على صفر، ولا تنس قلب الكسر الثاني فقط عند تحويل القسمة إلى ضرب.',
+    practiceQuestion: 'ما ناتج (3/7) ÷ (2/5)؟',
+    practiceOptions: ['6/35', '15/14', '14/15', '5/21'],
+    practiceCorrectIndex: 1,
+    practiceFeedback:
+        'صحيح: 3/7 ÷ 2/5 تصبح 3/7 × 5/2، والناتج 15/14.',
+  ),
 };
 
 LessonContent lessonContentFor(String lessonId) {
