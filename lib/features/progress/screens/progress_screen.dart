@@ -135,9 +135,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                           Expanded(
                             child: _MiniMetric(
                               label: 'فصول مكتملة',
-                              value: completedChapters.toString() +
-                                  '/' +
-                                  grade2MathChapters.length.toString(),
+                              value: '$completedChapters/${grade2MathChapters.length}',
                               icon: Icons.flag_rounded,
                               accent: AppColors.secondary,
                               surface: surface,
@@ -256,7 +254,7 @@ class _MasteryHero extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      percent.toString() + '%',
+                      '$percent%',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 25,
@@ -291,10 +289,7 @@ class _MasteryHero extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  completedLessons.toString() +
-                      ' من ' +
-                      totalLessons.toString() +
-                      ' درسًا مكتملًا',
+                  '$completedLessons من $totalLessons درسًا مكتملًا',
                   style: const TextStyle(
                     color: Colors.white70,
                     height: 1.5,
@@ -423,7 +418,7 @@ class _ChapterMilestone extends StatelessWidget {
     final status = complete
         ? 'مكتمل'
         : unlocked
-            ? completed.toString() + ' من ' + total.toString() + ' دروس'
+            ? '$completed من $total دروس'
             : 'مقفول';
 
     return Row(
@@ -453,7 +448,7 @@ class _ChapterMilestone extends StatelessWidget {
                       )
                     : unlocked
                         ? Text(
-                            (index + 1).toString(),
+                            '${index + 1}',
                             style: const TextStyle(
                               color: AppColors.primaryDark,
                               fontWeight: FontWeight.w900,
@@ -512,7 +507,7 @@ class _ChapterMilestone extends StatelessWidget {
                     const Spacer(),
                     if (unlocked)
                       Text(
-                        (progress * 100).round().toString() + '%',
+                        '${(progress * 100).round()}%',
                         style: TextStyle(
                           color: complete ? AppColors.primary : mutedColor,
                           fontSize: 11,
