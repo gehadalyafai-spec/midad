@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import '../../../app/theme/app_theme.dart';
 import '../../../services/progress_service.dart';
 import '../../curriculum/models/curriculum_models.dart';
 import '../models/quiz_question.dart';
@@ -104,108 +105,201 @@ class _QuizScreenState extends State<QuizScreen> {
       );
     }
 
-    final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final text = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final muted =
+        isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+    final surface = isDark ? AppColors.darkSurface : const Color(0xFFFFFDF8);
     final progress = (_currentIndex + 1) / widget.questions.length;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('اختبر نفسك')),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
+        child: Column(
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(99),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 8,
-                      backgroundColor: colors.surfaceContainerHighest,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
+              child: _QuizTopBar(
+                current: _currentIndex + 1,
+                total: widget.questions.length,
+                progress: progress,
+                textColor: text,
+                mutedColor: muted,
+                surface: surface,
+                onClose: () => Navigator.of(context).pop(),
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(20, 28, 20, 120),
+                children: [
+                  Text(
+                    'ركّز في هذا السؤال',
+                    style: const TextStyle(
+                      color: AppColors.accent,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 13,
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  '${_currentIndex + 1}/${widget.questions.length}',
-                  style: TextStyle(
-                    color: colors.onSurfaceVariant,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 26),
-            Text(
-              widget.lesson.title,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: colors.primary,
-                    fontWeight: FontWeight.w800,
-                  ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              _question.question,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    height: 1.45,
-                  ),
-            ),
-            const SizedBox(height: 24),
-            ...List.generate(_question.options.length, (index) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _OptionCard(
-                  index: index,
-                  text: _question.options[index],
-                  selected: _selectedIndex == index,
-                  answered: _answered,
-                  correctIndex: _question.correctIndex,
-                  onTap: () => _selectOption(index),
-                )
-                    .animate(delay: (index * 45).ms)
-                    .fadeIn(duration: 260.ms)
-                    .slideY(begin: 0.05, end: 0),
-              );
-            }),
-            if (_answered) ...[
-              const SizedBox(height: 8),
-              _ExplanationCard(
-                isCorrect: _selectedIndex == _question.correctIndex,
-                explanation: _question.explanation,
-              ).animate().fadeIn(duration: 260.ms),
-            ],
-            const SizedBox(height: 24),
-            FilledButton(
-              onPressed: _answered
-                  ? _next
-                  : (_selectedIndex == null ? null : _checkAnswer),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                child: Text(
-                  _answered
-                      ? (_currentIndex == widget.questions.length - 1
-                          ? 'عرض النتيجة'
-                          : 'السؤال التالي')
-                      : 'تحقق من الإجابة',
-                  style: const TextStyle(fontWeight: FontWeight.w900),
-                ),
+                  const SizedBox(height: 10),
+                  Text(
+                    _question.question,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          color: text,
+                          fontWeight: FontWeight.w900,
+                          height: 1.35,
+                          letterSpacing: -0.5,
+                        ),
+                  )
+                      .animate(key: ValueKey(_currentIndex))
+                      .fadeIn(duration: 300.ms)
+                      .slideY(begin: 0.07, end: 0),
+                  const SizedBox(height: 28),
+                  ...List.generate(_question.options.length, (index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 13),
+                      child: _FocusOption(
+                        index: index,
+                        text: _question.options[index],
+                        selected: _selectedIndex == index,
+                        answered: _answered,
+                        correctIndex: _question.correctIndex,
+                        surface: surface,
+                        textColor: text,
+                        mutedColor: muted,
+                        onTap: () => _selectOption(index),
+                      )
+                          .animate(
+                            key: ValueKey('q$_currentIndex-o$index'),
+                            delay: (index * 55).ms,
+                          )
+                          .fadeIn(duration: 260.ms)
+                          .slideX(begin: 0.05, end: 0),
+                    );
+                  }),
+                  if (_answered) ...[
+                    const SizedBox(height: 10),
+                    _AnswerExplanation(
+                      correct: _selectedIndex == _question.correctIndex,
+                      text: _question.explanation,
+                      surface: surface,
+                      textColor: text,
+                      mutedColor: muted,
+                    ).animate().fadeIn(duration: 250.ms),
+                  ],
+                ],
               ),
             ),
           ],
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(20, 8, 20, 18),
+        child: FilledButton(
+          onPressed: _answered
+              ? _next
+              : (_selectedIndex == null ? null : _checkAnswer),
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.primaryDark,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: muted.withValues(alpha: 0.16),
+            disabledForegroundColor: muted,
+            minimumSize: const Size.fromHeight(58),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          child: Text(
+            _answered
+                ? (_currentIndex == widget.questions.length - 1
+                    ? 'عرض النتيجة'
+                    : 'السؤال التالي')
+                : 'تحقق من الإجابة',
+            style: const TextStyle(
+              fontWeight: FontWeight.w900,
+              fontSize: 15,
+            ),
+          ),
         ),
       ),
     );
   }
 }
 
-class _OptionCard extends StatelessWidget {
-  const _OptionCard({
+class _QuizTopBar extends StatelessWidget {
+  const _QuizTopBar({
+    required this.current,
+    required this.total,
+    required this.progress,
+    required this.textColor,
+    required this.mutedColor,
+    required this.surface,
+    required this.onClose,
+  });
+
+  final int current;
+  final int total;
+  final double progress;
+  final Color textColor;
+  final Color mutedColor;
+  final Color surface;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Material(
+              color: surface,
+              borderRadius: BorderRadius.circular(14),
+              child: InkWell(
+                onTap: onClose,
+                borderRadius: BorderRadius.circular(14),
+                child: SizedBox(
+                  width: 44,
+                  height: 44,
+                  child: Icon(Icons.close_rounded, color: textColor),
+                ),
+              ),
+            ),
+            const Spacer(),
+            Text(
+              '$current / $total',
+              style: TextStyle(
+                color: textColor,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 18),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(99),
+          child: LinearProgressIndicator(
+            value: progress,
+            minHeight: 7,
+            backgroundColor: mutedColor.withValues(alpha: 0.14),
+            valueColor: const AlwaysStoppedAnimation<Color>(
+              AppColors.secondary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _FocusOption extends StatelessWidget {
+  const _FocusOption({
     required this.index,
     required this.text,
     required this.selected,
     required this.answered,
     required this.correctIndex,
+    required this.surface,
+    required this.textColor,
+    required this.mutedColor,
     required this.onTap,
   });
 
@@ -214,77 +308,93 @@ class _OptionCard extends StatelessWidget {
   final bool selected;
   final bool answered;
   final int correctIndex;
+  final Color surface;
+  final Color textColor;
+  final Color mutedColor;
   final VoidCallback onTap;
 
-  static const _labels = ['أ', 'ب', 'ج', 'د'];
+  static const labels = ['أ', 'ب', 'ج', 'د'];
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     final isCorrect = index == correctIndex;
-    final isWrongSelection = answered && selected && !isCorrect;
+    final wrongSelected = answered && selected && !isCorrect;
 
-    Color borderColor = colors.outlineVariant;
-    Color backgroundColor = colors.surface;
+    Color background = surface;
+    Color border = mutedColor.withValues(alpha: 0.15);
+    Color badge = mutedColor.withValues(alpha: 0.10);
+    Color badgeText = textColor;
 
     if (answered && isCorrect) {
-      borderColor = Colors.green;
-      backgroundColor = Colors.green.withValues(alpha: 0.08);
-    } else if (isWrongSelection) {
-      borderColor = colors.error;
-      backgroundColor = colors.error.withValues(alpha: 0.08);
+      background = AppColors.primary.withValues(alpha: 0.10);
+      border = AppColors.primary;
+      badge = AppColors.primary;
+      badgeText = Colors.white;
+    } else if (wrongSelected) {
+      background = AppColors.accent.withValues(alpha: 0.10);
+      border = AppColors.accent;
+      badge = AppColors.accent;
+      badgeText = Colors.white;
     } else if (selected) {
-      borderColor = colors.primary;
-      backgroundColor = colors.primaryContainer.withValues(alpha: 0.35);
+      background = AppColors.secondary.withValues(alpha: 0.24);
+      border = AppColors.secondary;
+      badge = AppColors.secondary;
+      badgeText = AppColors.primaryDark;
     }
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: answered ? null : onTap,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(22),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(17),
           decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: borderColor, width: selected ? 1.6 : 1),
+            color: background,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: border, width: selected ? 1.8 : 1),
           ),
           child: Row(
             children: [
-              Container(
-                width: 34,
-                height: 34,
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                width: 40,
+                height: 40,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: selected
-                      ? colors.primary.withValues(alpha: 0.12)
-                      : colors.surfaceContainerHighest,
+                  color: badge,
+                  borderRadius: BorderRadius.circular(13),
                 ),
                 child: Text(
-                  _labels[index],
+                  labels[index],
                   style: TextStyle(
-                    color: colors.onSurface,
+                    color: badgeText,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               Expanded(
                 child: Text(
                   text,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                    height: 1.4,
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.w800,
+                    height: 1.45,
                   ),
                 ),
               ),
               if (answered && isCorrect)
-                const Icon(Icons.check_circle_rounded, color: Colors.green),
-              if (isWrongSelection)
-                Icon(Icons.cancel_rounded, color: colors.error),
+                const Icon(
+                  Icons.check_circle_rounded,
+                  color: AppColors.primary,
+                ),
+              if (wrongSelected)
+                const Icon(
+                  Icons.cancel_rounded,
+                  color: AppColors.accent,
+                ),
             ],
           ),
         ),
@@ -293,42 +403,50 @@ class _OptionCard extends StatelessWidget {
   }
 }
 
-class _ExplanationCard extends StatelessWidget {
-  const _ExplanationCard({
-    required this.isCorrect,
-    required this.explanation,
+class _AnswerExplanation extends StatelessWidget {
+  const _AnswerExplanation({
+    required this.correct,
+    required this.text,
+    required this.surface,
+    required this.textColor,
+    required this.mutedColor,
   });
 
-  final bool isCorrect;
-  final String explanation;
+  final bool correct;
+  final String text;
+  final Color surface;
+  final Color textColor;
+  final Color mutedColor;
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final accent = isCorrect ? Colors.green : colors.error;
+    final accent = correct ? AppColors.primary : AppColors.accent;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.07),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: accent.withValues(alpha: 0.25)),
+        color: surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border(
+          right: BorderSide(color: accent, width: 5),
+        ),
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            isCorrect ? Icons.check_circle_outline : Icons.info_outline_rounded,
-            color: accent,
+          Text(
+            correct ? 'إجابة صحيحة' : 'راجع الفكرة',
+            style: TextStyle(
+              color: accent,
+              fontWeight: FontWeight.w900,
+            ),
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              explanation,
-              style: TextStyle(
-                color: colors.onSurfaceVariant,
-                height: 1.6,
-              ),
+          const SizedBox(height: 7),
+          Text(
+            text,
+            style: TextStyle(
+              color: mutedColor,
+              height: 1.65,
             ),
           ),
         ],
@@ -354,7 +472,10 @@ class _ResultView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final text = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final muted =
+        isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
     final percent = ((score / total) * 100).round();
 
     return Scaffold(
@@ -365,54 +486,71 @@ class _ResultView extends StatelessWidget {
             child: Column(
               children: [
                 Container(
-                  width: 92,
-                  height: 92,
+                  width: 118,
+                  height: 118,
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: passed
-                        ? Colors.green.withValues(alpha: 0.12)
-                        : colors.errorContainer,
+                    color: passed ? AppColors.secondary : AppColors.accent,
+                    borderRadius: BorderRadius.circular(38),
                   ),
-                  child: Icon(
-                    passed ? Icons.emoji_events_rounded : Icons.refresh_rounded,
-                    size: 46,
-                    color: passed ? Colors.green : colors.onErrorContainer,
+                  child: Text(
+                    '$percent%',
+                    style: TextStyle(
+                      color: passed
+                          ? AppColors.primaryDark
+                          : Colors.white,
+                      fontSize: 30,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 22),
+                )
+                    .animate()
+                    .scale(
+                      begin: const Offset(0.88, 0.88),
+                      end: const Offset(1, 1),
+                      duration: 420.ms,
+                      curve: Curves.easeOutBack,
+                    )
+                    .fadeIn(),
+                const SizedBox(height: 28),
                 Text(
-                  passed
-                      ? 'أحسنت، أتقنت الدرس!'
-                      : 'محاولة جيدة، راجع ثم أعد الاختبار',
+                  passed ? 'أحسنت، أتقنت الدرس' : 'قريب جدًا، حاول مرة أخرى',
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: text,
                         fontWeight: FontWeight.w900,
+                        height: 1.2,
                       ),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  '$score من $total • $percent%',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: colors.onSurfaceVariant,
-                        fontWeight: FontWeight.w800,
-                      ),
+                  '$score من $total إجابات صحيحة',
+                  style: TextStyle(
+                    color: muted,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 34),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: passed ? onDone : onRetry,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      child: Text(
-                        passed ? 'العودة إلى الدرس' : 'أعد المحاولة',
-                        style: const TextStyle(fontWeight: FontWeight.w900),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primaryDark,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size.fromHeight(58),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
+                    ),
+                    child: Text(
+                      passed ? 'العودة للدرس' : 'أعد الاختبار',
+                      style: const TextStyle(fontWeight: FontWeight.w900),
                     ),
                   ),
                 ),
                 if (!passed) ...[
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   TextButton(
                     onPressed: onDone,
                     child: const Text('العودة بدون إعادة'),
