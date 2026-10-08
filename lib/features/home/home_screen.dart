@@ -6,7 +6,6 @@ import '../../app/theme/app_theme.dart';
 import '../../services/progress_service.dart';
 import '../curriculum/data/grade2_math_data.dart';
 import '../curriculum/models/curriculum_models.dart';
-import '../curriculum/screens/chapter_screen.dart';
 import '../curriculum/screens/math_course_screen.dart';
 import '../lessons/screens/lesson_screen.dart';
 import '../mistakes/screens/mistakes_screen.dart';
