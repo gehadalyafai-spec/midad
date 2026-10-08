@@ -6,6 +6,7 @@ import '../../../services/progress_service.dart';
 import '../../curriculum/models/curriculum_models.dart';
 import '../../quizzes/data/rational_numbers_quiz.dart';
 import '../../quizzes/screens/quiz_screen.dart';
+import '../data/grade2_math_lesson_content.dart';
 
 class LessonScreen extends StatefulWidget {
   const LessonScreen({super.key, required this.lesson});
@@ -18,7 +19,10 @@ class LessonScreen extends StatefulWidget {
 
 class _LessonScreenState extends State<LessonScreen> {
   final ProgressService _progressService = ProgressService();
+
   bool _isCompleted = false;
+  int? _practiceSelected;
+  bool _practiceChecked = false;
 
   @override
   void initState() {
@@ -35,18 +39,11 @@ class _LessonScreenState extends State<LessonScreen> {
   }
 
   Future<void> _openQuiz() async {
-    if (widget.lesson.id != 'rational-numbers-intro') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('اختبار هذا الدرس سيُضاف قريبًا.')),
-      );
-      return;
-    }
-
     final passed = await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
         builder: (_) => QuizScreen(
           lesson: widget.lesson,
-          questions: rationalNumbersIntroQuiz,
+          questions: quizForLesson(widget.lesson.id),
         ),
       ),
     );
@@ -56,8 +53,26 @@ class _LessonScreenState extends State<LessonScreen> {
     }
   }
 
+  void _selectPractice(int index) {
+    if (_practiceChecked) return;
+    setState(() => _practiceSelected = index);
+  }
+
+  void _checkPractice() {
+    if (_practiceSelected == null) return;
+    setState(() => _practiceChecked = true);
+  }
+
+  void _resetPractice() {
+    setState(() {
+      _practiceSelected = null;
+      _practiceChecked = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final lessonData = lessonContentFor(widget.lesson.id);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final text = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
     final muted =
@@ -79,7 +94,7 @@ class _LessonScreenState extends State<LessonScreen> {
               ),
             ),
             ListView(
-              padding: const EdgeInsets.fromLTRB(22, 18, 22, 120),
+              padding: const EdgeInsets.fromLTRB(22, 18, 22, 126),
               children: [
                 Row(
                   children: [
@@ -122,9 +137,9 @@ class _LessonScreenState extends State<LessonScreen> {
                   ],
                 ),
                 const SizedBox(height: 32),
-                Text(
+                const Text(
                   'درس اليوم',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.accent,
                     fontWeight: FontWeight.w900,
                     fontSize: 13,
@@ -152,15 +167,18 @@ class _LessonScreenState extends State<LessonScreen> {
                       ),
                 ),
                 const SizedBox(height: 30),
-                const _ConceptBoard()
+                _ConceptBoard(
+                  label: lessonData.conceptLabel,
+                  main: lessonData.conceptMain,
+                  hint: lessonData.conceptHint,
+                )
                     .animate(delay: 80.ms)
                     .fadeIn(duration: 360.ms),
                 const SizedBox(height: 30),
                 _LessonSection(
                   number: '01',
-                  title: 'الفكرة الأساسية',
-                  text:
-                      'العدد النسبي هو أي عدد يمكن كتابته على صورة أ/ب، حيث أ و ب عددان صحيحان، وب لا يساوي صفرًا.',
+                  title: lessonData.sectionOneTitle,
+                  text: lessonData.sectionOneBody,
                   accent: AppColors.primary,
                   textColor: text,
                   mutedColor: muted,
@@ -168,22 +186,38 @@ class _LessonScreenState extends State<LessonScreen> {
                 const SizedBox(height: 26),
                 _LessonSection(
                   number: '02',
-                  title: 'كيف أفهمها؟',
-                  text:
-                      'تشمل الأعداد النسبية الكسور والأعداد الصحيحة وبعض الأعداد العشرية. مثال: 3/4 عدد نسبي، وكذلك -2 لأنه يمكن كتابته على الصورة -2/1.',
+                  title: lessonData.sectionTwoTitle,
+                  text: lessonData.sectionTwoBody,
                   accent: AppColors.secondary,
                   textColor: text,
                   mutedColor: muted,
                 ).animate(delay: 170.ms).fadeIn(),
                 const SizedBox(height: 26),
-                const _WorkedExample()
-                    .animate(delay: 210.ms)
-                    .fadeIn(),
-                const SizedBox(height: 18),
-                _WarningNote(
+                _WorkedExample(
+                  formula: lessonData.exampleFormula,
+                  body: lessonData.exampleBody,
+                ).animate(delay: 210.ms).fadeIn(),
+                const SizedBox(height: 22),
+                _QuickPractice(
+                  question: lessonData.practiceQuestion,
+                  options: lessonData.practiceOptions,
+                  correctIndex: lessonData.practiceCorrectIndex,
+                  feedback: lessonData.practiceFeedback,
+                  selectedIndex: _practiceSelected,
+                  checked: _practiceChecked,
+                  paper: paper,
                   textColor: text,
                   mutedColor: muted,
-                ).animate(delay: 250.ms).fadeIn(),
+                  onSelect: _selectPractice,
+                  onCheck: _checkPractice,
+                  onRetry: _resetPractice,
+                ).animate(delay: 240.ms).fadeIn(),
+                const SizedBox(height: 18),
+                _WarningNote(
+                  warning: lessonData.warning,
+                  textColor: text,
+                  mutedColor: muted,
+                ).animate(delay: 270.ms).fadeIn(),
                 if (_isCompleted) ...[
                   const SizedBox(height: 18),
                   _CompletedNote(
@@ -239,7 +273,15 @@ class _RoundBackButton extends StatelessWidget {
 }
 
 class _ConceptBoard extends StatelessWidget {
-  const _ConceptBoard();
+  const _ConceptBoard({
+    required this.label,
+    required this.main,
+    required this.hint,
+  });
+
+  final String label;
+  final String main;
+  final String hint;
 
   @override
   Widget build(BuildContext context) {
@@ -255,29 +297,30 @@ class _ConceptBoard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'الشكل العام',
-                  style: TextStyle(
+                Text(
+                  label,
+                  style: const TextStyle(
                     color: Colors.white60,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  'أ / ب',
+                Text(
+                  main,
                   textDirection: TextDirection.rtl,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 42,
+                    fontSize: 34,
                     fontWeight: FontWeight.w900,
+                    height: 1.15,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'ب ≠ 0',
-                  style: TextStyle(
+                  hint,
+                  style: const TextStyle(
                     color: AppColors.secondary,
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
@@ -363,7 +406,13 @@ class _LessonSection extends StatelessWidget {
 }
 
 class _WorkedExample extends StatelessWidget {
-  const _WorkedExample();
+  const _WorkedExample({
+    required this.formula,
+    required this.body,
+  });
+
+  final String formula;
+  final String body;
 
   @override
   Widget build(BuildContext context) {
@@ -394,18 +443,18 @@ class _WorkedExample extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          const Text(
-            '-5 = -5/1',
+          Text(
+            formula,
             textDirection: TextDirection.ltr,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.primaryDark,
               fontWeight: FontWeight.w900,
-              fontSize: 28,
+              fontSize: 26,
             ),
           ),
           const SizedBox(height: 10),
           Text(
-            'إذن -5 عدد نسبي، لأننا كتبناه على صورة كسر مقامه لا يساوي صفرًا. وكذلك 0.75 = 3/4.',
+            body,
             style: const TextStyle(
               color: AppColors.primaryDark,
               height: 1.65,
@@ -418,12 +467,199 @@ class _WorkedExample extends StatelessWidget {
   }
 }
 
+class _QuickPractice extends StatelessWidget {
+  const _QuickPractice({
+    required this.question,
+    required this.options,
+    required this.correctIndex,
+    required this.feedback,
+    required this.selectedIndex,
+    required this.checked,
+    required this.paper,
+    required this.textColor,
+    required this.mutedColor,
+    required this.onSelect,
+    required this.onCheck,
+    required this.onRetry,
+  });
+
+  final String question;
+  final List<String> options;
+  final int correctIndex;
+  final String feedback;
+  final int? selectedIndex;
+  final bool checked;
+  final Color paper;
+  final Color textColor;
+  final Color mutedColor;
+  final ValueChanged<int> onSelect;
+  final VoidCallback onCheck;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final correct = checked && selectedIndex == correctIndex;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: paper,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.15),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.edit_rounded, color: AppColors.primary),
+              SizedBox(width: 8),
+              Text(
+                'جرّب بنفسك',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Text(
+            question,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: textColor,
+                  fontWeight: FontWeight.w900,
+                  height: 1.5,
+                ),
+          ),
+          const SizedBox(height: 14),
+          ...List.generate(options.length, (index) {
+            final selected = selectedIndex == index;
+            final isCorrectOption = checked && index == correctIndex;
+            final wrongSelection = checked && selected && index != correctIndex;
+
+            Color background = Colors.transparent;
+            Color border = mutedColor.withValues(alpha: 0.16);
+
+            if (isCorrectOption) {
+              background = AppColors.primary.withValues(alpha: 0.10);
+              border = AppColors.primary;
+            } else if (wrongSelection) {
+              background = AppColors.accent.withValues(alpha: 0.10);
+              border = AppColors.accent;
+            } else if (selected) {
+              background = AppColors.secondary.withValues(alpha: 0.22);
+              border = AppColors.secondary;
+            }
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 9),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: checked ? null : () => onSelect(index),
+                  borderRadius: BorderRadius.circular(16),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 170),
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 13,
+                    ),
+                    decoration: BoxDecoration(
+                      color: background,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: border),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            options[index],
+                            style: TextStyle(
+                              color: textColor,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        if (isCorrectOption)
+                          const Icon(
+                            Icons.check_circle_rounded,
+                            color: AppColors.primary,
+                          ),
+                        if (wrongSelection)
+                          const Icon(
+                            Icons.cancel_rounded,
+                            color: AppColors.accent,
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
+          const SizedBox(height: 4),
+          if (!checked)
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: selectedIndex == null ? null : onCheck,
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text(
+                  'تحقق',
+                  style: TextStyle(fontWeight: FontWeight.w900),
+                ),
+              ),
+            )
+          else ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: (correct ? AppColors.primary : AppColors.accent)
+                    .withValues(alpha: 0.09),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                correct
+                    ? feedback
+                    : 'راجع الإجابة المظللة ثم حاول السؤال مرة أخرى.',
+                style: TextStyle(
+                  color: textColor,
+                  height: 1.55,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            if (!correct) ...[
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.replay_rounded),
+                label: const Text('حاول مرة أخرى'),
+              ),
+            ],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class _WarningNote extends StatelessWidget {
   const _WarningNote({
+    required this.warning,
     required this.textColor,
     required this.mutedColor,
   });
 
+  final String warning;
   final Color textColor;
   final Color mutedColor;
 
@@ -461,10 +697,7 @@ class _WarningNote extends StatelessWidget {
                       fontWeight: FontWeight.w900,
                     ),
                   ),
-                  const TextSpan(
-                    text:
-                        'لا يمكن أن يكون مقام الكسر صفرًا؛ لذلك أي تعبير على صورة أ/0 غير معرّف.',
-                  ),
+                  TextSpan(text: warning),
                 ],
               ),
             ),
