@@ -127,7 +127,11 @@ class _ChapterScreenState extends State<ChapterScreen> {
                 ...List.generate(widget.chapter.lessons.length, (index) {
                   final lesson = widget.chapter.lessons[index];
                   final done = _completedLessonIds.contains(lesson.id);
-                  final enabled = lesson.isAvailable;
+                  final prerequisiteDone = index == 0 ||
+                      _completedLessonIds.contains(
+                        widget.chapter.lessons[index - 1].id,
+                      );
+                  final enabled = lesson.isAvailable && prerequisiteDone;
 
                   return _TimelineLesson(
                     number: index + 1,
