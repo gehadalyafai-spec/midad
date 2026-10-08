@@ -419,7 +419,7 @@ class _CoursePulse extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Text(
-                  percent.toString() + '%',
+                  '$percent%',
                   style: const TextStyle(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w900,
@@ -444,10 +444,7 @@ class _CoursePulse extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          completed.toString() +
-                              '/' +
-                              total.toString() +
-                              ' درس',
+                          '$completed/$total درس',
                           style: TextStyle(
                             color: mutedColor,
                             fontSize: 10,
@@ -471,10 +468,7 @@ class _CoursePulse extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'الفصل ' +
-                          chapterNumber.toString() +
-                          ' من ' +
-                          chapterCount.toString(),
+                      'الفصل $chapterNumber من $chapterCount',
                       style: TextStyle(
                         color: mutedColor,
                         fontSize: 10,
