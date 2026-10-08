@@ -11,6 +11,8 @@ class ChapterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(title: const Text('رياضيات ثاني متوسط')),
       body: ListView(
@@ -20,16 +22,16 @@ class ChapterScreen extends StatelessWidget {
             chapter.title,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w900,
-                  color: AppColors.textPrimary,
+                  color: colors.onSurface,
                 ),
           ),
           const SizedBox(height: 6),
           Text(
             chapter.subtitle,
-            style: const TextStyle(
-              color: AppColors.textSecondary,
-              height: 1.6,
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  height: 1.6,
+                ),
           ),
           const SizedBox(height: 22),
           ...List.generate(chapter.lessons.length, (index) {
@@ -71,9 +73,11 @@ class _LessonTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onTap != null;
+    final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Material(
-      color: Colors.white,
+      color: isDark ? AppColors.darkSurface : Colors.white,
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
         onTap: onTap,
@@ -82,7 +86,11 @@ class _LessonTile extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFE5EAE7)),
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.07)
+                  : const Color(0xFFE5EAE7),
+            ),
           ),
           child: Row(
             children: [
@@ -92,19 +100,23 @@ class _LessonTile extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: enabled
-                      ? AppColors.surfaceSoft
-                      : const Color(0xFFF1F2F1),
+                      ? colors.primaryContainer
+                      : colors.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: enabled
                     ? Text(
                         '$number',
-                        style: const TextStyle(
-                          color: AppColors.primary,
+                        style: TextStyle(
+                          color: colors.onPrimaryContainer,
                           fontWeight: FontWeight.w900,
                         ),
                       )
-                    : const Icon(Icons.lock_outline_rounded, size: 20),
+                    : Icon(
+                        Icons.lock_outline_rounded,
+                        size: 20,
+                        color: colors.onSurfaceVariant,
+                      ),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -113,29 +125,28 @@ class _LessonTile extends StatelessWidget {
                   children: [
                     Text(
                       lesson.title,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                        color: enabled
-                            ? AppColors.textPrimary
-                            : AppColors.textSecondary,
-                      ),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: enabled
+                                ? colors.onSurface
+                                : colors.onSurfaceVariant,
+                          ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       enabled ? lesson.subtitle : 'سيُضاف قريبًا',
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 13,
-                      ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
                     ),
                   ],
                 ),
               ),
               if (enabled)
-                const Icon(
+                Icon(
                   Icons.arrow_back_ios_new_rounded,
                   size: 16,
-                  color: AppColors.primary,
+                  color: colors.primary,
                 ),
             ],
           ),
