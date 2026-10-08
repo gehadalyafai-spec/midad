@@ -113,4 +113,18 @@ const grade2MathChapters = <Chapter>[
       Lesson(id: 'pyramid-surface-area', title: 'مساحة سطح الهرم', subtitle: 'مساحة القاعدة والأوجه المثلثة الجانبية.'),
     ],
   ),
+  Chapter(
+    id: 'equations-inequalities',
+    title: 'الجبر: المعادلات والمتباينات',
+    subtitle: 'تبسيط العبارات وحل المعادلات والمتباينات وتمثيل حلولها.',
+    lessons: [
+      Lesson(id: 'simplify-expressions', title: 'تبسيط العبارات الجبرية', subtitle: 'استخدام الخصائص وجمع الحدود المتشابهة.'),
+      Lesson(id: 'two-step-equations', title: 'حل معادلات ذات خطوتين', subtitle: 'عزل المتغير باستخدام العمليات العكسية.'),
+      Lesson(id: 'write-two-step-equations', title: 'كتابة معادلات ذات خطوتين', subtitle: 'تحويل المسائل اللفظية إلى معادلات.'),
+      Lesson(id: 'variables-both-sides', title: 'حل معادلات تتضمن متغيرات في طرفيها', subtitle: 'جمع حدود المتغير في طرف واحد ثم الحل.'),
+      Lesson(id: 'guess-check-strategy', title: 'استراتيجية حل المسألة: التخمين والتحقق', subtitle: 'استخدام التخمين المنظم والتحقق للوصول للحل.'),
+      Lesson(id: 'inequalities', title: 'المتباينات', subtitle: 'فهم رموز المقارنة وتمثيل مجموعات الحل.'),
+      Lesson(id: 'solve-inequalities', title: 'حل المتباينات', subtitle: 'حل المتباينات وتمثيل حلولها على خط الأعداد.'),
+    ],
+  ),
 ];
