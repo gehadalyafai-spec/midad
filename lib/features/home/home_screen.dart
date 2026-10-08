@@ -9,6 +9,7 @@ import '../curriculum/models/curriculum_models.dart';
 import '../curriculum/screens/chapter_screen.dart';
 import '../lessons/screens/lesson_screen.dart';
 import '../mistakes/screens/mistakes_screen.dart';
+import '../progress/screens/progress_screen.dart';
 import '../quizzes/data/rational_numbers_quiz.dart';
 import '../quizzes/screens/quiz_screen.dart';
 
@@ -127,6 +128,15 @@ class _HomeScreenState extends State<HomeScreen> {
     await _loadProgress();
   }
 
+  Future<void> _openProgress(Chapter chapter) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ProgressScreen(chapter: chapter),
+      ),
+    );
+    await _loadProgress();
+  }
+
   @override
   Widget build(BuildContext context) {
     final chapter = grade2MathChapters.first;
@@ -160,6 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onOpenCourse: () => _openChapter(chapter),
                   onQuiz: () => _openQuiz(chapter),
                   onMistakes: () => _openMistakes(chapter),
+                  onProgress: () => _openProgress(chapter),
                 ),
         ),
       ),
@@ -180,6 +191,7 @@ class _StudyCanvas extends StatelessWidget {
     required this.onOpenCourse,
     required this.onQuiz,
     required this.onMistakes,
+    required this.onProgress,
   });
 
   final Chapter chapter;
@@ -192,6 +204,7 @@ class _StudyCanvas extends StatelessWidget {
   final VoidCallback onOpenCourse;
   final VoidCallback onQuiz;
   final VoidCallback onMistakes;
+  final VoidCallback onProgress;
 
   @override
   Widget build(BuildContext context) {
@@ -282,6 +295,7 @@ class _StudyCanvas extends StatelessWidget {
                         progress: progress,
                         completed: completed,
                         total: total,
+                        onTap: onProgress,
                       ),
                     ],
                   ),
@@ -301,6 +315,7 @@ class _StudyCanvas extends StatelessWidget {
             surface: surface,
             onCourse: onOpenCourse,
             onQuiz: onQuiz,
+            onProgress: onProgress,
           ),
         ),
       ],
@@ -733,17 +748,22 @@ class _ProgressTile extends StatelessWidget {
     required this.progress,
     required this.completed,
     required this.total,
+    required this.onTap,
   });
 
   final double progress;
   final int completed;
   final int total;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final percent = (progress * 100).round();
 
-    return Container(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(24),
+      child: Container(
       height: 138,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -789,6 +809,7 @@ class _ProgressTile extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 }
@@ -798,11 +819,13 @@ class _FloatingNav extends StatelessWidget {
     required this.surface,
     required this.onCourse,
     required this.onQuiz,
+    required this.onProgress,
   });
 
   final Color surface;
   final VoidCallback onCourse;
   final VoidCallback onQuiz;
+  final VoidCallback onProgress;
 
   @override
   Widget build(BuildContext context) {
@@ -848,7 +871,7 @@ class _FloatingNav extends StatelessWidget {
             child: _NavItem(
               icon: Icons.bar_chart_rounded,
               label: 'تقدمي',
-              onTap: () {},
+              onTap: onProgress,
             ),
           ),
         ],
