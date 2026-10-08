@@ -1,22 +1,43 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:midad/features/curriculum/data/grade2_math_data.dart';
+import 'package:midad/features/lessons/data/grade2_math_lesson_content.dart';
 import 'package:midad/features/quizzes/data/rational_numbers_quiz.dart';
 
 void main() {
-  test('starter curriculum contains the first available lesson', () {
+  test('starter curriculum exposes two completed learning experiences', () {
     final chapter = grade2MathChapters.first;
     final availableLessons =
         chapter.lessons.where((lesson) => lesson.isAvailable).toList();
 
     expect(chapter.title, 'الأعداد النسبية');
-    expect(availableLessons, hasLength(1));
+    expect(availableLessons, hasLength(2));
     expect(availableLessons.first.id, 'rational-numbers-intro');
+    expect(availableLessons[1].id, 'compare-rational');
   });
 
-  test('starter quiz has valid answers', () {
-    expect(rationalNumbersIntroQuiz, hasLength(5));
+  test('every available lesson has lesson content and a quiz', () {
+    final chapter = grade2MathChapters.first;
+    final availableLessons =
+        chapter.lessons.where((lesson) => lesson.isAvailable);
 
-    for (final question in rationalNumbersIntroQuiz) {
+    for (final lesson in availableLessons) {
+      final content = lessonContentFor(lesson.id);
+      final quiz = quizForLesson(lesson.id);
+
+      expect(content.sectionOneBody, isNotEmpty);
+      expect(content.practiceOptions.length, greaterThanOrEqualTo(3));
+      expect(
+        content.practiceCorrectIndex,
+        inInclusiveRange(0, content.practiceOptions.length - 1),
+      );
+      expect(quiz, hasLength(5));
+    }
+  });
+
+  test('all rational numbers quiz questions have valid answers', () {
+    expect(allRationalNumbersQuestions, hasLength(10));
+
+    for (final question in allRationalNumbersQuestions) {
       expect(question.options, hasLength(4));
       expect(question.correctIndex, inInclusiveRange(0, 3));
       expect(question.explanation, isNotEmpty);
