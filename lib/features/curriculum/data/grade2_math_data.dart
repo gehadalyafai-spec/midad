@@ -4,7 +4,7 @@ const grade2MathChapters = <Chapter>[
   Chapter(
     id: 'rational-numbers',
     title: 'الأعداد النسبية',
-    subtitle: 'الفصل الأول الذي سنبني عليه تجربة مداد التعليمية.',
+    subtitle: 'ابدأ بالمفهوم الأساسي، ثم انتقل للتدريب والاختبار.',
     lessons: [
       Lesson(
         id: 'rational-numbers-intro',
@@ -15,21 +15,25 @@ const grade2MathChapters = <Chapter>[
         id: 'compare-rational',
         title: 'مقارنة الأعداد النسبية وترتيبها',
         subtitle: 'المقارنة والترتيب باستخدام خط الأعداد.',
+        isAvailable: false,
       ),
       Lesson(
         id: 'multiply-rational',
         title: 'ضرب الأعداد النسبية',
         subtitle: 'تحديد الإشارة وإجراء عملية الضرب.',
+        isAvailable: false,
       ),
       Lesson(
         id: 'divide-rational',
         title: 'قسمة الأعداد النسبية',
         subtitle: 'القسمة مع فهم الإشارات والمقلوب.',
+        isAvailable: false,
       ),
       Lesson(
         id: 'add-subtract-rational',
         title: 'جمع الأعداد النسبية وطرحها',
         subtitle: 'تدريب تدريجي على الجمع والطرح.',
+        isAvailable: false,
       ),
       Lesson(
         id: 'powers',
