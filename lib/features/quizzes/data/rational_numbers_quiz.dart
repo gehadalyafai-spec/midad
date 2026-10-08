@@ -45,3 +45,66 @@ const rationalNumbersIntroQuiz = <QuizQuestion>[
     explanation: 'المقام لا يمكن أن يساوي صفرًا؛ لأن القسمة على صفر غير معرّفة.',
   ),
 ];
+
+const compareRationalQuiz = <QuizQuestion>[
+  QuizQuestion(
+    id: 'cr-1',
+    question: 'أي علاقة صحيحة بين -1/2 و -3/4؟',
+    options: ['-1/2 > -3/4', '-1/2 < -3/4', 'متساويان', 'لا يمكن المقارنة'],
+    correctIndex: 0,
+    explanation:
+        '-1/2 يساوي -2/4، وهو يقع إلى يمين -3/4 على خط الأعداد، لذلك هو الأكبر.',
+  ),
+  QuizQuestion(
+    id: 'cr-2',
+    question: 'أي عدد هو الأكبر؟',
+    options: ['-0.8', '-0.3', '-0.6', '-0.9'],
+    correctIndex: 1,
+    explanation:
+        'بين الأعداد السالبة يكون العدد الأقرب إلى الصفر هو الأكبر، لذلك -0.3 هو الأكبر.',
+  ),
+  QuizQuestion(
+    id: 'cr-3',
+    question: 'رتّب 1/2 و 3/4 تصاعديًا.',
+    options: ['3/4 ، 1/2', '1/2 ، 3/4', 'متساويان', 'لا يمكن الترتيب'],
+    correctIndex: 1,
+    explanation:
+        '1/2 يساوي 2/4، ولذلك 2/4 أصغر من 3/4.',
+  ),
+  QuizQuestion(
+    id: 'cr-4',
+    question: 'ما العلاقة بين -2/5 و 1/5؟',
+    options: ['-2/5 > 1/5', '-2/5 < 1/5', 'متساويان', 'كلاهما صفر'],
+    correctIndex: 1,
+    explanation:
+        'أي عدد سالب أصغر من أي عدد موجب، لذلك -2/5 أصغر من 1/5.',
+  ),
+  QuizQuestion(
+    id: 'cr-5',
+    question: 'أي عبارة صحيحة على خط الأعداد؟',
+    options: [
+      'العدد الأكبر يقع دائمًا إلى اليسار',
+      'العدد الأصغر يقع دائمًا إلى اليمين',
+      'العدد الأكبر يقع إلى اليمين',
+      'الموقع لا يساعد في المقارنة'
+    ],
+    correctIndex: 2,
+    explanation:
+        'على خط الأعداد تزداد القيم كلما اتجهنا إلى اليمين، لذا يقع العدد الأكبر إلى اليمين.',
+  ),
+];
+
+List<QuizQuestion> quizForLesson(String lessonId) {
+  switch (lessonId) {
+    case 'compare-rational':
+      return compareRationalQuiz;
+    case 'rational-numbers-intro':
+    default:
+      return rationalNumbersIntroQuiz;
+  }
+}
+
+const allRationalNumbersQuestions = <QuizQuestion>[
+  ...rationalNumbersIntroQuiz,
+  ...compareRationalQuiz,
+];
