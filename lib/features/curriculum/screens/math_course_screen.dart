@@ -63,6 +63,23 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
         isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
     final surface = isDark ? AppColors.darkSurface : const Color(0xFFFFFDF8);
 
+    final allLessons = grade2MathChapters
+        .expand((chapter) => chapter.lessons)
+        .where((lesson) => lesson.isAvailable)
+        .toList();
+    final completedLessons =
+        allLessons.where((lesson) => _completed.contains(lesson.id)).length;
+    final overallProgress =
+        allLessons.isEmpty ? 0.0 : completedLessons / allLessons.length;
+
+    var activeChapterIndex = grade2MathChapters.length - 1;
+    for (var index = 0; index < grade2MathChapters.length; index++) {
+      if (!_chapterComplete(grade2MathChapters[index])) {
+        activeChapterIndex = index;
+        break;
+      }
+    }
+
     return Scaffold(
       body: SafeArea(
         child: _loading
@@ -117,6 +134,13 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+                  const SizedBox(height: 22),
+                  _CourseSummary(
+                    progress: overallProgress,
+                    completed: completedLessons,
+                    total: allLessons.length,
+                    activeChapterIndex: activeChapterIndex,
+                  ).animate(delay: 60.ms).fadeIn(duration: 320.ms),
                   const SizedBox(height: 28),
                   ...List.generate(grade2MathChapters.length, (index) {
                     final chapter = grade2MathChapters[index];
@@ -151,6 +175,105 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
                   }),
                 ],
               ),
+      ),
+    );
+  }
+}
+
+class _CourseSummary extends StatelessWidget {
+  const _CourseSummary({
+    required this.progress,
+    required this.completed,
+    required this.total,
+    required this.activeChapterIndex,
+  });
+
+  final double progress;
+  final int completed;
+  final int total;
+  final int activeChapterIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    final percent = (progress * 100).round();
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.primaryDark,
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 82,
+            height: 82,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                CircularProgressIndicator(
+                  value: progress,
+                  strokeWidth: 8,
+                  backgroundColor: Colors.white12,
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    AppColors.secondary,
+                  ),
+                ),
+                Text(
+                  '${percent}%',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 18),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'تقدم المادة',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 17,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '${completed} من ${total} درسًا',
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    'الفصل الحالي ${activeChapterIndex + 1} من ${grade2MathChapters.length}',
+                    style: const TextStyle(
+                      color: AppColors.secondary,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
