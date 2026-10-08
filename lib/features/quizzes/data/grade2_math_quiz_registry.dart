@@ -1,5 +1,6 @@
 import '../models/quiz_question.dart';
 import 'geometry_quiz.dart';
+import 'measurement_quiz.dart';
 import 'percent_quiz.dart';
 import 'probability_quiz.dart';
 import 'proportions_quiz.dart';
@@ -8,6 +9,9 @@ import 'real_numbers_quiz.dart';
 import 'statistics_quiz.dart';
 
 List<QuizQuestion> quizForGrade2MathLesson(String lessonId) {
+  final measurementQuiz = measurementQuizForLesson(lessonId);
+  if (measurementQuiz.isNotEmpty) return measurementQuiz;
+
   final probabilityQuiz = probabilityQuizForLesson(lessonId);
   if (probabilityQuiz.isNotEmpty) return probabilityQuiz;
 
@@ -37,4 +41,5 @@ const allGrade2MathQuestions = <QuizQuestion>[
   ...allGeometryQuestions,
   ...allStatisticsQuestions,
   ...allProbabilityQuestions,
+  ...allMeasurementQuestions,
 ];
