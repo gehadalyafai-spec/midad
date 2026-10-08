@@ -72,4 +72,19 @@ const grade2MathChapters = <Chapter>[
       Lesson(id: 'rotation', title: 'الدوران', subtitle: 'تدوير الأشكال حول مركز وبزاوية محددة.'),
     ],
   ),
+  Chapter(
+    id: 'statistics',
+    title: 'الإحصاء',
+    subtitle: 'تنظيم البيانات وتمثيلها وتحليل مركزها وانتشارها.',
+    lessons: [
+      Lesson(id: 'table-strategy', title: 'استراتيجية حل المسألة: إنشاء جدول', subtitle: 'تنظيم البيانات والعلاقات داخل جدول واضح.'),
+      Lesson(id: 'histograms', title: 'المدرجات التكرارية', subtitle: 'تمثيل البيانات العددية ضمن فئات متجاورة.'),
+      Lesson(id: 'circle-sectors', title: 'القطاعات الدائرية', subtitle: 'تمثيل أجزاء الكل بالنسب والزوايا.'),
+      Lesson(id: 'central-tendency-range', title: 'مقاييس النزعة المركزية والمدى', subtitle: 'المتوسط والوسيط والمنوال والمدى.'),
+      Lesson(id: 'dispersion', title: 'مقاييس التشتت', subtitle: 'فهم مدى تقارب البيانات أو انتشارها.'),
+      Lesson(id: 'box-plot', title: 'التمثيل بالصندوق وطرفيه', subtitle: 'تلخيص توزيع البيانات بخمس قيم رئيسية.'),
+      Lesson(id: 'stem-leaf', title: 'التمثيل بالساق والورقة', subtitle: 'تنظيم البيانات مع الاحتفاظ بالقيم الأصلية.'),
+      Lesson(id: 'choose-display', title: 'اختيار طريقة التمثيل المناسبة', subtitle: 'اختيار الرسم الذي يوضح نوع البيانات والهدف منها.'),
+    ],
+  ),
 ];
