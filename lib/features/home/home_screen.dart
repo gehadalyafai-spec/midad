@@ -1,12 +1,15 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../app/theme/app_theme.dart';
+import '../../services/progress_service.dart';
 import '../curriculum/data/grade2_math_data.dart';
+import '../curriculum/models/curriculum_models.dart';
 import '../curriculum/screens/chapter_screen.dart';
+import '../lessons/screens/lesson_screen.dart';
+import '../quizzes/data/rational_numbers_quiz.dart';
+import '../quizzes/screens/quiz_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,28 +19,106 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late final Timer _loadingTimer;
+  final ProgressService _progressService = ProgressService();
+
   bool _isLoading = true;
+  Set<String> _completedLessonIds = const <String>{};
+  String? _lastLessonId;
+  String? _lastLessonTitle;
 
   @override
   void initState() {
     super.initState();
-    _loadingTimer = Timer(const Duration(milliseconds: 900), () {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+    _loadProgress(showSkeleton: true);
+  }
+
+  Future<void> _loadProgress({bool showSkeleton = false}) async {
+    if (showSkeleton && mounted) {
+      setState(() => _isLoading = true);
+    }
+
+    final completedFuture = _progressService.getCompletedLessonIds();
+    final lastIdFuture = _progressService.getLastLessonId();
+    final lastTitleFuture = _progressService.getLastLessonTitle();
+
+    final completed = await completedFuture;
+    final lastId = await lastIdFuture;
+    final lastTitle = await lastTitleFuture;
+
+    if (showSkeleton) {
+      await Future<void>.delayed(const Duration(milliseconds: 700));
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _completedLessonIds = completed;
+      _lastLessonId = lastId;
+      _lastLessonTitle = lastTitle;
+      _isLoading = false;
     });
   }
 
-  @override
-  void dispose() {
-    _loadingTimer.cancel();
-    super.dispose();
+  Lesson? _findLesson(Chapter chapter, String? lessonId) {
+    if (lessonId == null) return null;
+
+    for (final lesson in chapter.lessons) {
+      if (lesson.id == lessonId && lesson.isAvailable) {
+        return lesson;
+      }
+    }
+    return null;
+  }
+
+  Future<void> _openChapter(Chapter chapter) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ChapterScreen(chapter: chapter),
+      ),
+    );
+    await _loadProgress();
+  }
+
+  Future<void> _continueLearning(Chapter chapter) async {
+    final lastLesson = _findLesson(chapter, _lastLessonId);
+
+    if (lastLesson == null) {
+      await _openChapter(chapter);
+      return;
+    }
+
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => LessonScreen(lesson: lastLesson),
+      ),
+    );
+    await _loadProgress();
+  }
+
+  Future<void> _openStarterQuiz(Chapter chapter) async {
+    final lesson = chapter.lessons.firstWhere((item) => item.isAvailable);
+
+    await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => QuizScreen(
+          lesson: lesson,
+          questions: rationalNumbersIntroQuiz,
+        ),
+      ),
+    );
+    await _loadProgress();
   }
 
   @override
   Widget build(BuildContext context) {
     final firstChapter = grade2MathChapters.first;
+    final availableLessons =
+        firstChapter.lessons.where((lesson) => lesson.isAvailable).toList();
+    final completedCount = availableLessons
+        .where((lesson) => _completedLessonIds.contains(lesson.id))
+        .length;
+    final progress =
+        availableLessons.isEmpty ? 0.0 : completedCount / availableLessons.length;
+
     final colors = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -85,31 +166,10 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           Padding(
             padding: const EdgeInsetsDirectional.only(end: 16),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                IconButton.filledTonal(
-                  tooltip: 'الإشعارات',
-                  onPressed: () => _showComingSoon(context, 'الإشعارات'),
-                  icon: const Icon(Icons.notifications_none_rounded),
-                ),
-                PositionedDirectional(
-                  top: 6,
-                  end: 6,
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: colors.error,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        width: 1.5,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            child: IconButton.filledTonal(
+              tooltip: 'الإشعارات',
+              onPressed: () => _showComingSoon(context, 'الإشعارات'),
+              icon: const Icon(Icons.notifications_none_rounded),
             ),
           ),
         ],
@@ -126,13 +186,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   _WelcomeCard(
                     isDark: isDark,
-                    onContinue: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => ChapterScreen(chapter: firstChapter),
-                        ),
-                      );
-                    },
+                    lastLessonTitle: _lastLessonTitle,
+                    onContinue: () => _continueLearning(firstChapter),
                   )
                       .animate()
                       .fadeIn(duration: 420.ms)
@@ -153,11 +208,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       .slideX(begin: 0.04, end: 0),
                   const SizedBox(height: 14),
                   _LearningGrid(
-                    onOpenMath: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => ChapterScreen(chapter: firstChapter),
-                        ),
+                    progress: progress,
+                    onOpenMath: () => _openChapter(firstChapter),
+                    onOpenQuiz: () => _openStarterQuiz(firstChapter),
+                    onShowProgress: () {
+                      final percent = (progress * 100).round();
+                      _showMessage(
+                        context,
+                        'أنجزت $completedCount من ${availableLessons.length} درس • $percent%',
                       );
                     },
                     onComingSoon: (label) =>
@@ -166,7 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 26),
                   const _SectionHeader(
                     title: 'تقدمك',
-                    subtitle: 'نظرة سريعة على رحلتك الحالية',
+                    subtitle: 'يُحفظ تلقائيًا على جهازك',
                   )
                       .animate(delay: 220.ms)
                       .fadeIn(duration: 380.ms)
@@ -174,6 +232,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 14),
                   _ProgressCard(
                     chapterTitle: firstChapter.title,
+                    progress: progress,
+                    completed: completedCount,
+                    total: availableLessons.length,
+                    lastLessonTitle: _lastLessonTitle,
                   )
                       .animate(delay: 280.ms)
                       .fadeIn(duration: 420.ms)
@@ -185,8 +247,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showComingSoon(BuildContext context, String feature) {
+    _showMessage(context, '$feature سيُضاف قريبًا بإذن الله.');
+  }
+
+  void _showMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$feature سيُضاف قريبًا بإذن الله.')),
+      SnackBar(content: Text(message)),
     );
   }
 }
@@ -194,14 +260,18 @@ class _HomeScreenState extends State<HomeScreen> {
 class _WelcomeCard extends StatelessWidget {
   const _WelcomeCard({
     required this.isDark,
+    required this.lastLessonTitle,
     required this.onContinue,
   });
 
   final bool isDark;
+  final String? lastLessonTitle;
   final VoidCallback onContinue;
 
   @override
   Widget build(BuildContext context) {
+    final hasLastLesson = lastLessonTitle != null;
+
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
@@ -263,9 +333,9 @@ class _WelcomeCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          const Text(
-            'مرحبًا بك في مداد',
-            style: TextStyle(
+          Text(
+            hasLastLesson ? 'واصل من حيث توقفت' : 'مرحبًا بك في مداد',
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 27,
               fontWeight: FontWeight.w900,
@@ -274,7 +344,9 @@ class _WelcomeCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'ابدأ من حيث توقفت، وافهم الدرس خطوة بخطوة ثم اختبر نفسك.',
+            hasLastLesson
+                ? 'آخر درس فتحته: $lastLessonTitle'
+                : 'ابدأ أول درس، وافهم الفكرة ثم اختبر نفسك بخطوات قصيرة وواضحة.',
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.82),
               height: 1.65,
@@ -295,10 +367,14 @@ class _WelcomeCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
-            icon: const Icon(Icons.play_arrow_rounded),
-            label: const Text(
-              'أكمل التعلّم',
-              style: TextStyle(fontWeight: FontWeight.w800),
+            icon: Icon(
+              hasLastLesson
+                  ? Icons.play_arrow_rounded
+                  : Icons.arrow_back_rounded,
+            ),
+            label: Text(
+              hasLastLesson ? 'أكمل التعلّم' : 'ابدأ الآن',
+              style: const TextStyle(fontWeight: FontWeight.w800),
             ),
           ),
         ],
@@ -369,11 +445,17 @@ class _SectionHeader extends StatelessWidget {
 
 class _LearningGrid extends StatelessWidget {
   const _LearningGrid({
+    required this.progress,
     required this.onOpenMath,
+    required this.onOpenQuiz,
+    required this.onShowProgress,
     required this.onComingSoon,
   });
 
+  final double progress;
   final VoidCallback onOpenMath;
+  final VoidCallback onOpenQuiz;
+  final VoidCallback onShowProgress;
   final ValueChanged<String> onComingSoon;
 
   @override
@@ -390,9 +472,10 @@ class _LearningGrid extends StatelessWidget {
       _LearningTask(
         icon: Icons.fact_check_outlined,
         title: 'اختبر نفسك',
-        subtitle: 'أسئلة قصيرة ومركزة',
-        badge: 'قريبًا',
-        onTap: () => onComingSoon('الاختبارات'),
+        subtitle: '5 أسئلة مع شرح الإجابة',
+        badge: 'متاح',
+        enabled: true,
+        onTap: onOpenQuiz,
       ),
       _LearningTask(
         icon: Icons.replay_rounded,
@@ -404,9 +487,10 @@ class _LearningGrid extends StatelessWidget {
       _LearningTask(
         icon: Icons.insights_rounded,
         title: 'تقدمك',
-        subtitle: 'تابع نسبة الإتقان',
-        badge: 'قريبًا',
-        onTap: () => onComingSoon('تفاصيل التقدم'),
+        subtitle: 'نسبة الإتقان المحفوظة',
+        badge: '${(progress * 100).round()}%',
+        enabled: true,
+        onTap: onShowProgress,
       ),
     ];
 
@@ -549,14 +633,25 @@ class _LearningTaskCard extends StatelessWidget {
 }
 
 class _ProgressCard extends StatelessWidget {
-  const _ProgressCard({required this.chapterTitle});
+  const _ProgressCard({
+    required this.chapterTitle,
+    required this.progress,
+    required this.completed,
+    required this.total,
+    required this.lastLessonTitle,
+  });
 
   final String chapterTitle;
+  final double progress;
+  final int completed;
+  final int total;
+  final String? lastLessonTitle;
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final percent = (progress * 100).round();
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -578,14 +673,14 @@ class _ProgressCard extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 CircularProgressIndicator(
-                  value: 0.32,
+                  value: progress,
                   strokeWidth: 7,
                   strokeCap: StrokeCap.round,
                   backgroundColor: colors.surfaceContainerHighest,
-                  color: colors.primary,
+                  color: progress >= 1 ? Colors.green : colors.primary,
                 ),
                 Text(
-                  '32%',
+                  '$percent%',
                   style: TextStyle(
                     color: colors.onSurface,
                     fontSize: 12,
@@ -606,21 +701,34 @@ class _ProgressCard extends StatelessWidget {
                         fontWeight: FontWeight.w900,
                       ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 5),
                 Text(
-                  'أكمل الدروس والتدريبات لرفع نسبة إتقانك.',
+                  '$completed من $total درس مكتمل',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                        height: 1.5,
+                        color: colors.primary,
+                        fontWeight: FontWeight.w800,
                       ),
                 ),
+                if (lastLessonTitle != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    'آخر درس: $lastLessonTitle',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                  ),
+                ],
               ],
             ),
           ),
           Icon(
-            Icons.arrow_back_ios_new_rounded,
-            size: 16,
-            color: colors.onSurfaceVariant,
+            progress >= 1
+                ? Icons.verified_rounded
+                : Icons.arrow_back_ios_new_rounded,
+            size: progress >= 1 ? 22 : 16,
+            color: progress >= 1 ? Colors.green : colors.onSurfaceVariant,
           ),
         ],
       ),
