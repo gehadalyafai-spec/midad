@@ -129,10 +129,10 @@ class _HomeScreenState extends State<HomeScreen> {
     await _loadProgress();
   }
 
-  Future<void> _openProgress(Chapter chapter) async {
+  Future<void> _openProgress() async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => ProgressScreen(chapter: chapter),
+        builder: (_) => const ProgressScreen(),
       ),
     );
     await _loadProgress();
@@ -180,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onOpenCourse: _openCourseOverview,
                   onQuiz: () => _openQuiz(chapter),
                   onMistakes: () => _openMistakes(chapter),
-                  onProgress: () => _openProgress(chapter),
+                  onProgress: _openProgress,
                 ),
         ),
       ),
