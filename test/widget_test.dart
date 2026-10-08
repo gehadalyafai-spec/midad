@@ -4,13 +4,13 @@ import 'package:midad/features/lessons/data/grade2_math_lesson_content.dart';
 import 'package:midad/features/quizzes/data/rational_numbers_quiz.dart';
 
 void main() {
-  test('starter curriculum exposes five complete learning experiences', () {
+  test('rational numbers chapter exposes seven complete learning experiences', () {
     final chapter = grade2MathChapters.first;
     final availableLessons =
         chapter.lessons.where((lesson) => lesson.isAvailable).toList();
 
     expect(chapter.title, 'الأعداد النسبية');
-    expect(availableLessons, hasLength(5));
+    expect(availableLessons, hasLength(7));
     expect(
       availableLessons.map((lesson) => lesson.id).toList(),
       [
@@ -19,6 +19,8 @@ void main() {
         'multiply-rational',
         'divide-rational',
         'add-subtract-rational',
+        'powers',
+        'scientific-notation',
       ],
     );
   });
@@ -46,7 +48,7 @@ void main() {
   });
 
   test('all rational numbers quiz questions have valid answers', () {
-    expect(allRationalNumbersQuestions, hasLength(25));
+    expect(allRationalNumbersQuestions, hasLength(35));
 
     for (final question in allRationalNumbersQuestions) {
       expect(question.options, hasLength(4));
