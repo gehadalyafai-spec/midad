@@ -15,7 +15,6 @@ const grade2MathChapters = <Chapter>[
         id: 'compare-rational',
         title: 'مقارنة الأعداد النسبية وترتيبها',
         subtitle: 'المقارنة والترتيب باستخدام خط الأعداد.',
-        isAvailable: false,
       ),
       Lesson(
         id: 'multiply-rational',
