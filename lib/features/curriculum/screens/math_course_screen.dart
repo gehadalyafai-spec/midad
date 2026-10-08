@@ -153,24 +153,46 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
                     final total = lessons.length;
                     final progress = total == 0 ? 0.0 : completedCount / total;
 
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: _ChapterCard(
-                        index: index + 1,
-                        chapter: chapter,
-                        unlocked: unlocked,
-                        complete: complete,
-                        progress: progress,
-                        completed: completedCount,
-                        total: total,
-                        surface: surface,
-                        textColor: text,
-                        mutedColor: muted,
-                        onTap: unlocked ? () => _openChapter(chapter) : null,
-                      )
-                          .animate(delay: (index * 70).ms)
-                          .fadeIn(duration: 340.ms)
-                          .slideY(begin: 0.06, end: 0),
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (index == 0 || index == 5) ...[
+                          _SemesterHeader(
+                            title: index == 0
+                                ? 'الفصل الدراسي الأول'
+                                : 'الفصل الدراسي الثاني',
+                            chapterRange: index == 0
+                                ? 'الفصول 1 – 5'
+                                : 'الفصول 6 – 10',
+                            accent: index == 0
+                                ? AppColors.primary
+                                : AppColors.accent,
+                            textColor: text,
+                            mutedColor: muted,
+                          ),
+                          const SizedBox(height: 14),
+                        ],
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: _ChapterCard(
+                            index: index + 1,
+                            chapter: chapter,
+                            unlocked: unlocked,
+                            complete: complete,
+                            progress: progress,
+                            completed: completedCount,
+                            total: total,
+                            surface: surface,
+                            textColor: text,
+                            mutedColor: muted,
+                            onTap:
+                                unlocked ? () => _openChapter(chapter) : null,
+                          )
+                              .animate(delay: (index * 70).ms)
+                              .fadeIn(duration: 340.ms)
+                              .slideY(begin: 0.06, end: 0),
+                        ),
+                      ],
                     );
                   }),
                 ],
@@ -268,6 +290,66 @@ class _CourseSummary extends StatelessWidget {
                       fontWeight: FontWeight.w900,
                       fontSize: 10,
                     ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SemesterHeader extends StatelessWidget {
+  const _SemesterHeader({
+    required this.title,
+    required this.chapterRange,
+    required this.accent,
+    required this.textColor,
+    required this.mutedColor,
+  });
+
+  final String title;
+  final String chapterRange;
+  final Color accent;
+  final Color textColor;
+  final Color mutedColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
+        children: [
+          Container(
+            width: 10,
+            height: 42,
+            decoration: BoxDecoration(
+              color: accent,
+              borderRadius: BorderRadius.circular(99),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  chapterRange,
+                  style: TextStyle(
+                    color: mutedColor,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
