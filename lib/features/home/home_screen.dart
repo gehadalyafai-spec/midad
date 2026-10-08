@@ -27,7 +27,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Set<String> _completedLessonIds = const <String>{};
   Set<String> _mistakeQuestionIds = const <String>{};
   String? _lastLessonId;
-  String? _lastLessonTitle;
 
   @override
   void initState() {
@@ -41,8 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final completed = await _progressService.getCompletedLessonIds();
     final mistakes = await _progressService.getMistakeQuestionIds();
     final lastId = await _progressService.getLastLessonId();
-    final lastTitle = await _progressService.getLastLessonTitle();
-
     if (showSkeleton) {
       await Future<void>.delayed(const Duration(milliseconds: 650));
     }
@@ -52,7 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _completedLessonIds = completed;
       _mistakeQuestionIds = mistakes;
       _lastLessonId = lastId;
-      _lastLessonTitle = lastTitle;
       _isLoading = false;
     });
   }
