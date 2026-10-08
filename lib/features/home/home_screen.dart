@@ -10,7 +10,7 @@ import '../curriculum/screens/chapter_screen.dart';
 import '../lessons/screens/lesson_screen.dart';
 import '../mistakes/screens/mistakes_screen.dart';
 import '../progress/screens/progress_screen.dart';
-import '../quizzes/data/rational_numbers_quiz.dart';
+import '../quizzes/data/grade2_math_quiz_registry.dart';
 import '../quizzes/screens/quiz_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -74,6 +74,20 @@ class _HomeScreenState extends State<HomeScreen> {
     return available.last;
   }
 
+  bool _isChapterComplete(Chapter chapter) {
+    final available =
+        chapter.lessons.where((lesson) => lesson.isAvailable).toList();
+    return available.isNotEmpty &&
+        available.every((lesson) => _completedLessonIds.contains(lesson.id));
+  }
+
+  Chapter _activeChapter() {
+    for (final chapter in grade2MathChapters) {
+      if (!_isChapterComplete(chapter)) return chapter;
+    }
+    return grade2MathChapters.last;
+  }
+
   Future<void> _openChapter(Chapter chapter) async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -104,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute<bool>(
         builder: (_) => QuizScreen(
           lesson: lesson,
-          questions: quizForLesson(lesson.id),
+          questions: quizForGrade2MathLesson(lesson.id),
         ),
       ),
     );
@@ -117,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute<void>(
         builder: (_) => MistakesScreen(
           lesson: lesson,
-          allQuestions: allRationalNumbersQuestions,
+          allQuestions: allGrade2MathQuestions,
         ),
       ),
     );
@@ -135,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final chapter = grade2MathChapters.first;
+    final chapter = _activeChapter();
     final available =
         chapter.lessons.where((lesson) => lesson.isAvailable).toList();
     final completed = available
