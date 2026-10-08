@@ -307,6 +307,7 @@ class _FocusOption extends StatelessWidget {
   final bool answered;
   final int correctIndex;
   final Color surface;
+  final Color textColor;
   final Color mutedColor;
   final VoidCallback onTap;
 
@@ -412,7 +413,6 @@ class _AnswerExplanation extends StatelessWidget {
   final bool correct;
   final String text;
   final Color surface;
-  final Color textColor;
   final Color mutedColor;
 
   @override
