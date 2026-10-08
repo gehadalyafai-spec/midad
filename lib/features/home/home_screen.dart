@@ -217,7 +217,7 @@ class _StudyCanvas extends StatelessWidget {
                 .slideY(begin: 0.10, end: 0),
             const SizedBox(height: 10),
             Text(
-              'ثاني متوسط • الرياضيات • ' + chapter.title,
+              'ثاني متوسط • الرياضيات • ${chapter.title}',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: muted,
                     fontWeight: FontWeight.w700,
