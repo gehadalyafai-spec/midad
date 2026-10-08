@@ -127,4 +127,17 @@ const grade2MathChapters = <Chapter>[
       Lesson(id: 'solve-inequalities', title: 'حل المتباينات', subtitle: 'حل المتباينات وتمثيل حلولها على خط الأعداد.'),
     ],
   ),
+  Chapter(
+    id: 'linear-functions',
+    title: 'الجبر: الدوال الخطية',
+    subtitle: 'المتتابعات والدوال والتمثيل البياني والميل والتغير الطردي.',
+    lessons: [
+      Lesson(id: 'sequences', title: 'المتتابعات', subtitle: 'اكتشاف الأنماط والقواعد بين الحدود المرتبة.'),
+      Lesson(id: 'functions', title: 'الدوال', subtitle: 'فهم العلاقة التي تعطي لكل مدخل مخرجًا واحدًا.'),
+      Lesson(id: 'graph-linear-functions', title: 'تمثيل الدوال الخطية', subtitle: 'إنشاء جداول قيم وتمثيل الدوال بخطوط مستقيمة.'),
+      Lesson(id: 'slope', title: 'ميل المستقيم', subtitle: 'إيجاد الميل وتفسيره كمعدل تغير.'),
+      Lesson(id: 'direct-variation', title: 'التغير الطردي', subtitle: 'فهم العلاقة y=kx وثابت التغير.'),
+      Lesson(id: 'model-strategy', title: 'استراتيجية حل المسألة: إنشاء نموذج', subtitle: 'تمثيل المواقف الواقعية بجدول أو رسم أو معادلة.'),
+    ],
+  ),
 ];
