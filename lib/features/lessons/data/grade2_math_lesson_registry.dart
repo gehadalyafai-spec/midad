@@ -1,6 +1,7 @@
 import 'geometry_lesson_content.dart';
 import 'grade2_math_lesson_content.dart';
 import 'percent_lesson_content.dart';
+import 'probability_lesson_content.dart';
 import 'proportions_lesson_content.dart';
 import 'real_numbers_lesson_content.dart';
 import 'statistics_lesson_content.dart';
@@ -23,6 +24,9 @@ LessonContent lessonContentForGrade2Math(String lessonId) {
 
   final statistics = statisticsLessonContent[lessonId];
   if (statistics != null) return statistics;
+
+  final probability = probabilityLessonContent[lessonId];
+  if (probability != null) return probability;
 
   throw StateError('No lesson content registered for $lessonId');
 }
