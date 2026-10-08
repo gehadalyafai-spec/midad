@@ -122,6 +122,27 @@ const grade2MathLessonContent = <String, LessonContent>{
     practiceFeedback:
         'صحيح: 3/7 ÷ 2/5 تصبح 3/7 × 5/2، والناتج 15/14.',
   ),
+  'add-subtract-like-denominators': LessonContent(
+    conceptLabel: 'مقامات متشابهة',
+    conceptMain: 'المقام يبقى كما هو',
+    conceptHint: 'اجمع أو اطرح البسطين',
+    sectionOneTitle: 'الفكرة الأساسية',
+    sectionOneBody:
+        'عند جمع أو طرح عددين نسبيين لهما المقام نفسه، نجمع أو نطرح البسطين ونبقي المقام كما هو، ثم نبسّط الناتج إن أمكن.',
+    sectionTwoTitle: 'ماذا عن الإشارات؟',
+    sectionTwoBody:
+        'نتعامل مع البسطين كأعداد صحيحة. إذا اختلفت الإشارتان نطرح القيم المطلقة ونأخذ إشارة العدد الأكبر قيمةً مطلقة.',
+    exampleFormula: '-3/7 + 5/7 = 2/7',
+    exampleBody:
+        'المقامات متساوية، لذلك نحسب -3 + 5 = 2 ونبقي المقام 7.',
+    warning:
+        'لا تجمع المقامات؛ عند تساويها يبقى المقام نفسه وتكون العملية على البسطين.',
+    practiceQuestion: 'ما ناتج 4/9 - 7/9؟',
+    practiceOptions: ['-3/9', '3/18', '-11/9', '3/9'],
+    practiceCorrectIndex: 0,
+    practiceFeedback:
+        'صحيح: 4-7=-3 والمقام يبقى 9، ويمكن تبسيط -3/9 إلى -1/3.',
+  ),
   'add-subtract-rational': LessonContent(
     conceptLabel: 'قاعدة الجمع',
     conceptMain: 'وحّد المقامات',
@@ -142,6 +163,27 @@ const grade2MathLessonContent = <String, LessonContent>{
     practiceCorrectIndex: 2,
     practiceFeedback:
         'صحيح: 2/5 = 4/10، ثم 4/10 + 1/10 = 5/10 = 1/2.',
+  ),
+  'pattern-strategy': LessonContent(
+    conceptLabel: 'البحث عن نمط',
+    conceptMain: 'لاحظ → توقّع → تحقق',
+    conceptHint: 'ابحث عن قاعدة تتكرر',
+    sectionOneTitle: 'الفكرة الأساسية',
+    sectionOneBody:
+        'البحث عن نمط استراتيجية لحل المسائل التي تتكرر فيها علاقة أو قاعدة. نرتب المعلومات ثم نبحث عما يتكرر لنستخدمه في التنبؤ.',
+    sectionTwoTitle: 'كيف أستخدمها؟',
+    sectionTwoBody:
+        'اكتب عدة حالات مرتبة، قارن بينها، حدّد التغير أو القاعدة المتكررة، ثم طبّقها على الحالة المطلوبة وتحقق من النتيجة.',
+    exampleFormula: '2، 5، 8، 11، ... → +3',
+    exampleBody:
+        'كل حد يزيد 3 عن السابق، لذلك يمكن استخدام النمط لإيجاد الحدود التالية.',
+    warning:
+        'لا تعتمد على حالة واحدة أو حالتين فقط؛ تأكد أن القاعدة تعمل على أكثر من حالة.',
+    practiceQuestion: 'ما العدد التالي في النمط 4، 7، 10، 13؟',
+    practiceOptions: ['14', '15', '16', '17'],
+    practiceCorrectIndex: 2,
+    practiceFeedback:
+        'صحيح: النمط يزيد 3 كل مرة، لذلك 13+3=16.',
   ),
   'powers': LessonContent(
     conceptLabel: 'القوة',
