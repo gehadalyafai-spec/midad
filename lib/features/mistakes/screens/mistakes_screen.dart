@@ -128,9 +128,7 @@ class _MistakesScreenState extends State<MistakesScreen> {
                             .slideY(begin: 0.08, end: 0),
                         const SizedBox(height: 12),
                         Text(
-                          'لديك ' +
-                              _mistakes.length.toString() +
-                              ' أسئلة تحتاج مراجعة.',
+                          'لديك ${_mistakes.length} أسئلة تحتاج مراجعة.',
                           style: TextStyle(
                             color: muted,
                             fontWeight: FontWeight.w700,
