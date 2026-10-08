@@ -18,13 +18,13 @@ void main() {
     expect(grade2MathChapters[9].title, 'الجبر: الدوال الخطية');
   });
 
-  test('course exposes sixty nine available lessons', () {
+  test('course exposes seventy one available lessons', () {
     final lessons = grade2MathChapters
         .expand((chapter) => chapter.lessons)
         .where((lesson) => lesson.isAvailable)
         .toList();
 
-    expect(lessons, hasLength(69));
+    expect(lessons, hasLength(71));
   });
 
   test('every lesson has content, practice and five quiz questions', () {
@@ -57,6 +57,6 @@ void main() {
       expect(ids.add(question.id), isTrue);
     }
 
-    expect(allGrade2MathQuestions, hasLength(345));
+    expect(allGrade2MathQuestions, hasLength(355));
   });
 }
