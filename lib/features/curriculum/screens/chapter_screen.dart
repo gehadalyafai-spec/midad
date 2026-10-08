@@ -1,13 +1,44 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/theme/app_theme.dart';
+import '../../../services/progress_service.dart';
 import '../../lessons/screens/lesson_screen.dart';
 import '../models/curriculum_models.dart';
 
-class ChapterScreen extends StatelessWidget {
+class ChapterScreen extends StatefulWidget {
   const ChapterScreen({super.key, required this.chapter});
 
   final Chapter chapter;
+
+  @override
+  State<ChapterScreen> createState() => _ChapterScreenState();
+}
+
+class _ChapterScreenState extends State<ChapterScreen> {
+  final ProgressService _progressService = ProgressService();
+
+  Set<String> _completedLessonIds = const <String>{};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProgress();
+  }
+
+  Future<void> _loadProgress() async {
+    final completed = await _progressService.getCompletedLessonIds();
+    if (!mounted) return;
+    setState(() => _completedLessonIds = completed);
+  }
+
+  Future<void> _openLesson(Lesson lesson) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => LessonScreen(lesson: lesson),
+      ),
+    );
+    await _loadProgress();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +50,7 @@ class ChapterScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
           Text(
-            chapter.title,
+            widget.chapter.title,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: colors.onSurface,
@@ -27,29 +58,22 @@ class ChapterScreen extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            chapter.subtitle,
+            widget.chapter.subtitle,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: colors.onSurfaceVariant,
                   height: 1.6,
                 ),
           ),
           const SizedBox(height: 22),
-          ...List.generate(chapter.lessons.length, (index) {
-            final lesson = chapter.lessons[index];
+          ...List.generate(widget.chapter.lessons.length, (index) {
+            final lesson = widget.chapter.lessons[index];
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: _LessonTile(
                 number: index + 1,
                 lesson: lesson,
-                onTap: lesson.isAvailable
-                    ? () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => LessonScreen(lesson: lesson),
-                          ),
-                        );
-                      }
-                    : null,
+                completed: _completedLessonIds.contains(lesson.id),
+                onTap: lesson.isAvailable ? () => _openLesson(lesson) : null,
               ),
             );
           }),
@@ -63,11 +87,13 @@ class _LessonTile extends StatelessWidget {
   const _LessonTile({
     required this.number,
     required this.lesson,
+    required this.completed,
     required this.onTap,
   });
 
   final int number;
   final Lesson lesson;
+  final bool completed;
   final VoidCallback? onTap;
 
   @override
@@ -87,9 +113,11 @@ class _LessonTile extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.07)
-                  : const Color(0xFFE5EAE7),
+              color: completed
+                  ? Colors.green.withValues(alpha: 0.35)
+                  : (isDark
+                      ? Colors.white.withValues(alpha: 0.07)
+                      : const Color(0xFFE5EAE7)),
             ),
           ),
           child: Row(
@@ -99,24 +127,32 @@ class _LessonTile extends StatelessWidget {
                 height: 44,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: enabled
-                      ? colors.primaryContainer
-                      : colors.surfaceContainerHighest,
+                  color: completed
+                      ? Colors.green.withValues(alpha: 0.12)
+                      : (enabled
+                          ? colors.primaryContainer
+                          : colors.surfaceContainerHighest),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: enabled
-                    ? Text(
-                        '$number',
-                        style: TextStyle(
-                          color: colors.onPrimaryContainer,
-                          fontWeight: FontWeight.w900,
-                        ),
+                child: completed
+                    ? const Icon(
+                        Icons.check_rounded,
+                        color: Colors.green,
+                        size: 22,
                       )
-                    : Icon(
-                        Icons.lock_outline_rounded,
-                        size: 20,
-                        color: colors.onSurfaceVariant,
-                      ),
+                    : (enabled
+                        ? Text(
+                            '$number',
+                            style: TextStyle(
+                              color: colors.onPrimaryContainer,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          )
+                        : Icon(
+                            Icons.lock_outline_rounded,
+                            size: 20,
+                            color: colors.onSurfaceVariant,
+                          )),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -134,9 +170,13 @@ class _LessonTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      enabled ? lesson.subtitle : 'سيُضاف قريبًا',
+                      completed
+                          ? 'تم إكمال الدرس'
+                          : (enabled ? lesson.subtitle : 'سيُضاف قريبًا'),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: colors.onSurfaceVariant,
+                            color: completed
+                                ? Colors.green
+                                : colors.onSurfaceVariant,
                           ),
                     ),
                   ],
@@ -146,7 +186,7 @@ class _LessonTile extends StatelessWidget {
                 Icon(
                   Icons.arrow_back_ios_new_rounded,
                   size: 16,
-                  color: colors.primary,
+                  color: completed ? Colors.green : colors.primary,
                 ),
             ],
           ),
