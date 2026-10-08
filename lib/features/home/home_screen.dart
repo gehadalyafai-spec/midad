@@ -64,6 +64,19 @@ class _HomeScreenState extends State<HomeScreen> {
     return null;
   }
 
+  Lesson _nextLesson(Chapter chapter) {
+    final available =
+        chapter.lessons.where((lesson) => lesson.isAvailable).toList();
+
+    for (final lesson in available) {
+      if (!_completedLessonIds.contains(lesson.id)) {
+        return lesson;
+      }
+    }
+
+    return available.last;
+  }
+
   Future<void> _openChapter(Chapter chapter) async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -89,12 +102,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _openQuiz(Chapter chapter) async {
-    final lesson = chapter.lessons.firstWhere((item) => item.isAvailable);
+    final lesson = _nextLesson(chapter);
     await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
         builder: (_) => QuizScreen(
           lesson: lesson,
-          questions: rationalNumbersIntroQuiz,
+          questions: quizForLesson(lesson.id),
         ),
       ),
     );
@@ -102,12 +115,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _openMistakes(Chapter chapter) async {
-    final lesson = chapter.lessons.firstWhere((item) => item.isAvailable);
+    final lesson = _nextLesson(chapter);
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => MistakesScreen(
           lesson: lesson,
-          allQuestions: rationalNumbersIntroQuiz,
+          allQuestions: allRationalNumbersQuestions,
         ),
       ),
     );
