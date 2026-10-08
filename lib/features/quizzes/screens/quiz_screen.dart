@@ -297,6 +297,7 @@ class _FocusOption extends StatelessWidget {
     required this.answered,
     required this.correctIndex,
     required this.surface,
+    required this.textColor,
     required this.mutedColor,
     required this.onTap,
   });
@@ -406,7 +407,6 @@ class _AnswerExplanation extends StatelessWidget {
     required this.correct,
     required this.text,
     required this.surface,
-    required this.textColor,
     required this.mutedColor,
   });
 
