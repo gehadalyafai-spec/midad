@@ -8,6 +8,7 @@ import '../curriculum/data/grade2_math_data.dart';
 import '../curriculum/models/curriculum_models.dart';
 import '../curriculum/screens/chapter_screen.dart';
 import '../lessons/screens/lesson_screen.dart';
+import '../mistakes/screens/mistakes_screen.dart';
 import '../quizzes/data/rational_numbers_quiz.dart';
 import '../quizzes/screens/quiz_screen.dart';
 
@@ -23,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool _isLoading = true;
   Set<String> _completedLessonIds = const <String>{};
+  Set<String> _mistakeQuestionIds = const <String>{};
   String? _lastLessonId;
   String? _lastLessonTitle;
 
@@ -38,10 +40,12 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final completedFuture = _progressService.getCompletedLessonIds();
+    final mistakesFuture = _progressService.getMistakeQuestionIds();
     final lastIdFuture = _progressService.getLastLessonId();
     final lastTitleFuture = _progressService.getLastLessonTitle();
 
     final completed = await completedFuture;
+    final mistakes = await mistakesFuture;
     final lastId = await lastIdFuture;
     final lastTitle = await lastTitleFuture;
 
@@ -52,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!mounted) return;
     setState(() {
       _completedLessonIds = completed;
+      _mistakeQuestionIds = mistakes;
       _lastLessonId = lastId;
       _lastLessonTitle = lastTitle;
       _isLoading = false;
@@ -102,6 +107,20 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (_) => QuizScreen(
           lesson: lesson,
           questions: rationalNumbersIntroQuiz,
+        ),
+      ),
+    );
+    await _loadProgress();
+  }
+
+  Future<void> _openMistakes(Chapter chapter) async {
+    final lesson = chapter.lessons.firstWhere((item) => item.isAvailable);
+
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => MistakesScreen(
+          lesson: lesson,
+          allQuestions: rationalNumbersIntroQuiz,
         ),
       ),
     );
@@ -209,8 +228,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 14),
                   _LearningGrid(
                     progress: progress,
+                    mistakeCount: _mistakeQuestionIds.length,
                     onOpenMath: () => _openChapter(firstChapter),
                     onOpenQuiz: () => _openStarterQuiz(firstChapter),
+                    onReviewMistakes: () => _openMistakes(firstChapter),
                     onShowProgress: () {
                       final percent = (progress * 100).round();
                       _showMessage(
@@ -218,8 +239,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         'أنجزت $completedCount من ${availableLessons.length} درس • $percent%',
                       );
                     },
-                    onComingSoon: (label) =>
-                        _showComingSoon(context, label),
                   ),
                   const SizedBox(height: 26),
                   const _SectionHeader(
@@ -446,17 +465,19 @@ class _SectionHeader extends StatelessWidget {
 class _LearningGrid extends StatelessWidget {
   const _LearningGrid({
     required this.progress,
+    required this.mistakeCount,
     required this.onOpenMath,
     required this.onOpenQuiz,
+    required this.onReviewMistakes,
     required this.onShowProgress,
-    required this.onComingSoon,
   });
 
   final double progress;
+  final int mistakeCount;
   final VoidCallback onOpenMath;
   final VoidCallback onOpenQuiz;
+  final VoidCallback onReviewMistakes;
   final VoidCallback onShowProgress;
-  final ValueChanged<String> onComingSoon;
 
   @override
   Widget build(BuildContext context) {
@@ -480,9 +501,10 @@ class _LearningGrid extends StatelessWidget {
       _LearningTask(
         icon: Icons.replay_rounded,
         title: 'راجع أخطاءك',
-        subtitle: 'ارجع للأسئلة التي أخطأت فيها',
-        badge: 'قريبًا',
-        onTap: () => onComingSoon('مراجعة الأخطاء'),
+        subtitle: 'صحح الأسئلة التي أخطأت فيها',
+        badge: mistakeCount == 0 ? 'لا أخطاء' : '$mistakeCount أخطاء',
+        enabled: true,
+        onTap: onReviewMistakes,
       ),
       _LearningTask(
         icon: Icons.insights_rounded,
