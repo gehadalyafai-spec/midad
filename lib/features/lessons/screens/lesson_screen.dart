@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../../app/theme/app_theme.dart';
 import '../../../services/progress_service.dart';
@@ -17,7 +18,6 @@ class LessonScreen extends StatefulWidget {
 
 class _LessonScreenState extends State<LessonScreen> {
   final ProgressService _progressService = ProgressService();
-
   bool _isCompleted = false;
 
   @override
@@ -58,140 +58,376 @@ class _LessonScreenState extends State<LessonScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final text = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final muted =
+        isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+    final paper = isDark ? AppColors.darkSurface : const Color(0xFFFFFDF8);
+
     return Scaffold(
-      appBar: AppBar(title: Text(widget.lesson.title)),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-        children: [
-          _HeaderCard(
-            lesson: widget.lesson,
-            isCompleted: _isCompleted,
-          ),
-          const SizedBox(height: 16),
-          const _SectionCard(
-            icon: Icons.lightbulb_outline_rounded,
-            title: 'الفكرة الأساسية',
-            text:
-                'العدد النسبي هو أي عدد يمكن كتابته على صورة أ/ب، حيث أ و ب عددان صحيحان، وب لا يساوي صفرًا.',
-          ),
-          const SizedBox(height: 12),
-          const _SectionCard(
-            icon: Icons.menu_book_rounded,
-            title: 'افهم الدرس',
-            text:
-                'تشمل الأعداد النسبية الكسور والأعداد الصحيحة وبعض الأعداد العشرية. مثال: 3/4 عدد نسبي، وكذلك -2 لأنه يمكن كتابته على الصورة -2/1.',
-          ),
-          const SizedBox(height: 12),
-          const _ExampleCard(),
-          const SizedBox(height: 12),
-          const _SectionCard(
-            icon: Icons.warning_amber_rounded,
-            title: 'خطأ شائع',
-            text:
-                'لا يمكن أن يكون مقام الكسر صفرًا. لذلك أي تعبير على صورة أ/0 لا يمثل عددًا نسبيًا معرّفًا.',
-          ),
-          const SizedBox(height: 20),
-          FilledButton.icon(
-            onPressed: _openQuiz,
-            icon: Icon(
-              _isCompleted
-                  ? Icons.check_circle_rounded
-                  : Icons.fact_check_outlined,
-            ),
-            label: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              child: Text(
-                _isCompleted ? 'أعد الاختبار' : 'اختبر نفسك',
-                style: const TextStyle(fontWeight: FontWeight.w900),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _NotebookLinesPainter(
+                  lineColor: isDark
+                      ? Colors.white.withValues(alpha: 0.035)
+                      : AppColors.primary.withValues(alpha: 0.045),
+                  marginColor: AppColors.accent.withValues(alpha: 0.13),
+                ),
               ),
             ),
-          ),
-          if (_isCompleted) ...[
-            const SizedBox(height: 12),
-            const _CompletedBanner(),
+            ListView(
+              padding: const EdgeInsets.fromLTRB(22, 18, 22, 120),
+              children: [
+                Row(
+                  children: [
+                    _RoundBackButton(
+                      paper: paper,
+                      color: text,
+                      onTap: () => Navigator.of(context).pop(),
+                    ),
+                    const Spacer(),
+                    if (_isCompleted)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.check_rounded,
+                              size: 16,
+                              color: Colors.white,
+                            ),
+                            SizedBox(width: 5),
+                            Text(
+                              'مكتمل',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 32),
+                Text(
+                  'درس اليوم',
+                  style: const TextStyle(
+                    color: AppColors.accent,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  widget.lesson.title,
+                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        color: text,
+                        fontWeight: FontWeight.w900,
+                        height: 1.04,
+                        letterSpacing: -1.1,
+                      ),
+                )
+                    .animate()
+                    .fadeIn(duration: 350.ms)
+                    .slideY(begin: 0.08, end: 0),
+                const SizedBox(height: 10),
+                Text(
+                  widget.lesson.subtitle,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: muted,
+                        height: 1.6,
+                      ),
+                ),
+                const SizedBox(height: 30),
+                _ConceptBoard(
+                  paper: paper,
+                  textColor: text,
+                  mutedColor: muted,
+                ).animate(delay: 80.ms).fadeIn(duration: 360.ms),
+                const SizedBox(height: 30),
+                _LessonSection(
+                  number: '01',
+                  title: 'الفكرة الأساسية',
+                  text:
+                      'العدد النسبي هو أي عدد يمكن كتابته على صورة أ/ب، حيث أ و ب عددان صحيحان، وب لا يساوي صفرًا.',
+                  accent: AppColors.primary,
+                  textColor: text,
+                  mutedColor: muted,
+                ).animate(delay: 120.ms).fadeIn(),
+                const SizedBox(height: 26),
+                _LessonSection(
+                  number: '02',
+                  title: 'كيف أفهمها؟',
+                  text:
+                      'تشمل الأعداد النسبية الكسور والأعداد الصحيحة وبعض الأعداد العشرية. مثال: 3/4 عدد نسبي، وكذلك -2 لأنه يمكن كتابته على الصورة -2/1.',
+                  accent: AppColors.secondary,
+                  textColor: text,
+                  mutedColor: muted,
+                ).animate(delay: 170.ms).fadeIn(),
+                const SizedBox(height: 26),
+                _WorkedExample(
+                  textColor: text,
+                  mutedColor: muted,
+                ).animate(delay: 210.ms).fadeIn(),
+                const SizedBox(height: 18),
+                _WarningNote(
+                  textColor: text,
+                  mutedColor: muted,
+                ).animate(delay: 250.ms).fadeIn(),
+                if (_isCompleted) ...[
+                  const SizedBox(height: 18),
+                  _CompletedNote(
+                    paper: paper,
+                    textColor: text,
+                  ),
+                ],
+              ],
+            ),
+            Positioned(
+              left: 22,
+              right: 22,
+              bottom: 18,
+              child: _LessonActionBar(
+                completed: _isCompleted,
+                onQuiz: _openQuiz,
+              ),
+            ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RoundBackButton extends StatelessWidget {
+  const _RoundBackButton({
+    required this.paper,
+    required this.color,
+    required this.onTap,
+  });
+
+  final Color paper;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: paper,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: SizedBox(
+          width: 46,
+          height: 46,
+          child: Icon(Icons.arrow_forward_rounded, color: color),
+        ),
+      ),
+    );
+  }
+}
+
+class _ConceptBoard extends StatelessWidget {
+  const _ConceptBoard({
+    required this.paper,
+    required this.textColor,
+    required this.mutedColor,
+  });
+
+  final Color paper;
+  final Color textColor;
+  final Color mutedColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        color: AppColors.primaryDark,
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'الشكل العام',
+                  style: TextStyle(
+                    color: Colors.white60,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'أ / ب',
+                  textDirection: TextDirection.rtl,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 42,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'ب ≠ 0',
+                  style: TextStyle(
+                    color: AppColors.secondary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            width: 92,
+            height: 92,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppColors.secondary,
+              borderRadius: BorderRadius.circular(28),
+            ),
+            child: const Icon(
+              Icons.functions_rounded,
+              color: AppColors.primaryDark,
+              size: 42,
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-class _HeaderCard extends StatelessWidget {
-  const _HeaderCard({
-    required this.lesson,
-    required this.isCompleted,
+class _LessonSection extends StatelessWidget {
+  const _LessonSection({
+    required this.number,
+    required this.title,
+    required this.text,
+    required this.accent,
+    required this.textColor,
+    required this.mutedColor,
   });
 
-  final Lesson lesson;
-  final bool isCompleted;
+  final String number;
+  final String title;
+  final String text;
+  final Color accent;
+  final Color textColor;
+  final Color mutedColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          number,
+          style: TextStyle(
+            color: accent,
+            fontWeight: FontWeight.w900,
+            fontSize: 13,
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w900,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                text,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: mutedColor,
+                      height: 1.75,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _WorkedExample extends StatelessWidget {
+  const _WorkedExample({
+    required this.textColor,
+    required this.mutedColor,
+  });
+
+  final Color textColor;
+  final Color mutedColor;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDark],
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-        ),
-        borderRadius: BorderRadius.circular(24),
+        color: AppColors.secondary,
+        borderRadius: BorderRadius.circular(28),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              const Expanded(
-                child: Text(
-                  'رياضيات • ثاني متوسط',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
+              Icon(
+                Icons.auto_awesome_rounded,
+                color: AppColors.primaryDark,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'مثال محلول',
+                style: TextStyle(
+                  color: AppColors.primaryDark,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 17,
                 ),
               ),
-              if (isCompleted)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.14),
-                    borderRadius: BorderRadius.circular(99),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.check_circle_rounded,
-                        size: 15,
-                        color: Colors.white,
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        'مكتمل',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            lesson.title,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                ),
+          const SizedBox(height: 16),
+          const Text(
+            '-5 = -5/1',
+            textDirection: TextDirection.ltr,
+            style: TextStyle(
+              color: AppColors.primaryDark,
+              fontWeight: FontWeight.w900,
+              fontSize: 28,
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
-            lesson.subtitle,
-            style: const TextStyle(color: Colors.white70, height: 1.5),
+            'إذن -5 عدد نسبي، لأننا كتبناه على صورة كسر مقامه لا يساوي صفرًا. وكذلك 0.75 = 3/4.',
+            style: const TextStyle(
+              color: AppColors.primaryDark,
+              height: 1.65,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       ),
@@ -199,66 +435,55 @@ class _HeaderCard extends StatelessWidget {
   }
 }
 
-class _SectionCard extends StatelessWidget {
-  const _SectionCard({
-    required this.icon,
-    required this.title,
-    required this.text,
+class _WarningNote extends StatelessWidget {
+  const _WarningNote({
+    required this.textColor,
+    required this.mutedColor,
   });
 
-  final IconData icon;
-  final String title;
-  final String text;
+  final Color textColor;
+  final Color mutedColor;
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        color: AppColors.accent.withValues(alpha: 0.11),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.07)
-              : const Color(0xFFE5EAE7),
+          color: AppColors.accent.withValues(alpha: 0.28),
         ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: colors.primaryContainer,
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: Icon(icon, color: colors.onPrimaryContainer),
+          const Icon(
+            Icons.error_outline_rounded,
+            color: AppColors.accent,
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: colors.onSurface,
-                      ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  text,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: colors.onSurfaceVariant,
-                        height: 1.7,
-                      ),
-                ),
-              ],
+            child: RichText(
+              text: TextSpan(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: mutedColor,
+                      height: 1.65,
+                    ),
+                children: [
+                  TextSpan(
+                    text: 'انتبه: ',
+                    style: TextStyle(
+                      color: textColor,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const TextSpan(
+                    text:
+                        'لا يمكن أن يكون مقام الكسر صفرًا؛ لذلك أي تعبير على صورة أ/0 غير معرّف.',
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -267,48 +492,42 @@ class _SectionCard extends StatelessWidget {
   }
 }
 
-class _ExampleCard extends StatelessWidget {
-  const _ExampleCard();
+class _CompletedNote extends StatelessWidget {
+  const _CompletedNote({
+    required this.paper,
+    required this.textColor,
+  });
+
+  final Color paper;
+  final Color textColor;
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final background =
-        isDark ? const Color(0xFF2A251B) : const Color(0xFFFFF8E8);
-    final border =
-        isDark ? const Color(0xFF4A3D22) : const Color(0xFFF0DDAE);
-
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: border),
+        color: paper,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.25),
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              const Icon(Icons.calculate_outlined, color: AppColors.secondary),
-              const SizedBox(width: 8),
-              Text(
-                'مثال سريع',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: colors.onSurface,
-                    ),
-              ),
-            ],
+          const Icon(
+            Icons.verified_rounded,
+            color: AppColors.primary,
           ),
-          const SizedBox(height: 12),
-          Text(
-            'العدد -5 عدد نسبي؛ لأننا نستطيع كتابته على الصورة -5/1. والعدد 0.75 نسبي أيضًا لأنه يساوي 3/4.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colors.onSurfaceVariant,
-                  height: 1.7,
-                ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'أكملت هذا الدرس بنجاح. يمكنك إعادة الاختبار وقتما تريد.',
+              style: TextStyle(
+                color: textColor,
+                fontWeight: FontWeight.w800,
+                height: 1.5,
+              ),
+            ),
           ),
         ],
       ),
@@ -316,30 +535,95 @@ class _ExampleCard extends StatelessWidget {
   }
 }
 
-class _CompletedBanner extends StatelessWidget {
-  const _CompletedBanner();
+class _LessonActionBar extends StatelessWidget {
+  const _LessonActionBar({
+    required this.completed,
+    required this.onQuiz,
+  });
+
+  final bool completed;
+  final VoidCallback onQuiz;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(15),
+      height: 68,
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.green.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.green.withValues(alpha: 0.22)),
+        color: AppColors.primaryDark,
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.16),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
+          ),
+        ],
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.verified_rounded, color: Colors.green),
-          SizedBox(width: 10),
           Expanded(
             child: Text(
-              'أتممت هذا الدرس بنجاح. يمكنك إعادة الاختبار في أي وقت.',
-              style: TextStyle(fontWeight: FontWeight.w700, height: 1.5),
+              completed ? 'أتقنت الدرس' : 'جاهز للاختبار؟',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          FilledButton.icon(
+            onPressed: onQuiz,
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.secondary,
+              foregroundColor: AppColors.primaryDark,
+            ),
+            icon: Icon(
+              completed ? Icons.replay_rounded : Icons.bolt_rounded,
+            ),
+            label: Text(
+              completed ? 'أعد الاختبار' : 'ابدأ',
+              style: const TextStyle(fontWeight: FontWeight.w900),
             ),
           ),
         ],
       ),
     );
+  }
+}
+
+class _NotebookLinesPainter extends CustomPainter {
+  const _NotebookLinesPainter({
+    required this.lineColor,
+    required this.marginColor,
+  });
+
+  final Color lineColor;
+  final Color marginColor;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final linePaint = Paint()
+      ..color = lineColor
+      ..strokeWidth = 1;
+    final marginPaint = Paint()
+      ..color = marginColor
+      ..strokeWidth = 1.5;
+
+    const gap = 34.0;
+    for (double y = 86; y < size.height; y += gap) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), linePaint);
+    }
+
+    canvas.drawLine(
+      Offset(size.width - 34, 0),
+      Offset(size.width - 34, size.height),
+      marginPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _NotebookLinesPainter oldDelegate) {
+    return oldDelegate.lineColor != lineColor ||
+        oldDelegate.marginColor != marginColor;
   }
 }
