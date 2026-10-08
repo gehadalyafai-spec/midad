@@ -9,11 +9,17 @@ class ProgressService {
   static const _completedLessonsKey = 'completed_lesson_ids';
   static const _lastLessonIdKey = 'last_lesson_id';
   static const _lastLessonTitleKey = 'last_lesson_title';
+  static const _mistakeQuestionIdsKey = 'mistake_question_ids';
 
   final SharedPreferencesAsync _preferences;
 
   Future<Set<String>> getCompletedLessonIds() async {
     final values = await _preferences.getStringList(_completedLessonsKey);
+    return (values ?? const <String>[]).toSet();
+  }
+
+  Future<Set<String>> getMistakeQuestionIds() async {
+    final values = await _preferences.getStringList(_mistakeQuestionIdsKey);
     return (values ?? const <String>[]).toSet();
   }
 
@@ -37,5 +43,21 @@ class ProgressService {
 
     await _preferences.setStringList(_completedLessonsKey, sorted);
     await markLessonStarted(lesson);
+  }
+
+  Future<void> recordQuestionResult({
+    required String questionId,
+    required bool isCorrect,
+  }) async {
+    final mistakes = await getMistakeQuestionIds();
+
+    if (isCorrect) {
+      mistakes.remove(questionId);
+    } else {
+      mistakes.add(questionId);
+    }
+
+    final sorted = mistakes.toList()..sort();
+    await _preferences.setStringList(_mistakeQuestionIdsKey, sorted);
   }
 }
