@@ -122,6 +122,27 @@ const grade2MathLessonContent = <String, LessonContent>{
     practiceFeedback:
         'صحيح: 3/7 ÷ 2/5 تصبح 3/7 × 5/2، والناتج 15/14.',
   ),
+  'add-subtract-rational': LessonContent(
+    conceptLabel: 'قاعدة الجمع',
+    conceptMain: 'وحّد المقامات',
+    conceptHint: 'ثم اجمع أو اطرح',
+    sectionOneTitle: 'الفكرة الأساسية',
+    sectionOneBody:
+        'عند جمع أو طرح كسور ذات مقامات مختلفة، يجب أولًا إيجاد مقام مشترك ثم تحويل الكسور إلى كسور مكافئة.',
+    sectionTwoTitle: 'كيف أتعامل مع الإشارات؟',
+    sectionTwoBody:
+        'بعد توحيد المقامات نتعامل مع البسطين كأعداد صحيحة: إذا كانت الإشارتان متماثلتين نجمع القيم ونحافظ على الإشارة، وإذا اختلفتا نطرح الأصغر من الأكبر ونأخذ إشارة الأكبر قيمةً.',
+    exampleFormula: '1/3 + (-1/2) = -1/6',
+    exampleBody:
+        'المقام المشترك هو 6: يصبح 1/3 = 2/6 و-1/2 = -3/6، ثم 2/6 + (-3/6) = -1/6.',
+    warning:
+        'لا تجمع المقامات أو تطرحها. المقام يبقى موحدًا بعد إيجاد المقام المشترك، والعملية تكون على البسطين فقط.',
+    practiceQuestion: 'ما ناتج 2/5 + 1/10؟',
+    practiceOptions: ['3/15', '5/10', '1/2', '3/10'],
+    practiceCorrectIndex: 2,
+    practiceFeedback:
+        'صحيح: 2/5 = 4/10، ثم 4/10 + 1/10 = 5/10 = 1/2.',
+  ),
 };
 
 LessonContent lessonContentFor(String lessonId) {
