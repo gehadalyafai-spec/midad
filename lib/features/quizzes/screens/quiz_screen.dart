@@ -12,10 +12,12 @@ class QuizScreen extends StatefulWidget {
     super.key,
     required this.lesson,
     required this.questions,
+    this.markLessonComplete = true,
   });
 
   final Lesson lesson;
   final List<QuizQuestion> questions;
+  final bool markLessonComplete;
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -38,7 +40,7 @@ class _QuizScreenState extends State<QuizScreen> {
     setState(() => _selectedIndex = index);
   }
 
-  void _checkAnswer() {
+  Future<void> _checkAnswer() async {
     if (_selectedIndex == null || _answered) return;
 
     final isCorrect = _selectedIndex == _question.correctIndex;
@@ -46,6 +48,11 @@ class _QuizScreenState extends State<QuizScreen> {
       _answered = true;
       if (isCorrect) _score++;
     });
+
+    await _progressService.recordQuestionResult(
+      questionId: _question.id,
+      isCorrect: isCorrect,
+    );
   }
 
   Future<void> _next() async {
@@ -63,7 +70,7 @@ class _QuizScreenState extends State<QuizScreen> {
     final minimumScore = math.max(1, (widget.questions.length * 0.6).ceil());
     final passed = _score >= minimumScore;
 
-    if (passed) {
+    if (passed && widget.markLessonComplete) {
       await _progressService.markLessonCompleted(widget.lesson);
     }
 
