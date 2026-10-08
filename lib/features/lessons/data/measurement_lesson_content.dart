@@ -121,7 +121,7 @@ const measurementLessonContent = <String, LessonContent>{
         'الحد الأول يمثل القاعدتين، والحد الثاني يمثل المستطيل الناتج عن فرد السطح الجانبي.',
     warning:
         'مساحة السطح تقاس بوحدات مربعة لأنها مجموع مساحات.',
-    practiceQuestion: 'مساحة سطح مجسم تعني:',options:['حجمه','مجموع مساحات أوجهه','ارتفاعه','طول حرفه'],practiceCorrectIndex:1,practiceFeedback:'صحيح: مساحة السطح تجمع مساحات الأسطح الخارجية.',
+    practiceQuestion: 'مساحة سطح مجسم تعني:', practiceOptions: ['حجمه', 'مجموع مساحات أوجهه', 'ارتفاعه', 'طول حرفه'], practiceCorrectIndex: 1, practiceFeedback: 'صحيح: مساحة السطح تجمع مساحات الأسطح الخارجية.',
   ),
   'pyramid-surface-area': LessonContent(
     conceptLabel: 'سطح الهرم',
