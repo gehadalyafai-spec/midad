@@ -87,4 +87,16 @@ const grade2MathChapters = <Chapter>[
       Lesson(id: 'choose-display', title: 'اختيار طريقة التمثيل المناسبة', subtitle: 'اختيار الرسم الذي يوضح نوع البيانات والهدف منها.'),
     ],
   ),
+  Chapter(
+    id: 'probability',
+    title: 'الاحتمالات',
+    subtitle: 'عد النواتج وحساب الاحتمالات واستخدام العينات في التنبؤ.',
+    lessons: [
+      Lesson(id: 'count-outcomes', title: 'عد النواتج', subtitle: 'تنظيم جميع النتائج الممكنة باستخدام أكثر من طريقة.'),
+      Lesson(id: 'compound-events', title: 'احتمال الحوادث المركبة', subtitle: 'حساب احتمال أحداث تتكون من أكثر من خطوة.'),
+      Lesson(id: 'theoretical-experimental', title: 'الاحتمال النظري والاحتمال التجريبي', subtitle: 'التمييز بين الاحتمال المتوقع والنتائج الفعلية.'),
+      Lesson(id: 'represent-problem', title: 'استراتيجية حل المسألة: تمثيل المسألة', subtitle: 'تنظيم فضاء العينة بمخططات أو جداول أو قوائم.'),
+      Lesson(id: 'sampling-prediction', title: 'استعمال المعاينة في التنبؤ', subtitle: 'استخدام عينة ممثلة لتقدير خصائص مجتمع أكبر.'),
+    ],
+  ),
 ];
