@@ -20,13 +20,11 @@ const grade2MathChapters = <Chapter>[
         id: 'multiply-rational',
         title: 'ضرب الأعداد النسبية',
         subtitle: 'تحديد الإشارة وإجراء عملية الضرب.',
-        isAvailable: false,
       ),
       Lesson(
         id: 'divide-rational',
         title: 'قسمة الأعداد النسبية',
         subtitle: 'القسمة مع فهم الإشارات والمقلوب.',
-        isAvailable: false,
       ),
       Lesson(
         id: 'add-subtract-rational',
