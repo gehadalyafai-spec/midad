@@ -87,11 +87,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _continueLearning(Chapter chapter) async {
-    final lesson = _findLesson(chapter, _lastLessonId);
-    if (lesson == null) {
-      await _openChapter(chapter);
-      return;
-    }
+    final lastLesson = _findLesson(chapter, _lastLessonId);
+    final lesson = lastLesson == null ||
+            _completedLessonIds.contains(lastLesson.id)
+        ? _nextLesson(chapter)
+        : lastLesson;
 
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -136,6 +136,11 @@ class _HomeScreenState extends State<HomeScreen> {
         .where((lesson) => _completedLessonIds.contains(lesson.id))
         .length;
     final progress = available.isEmpty ? 0.0 : completed / available.length;
+    final lastLesson = _findLesson(chapter, _lastLessonId);
+    final continueLesson = lastLesson == null ||
+            _completedLessonIds.contains(lastLesson.id)
+        ? _nextLesson(chapter)
+        : lastLesson;
 
     return Scaffold(
       body: SafeArea(
@@ -150,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   completed: completed,
                   total: available.length,
                   mistakeCount: _mistakeQuestionIds.length,
-                  lastLessonTitle: _lastLessonTitle,
+                  lastLessonTitle: continueLesson.title,
                   onContinue: () => _continueLearning(chapter),
                   onOpenCourse: () => _openChapter(chapter),
                   onQuiz: () => _openQuiz(chapter),
