@@ -7,6 +7,7 @@ import '../../services/progress_service.dart';
 import '../curriculum/data/grade2_math_data.dart';
 import '../curriculum/models/curriculum_models.dart';
 import '../curriculum/screens/chapter_screen.dart';
+import '../curriculum/screens/math_course_screen.dart';
 import '../lessons/screens/lesson_screen.dart';
 import '../mistakes/screens/mistakes_screen.dart';
 import '../progress/screens/progress_screen.dart';
@@ -147,6 +148,15 @@ class _HomeScreenState extends State<HomeScreen> {
     await _loadProgress();
   }
 
+  Future<void> _openCourseOverview() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const MathCourseScreen(),
+      ),
+    );
+    await _loadProgress();
+  }
+
   @override
   Widget build(BuildContext context) {
     final chapter = _activeChapter();
@@ -177,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   mistakeCount: _mistakeQuestionIds.length,
                   lastLessonTitle: continueLesson.title,
                   onContinue: () => _continueLearning(chapter),
-                  onOpenCourse: () => _openChapter(chapter),
+                  onOpenCourse: _openCourseOverview,
                   onQuiz: () => _openQuiz(chapter),
                   onMistakes: () => _openMistakes(chapter),
                   onProgress: () => _openProgress(chapter),
@@ -529,7 +539,7 @@ class _ContinuePanel extends StatelessWidget {
                             style: TextButton.styleFrom(
                               foregroundColor: Colors.white,
                             ),
-                            child: const Text('عرض الفصل'),
+                            child: const Text('كل الفصول'),
                           ),
                         ],
                       ),
