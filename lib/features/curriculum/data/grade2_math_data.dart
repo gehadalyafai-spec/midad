@@ -45,4 +45,16 @@ const grade2MathChapters = <Chapter>[
       Lesson(id: 'indirect-measurement', title: 'القياس غير المباشر', subtitle: 'إيجاد أطوال يصعب قياسها مباشرة باستخدام التشابه.'),
     ],
   ),
+  Chapter(
+    id: 'percent',
+    title: 'النسبة المئوية',
+    subtitle: 'حساب النسب والتقدير والتغير المئوي.',
+    lessons: [
+      Lesson(id: 'mental-percent', title: 'إيجاد النسب المئوية ذهنيًا', subtitle: 'استخدام الكسور والنسب السهلة للحساب الذهني.'),
+      Lesson(id: 'percent-estimation', title: 'النسبة المئوية والتقدير', subtitle: 'تقدير النسب المئوية بسرعة وبشكل معقول.'),
+      Lesson(id: 'reasonableness-strategy', title: 'استراتيجية حل المسألة: التحقق من معقولية الإجابة', subtitle: 'فحص النتائج باستخدام التقدير والمنطق.'),
+      Lesson(id: 'percent-equation', title: 'المعادلة المئوية', subtitle: 'إيجاد الجزء أو النسبة أو الكل بالمعادلة المئوية.'),
+      Lesson(id: 'percent-change', title: 'التغير المئوي', subtitle: 'حساب الزيادة والنقصان كنسبة من القيمة الأصلية.'),
+    ],
+  ),
 ];
