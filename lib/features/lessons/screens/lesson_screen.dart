@@ -7,6 +7,7 @@ import '../../curriculum/data/grade2_math_data.dart';
 import '../../curriculum/models/curriculum_models.dart';
 import '../../quizzes/data/grade2_math_quiz_registry.dart';
 import '../../quizzes/screens/quiz_screen.dart';
+import '../../progress/screens/course_complete_screen.dart';
 import '../data/grade2_math_lesson_registry.dart';
 
 class LessonScreen extends StatefulWidget {
@@ -107,7 +108,11 @@ class _LessonScreenState extends State<LessonScreen> {
   Future<void> _openNextLesson() async {
     final nextLesson = _nextLessonInCourse();
     if (nextLesson == null) {
-      Navigator.of(context).pop();
+      await Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          builder: (_) => const CourseCompleteScreen(),
+        ),
+      );
       return;
     }
 
