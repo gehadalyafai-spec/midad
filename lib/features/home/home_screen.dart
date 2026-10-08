@@ -156,6 +156,17 @@ class _HomeScreenState extends State<HomeScreen> {
         .where((lesson) => _completedLessonIds.contains(lesson.id))
         .length;
     final progress = available.isEmpty ? 0.0 : completed / available.length;
+
+    final allLessons = grade2MathChapters
+        .expand((item) => item.lessons)
+        .where((lesson) => lesson.isAvailable)
+        .toList();
+    final overallCompleted = allLessons
+        .where((lesson) => _completedLessonIds.contains(lesson.id))
+        .length;
+    final overallProgress =
+        allLessons.isEmpty ? 0.0 : overallCompleted / allLessons.length;
+
     final lastLesson = _findLesson(chapter, _lastLessonId);
     final continueLesson = lastLesson == null ||
             _completedLessonIds.contains(lastLesson.id)
@@ -176,6 +187,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   total: available.length,
                   mistakeCount: _mistakeQuestionIds.length,
                   lastLessonTitle: continueLesson.title,
+                  overallProgress: overallProgress,
+                  overallCompleted: overallCompleted,
+                  overallTotal: allLessons.length,
                   onContinue: () => _continueLearning(chapter),
                   onOpenCourse: _openCourseOverview,
                   onQuiz: () => _openQuiz(chapter),
@@ -197,6 +211,9 @@ class _StudyCanvas extends StatelessWidget {
     required this.total,
     required this.mistakeCount,
     required this.lastLessonTitle,
+    required this.overallProgress,
+    required this.overallCompleted,
+    required this.overallTotal,
     required this.onContinue,
     required this.onOpenCourse,
     required this.onQuiz,
@@ -210,6 +227,9 @@ class _StudyCanvas extends StatelessWidget {
   final int total;
   final int mistakeCount;
   final String? lastLessonTitle;
+  final double overallProgress;
+  final int overallCompleted;
+  final int overallTotal;
   final VoidCallback onContinue;
   final VoidCallback onOpenCourse;
   final VoidCallback onQuiz;
@@ -264,7 +284,21 @@ class _StudyCanvas extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
             ).animate(delay: 110.ms).fadeIn(),
-            const SizedBox(height: 28),
+            const SizedBox(height: 18),
+            _CoursePulse(
+              progress: overallProgress,
+              completed: overallCompleted,
+              total: overallTotal,
+              chapterNumber:
+                  grade2MathChapters.indexWhere((item) => item.id == chapter.id) +
+                      1,
+              chapterCount: grade2MathChapters.length,
+              surface: surface,
+              textColor: text,
+              mutedColor: muted,
+              onTap: onProgress,
+            ).animate(delay: 130.ms).fadeIn(duration: 320.ms),
+            const SizedBox(height: 22),
             _ContinuePanel(
               progress: progress,
               lastLessonTitle: lastLessonTitle,
@@ -329,6 +363,137 @@ class _StudyCanvas extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _CoursePulse extends StatelessWidget {
+  const _CoursePulse({
+    required this.progress,
+    required this.completed,
+    required this.total,
+    required this.chapterNumber,
+    required this.chapterCount,
+    required this.surface,
+    required this.textColor,
+    required this.mutedColor,
+    required this.onTap,
+  });
+
+  final double progress;
+  final int completed;
+  final int total;
+  final int chapterNumber;
+  final int chapterCount;
+  final Color surface;
+  final Color textColor;
+  final Color mutedColor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final percent = (progress * 100).round();
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: mutedColor.withValues(alpha: 0.12),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Text(
+                  percent.toString() + '%',
+                  style: const TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'تقدم المادة',
+                            style: TextStyle(
+                              color: textColor,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          completed.toString() +
+                              '/' +
+                              total.toString() +
+                              ' درس',
+                          style: TextStyle(
+                            color: mutedColor,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 7),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(99),
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        minHeight: 6,
+                        backgroundColor:
+                            mutedColor.withValues(alpha: 0.10),
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          AppColors.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'الفصل ' +
+                          chapterNumber.toString() +
+                          ' من ' +
+                          chapterCount.toString(),
+                      style: TextStyle(
+                        color: mutedColor,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.arrow_back_rounded,
+                color: mutedColor,
+                size: 19,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
