@@ -152,11 +152,9 @@ class _LessonScreenState extends State<LessonScreen> {
                       ),
                 ),
                 const SizedBox(height: 30),
-                _ConceptBoard(
-                  paper: paper,
-                  textColor: text,
-                  mutedColor: muted,
-                ).animate(delay: 80.ms).fadeIn(duration: 360.ms),
+                const _ConceptBoard()
+                    .animate(delay: 80.ms)
+                    .fadeIn(duration: 360.ms),
                 const SizedBox(height: 30),
                 _LessonSection(
                   number: '01',
@@ -178,10 +176,9 @@ class _LessonScreenState extends State<LessonScreen> {
                   mutedColor: muted,
                 ).animate(delay: 170.ms).fadeIn(),
                 const SizedBox(height: 26),
-                _WorkedExample(
-                  textColor: text,
-                  mutedColor: muted,
-                ).animate(delay: 210.ms).fadeIn(),
+                const _WorkedExample()
+                    .animate(delay: 210.ms)
+                    .fadeIn(),
                 const SizedBox(height: 18),
                 _WarningNote(
                   textColor: text,
@@ -242,15 +239,7 @@ class _RoundBackButton extends StatelessWidget {
 }
 
 class _ConceptBoard extends StatelessWidget {
-  const _ConceptBoard({
-    required this.paper,
-    required this.textColor,
-    required this.mutedColor,
-  });
-
-  final Color paper;
-  final Color textColor;
-  final Color mutedColor;
+  const _ConceptBoard();
 
   @override
   Widget build(BuildContext context) {
@@ -374,13 +363,7 @@ class _LessonSection extends StatelessWidget {
 }
 
 class _WorkedExample extends StatelessWidget {
-  const _WorkedExample({
-    required this.textColor,
-    required this.mutedColor,
-  });
-
-  final Color textColor;
-  final Color mutedColor;
+  const _WorkedExample();
 
   @override
   Widget build(BuildContext context) {
