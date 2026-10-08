@@ -190,6 +190,54 @@ const divideRationalQuiz = <QuizQuestion>[
   ),
 ];
 
+const addSubtractRationalQuiz = <QuizQuestion>[
+  QuizQuestion(
+    id: 'asr-1',
+    question: 'ما ناتج 1/3 + 1/6؟',
+    options: ['2/9', '1/2', '2/6', '1/9'],
+    correctIndex: 1,
+    explanation:
+        'نحوّل 1/3 إلى 2/6، ثم 2/6 + 1/6 = 3/6 = 1/2.',
+  ),
+  QuizQuestion(
+    id: 'asr-2',
+    question: 'ما ناتج 3/4 - 1/2؟',
+    options: ['1/4', '2/2', '2/4', '1/2'],
+    correctIndex: 0,
+    explanation:
+        '1/2 = 2/4، ثم 3/4 - 2/4 = 1/4.',
+  ),
+  QuizQuestion(
+    id: 'asr-3',
+    question: 'ما ناتج -2/5 + 1/5؟',
+    options: ['-3/5', '-1/5', '1/5', '3/5'],
+    correctIndex: 1,
+    explanation:
+        'المقامات متساوية، فنحسب -2 + 1 = -1، والناتج -1/5.',
+  ),
+  QuizQuestion(
+    id: 'asr-4',
+    question: 'عند جمع 2/3 و 1/4، ما المقام المشترك المناسب؟',
+    options: ['7', '12', '6', '8'],
+    correctIndex: 1,
+    explanation:
+        'المضاعف المشترك الأصغر للعددين 3 و4 هو 12.',
+  ),
+  QuizQuestion(
+    id: 'asr-5',
+    question: 'أي عبارة صحيحة عند جمع كسرين مختلفي المقام؟',
+    options: [
+      'نجمع المقامين مباشرة',
+      'نوحّد المقامات أولًا',
+      'نضرب البسطين',
+      'نقلب الكسر الثاني'
+    ],
+    correctIndex: 1,
+    explanation:
+        'يجب توحيد المقامات أولًا ثم إجراء الجمع أو الطرح على البسطين.',
+  ),
+];
+
 List<QuizQuestion> quizForLesson(String lessonId) {
   switch (lessonId) {
     case 'compare-rational':
@@ -198,6 +246,8 @@ List<QuizQuestion> quizForLesson(String lessonId) {
       return multiplyRationalQuiz;
     case 'divide-rational':
       return divideRationalQuiz;
+    case 'add-subtract-rational':
+      return addSubtractRationalQuiz;
     case 'rational-numbers-intro':
     default:
       return rationalNumbersIntroQuiz;
@@ -209,4 +259,5 @@ const allRationalNumbersQuestions = <QuizQuestion>[
   ...compareRationalQuiz,
   ...multiplyRationalQuiz,
   ...divideRationalQuiz,
+  ...addSubtractRationalQuiz,
 ];
