@@ -12,6 +12,8 @@ class MidadApp extends StatelessWidget {
       title: 'مداد',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.system,
       builder: (context, child) {
         return Directionality(
           textDirection: TextDirection.rtl,
