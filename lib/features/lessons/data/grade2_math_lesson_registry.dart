@@ -1,6 +1,7 @@
 import 'equations_inequalities_lesson_content.dart';
 import 'geometry_lesson_content.dart';
 import 'grade2_math_lesson_content.dart';
+import 'linear_functions_lesson_content.dart';
 import 'measurement_lesson_content.dart';
 import 'percent_lesson_content.dart';
 import 'probability_lesson_content.dart';
@@ -35,6 +36,9 @@ LessonContent lessonContentForGrade2Math(String lessonId) {
 
   final equations = equationsInequalitiesLessonContent[lessonId];
   if (equations != null) return equations;
+
+  final linearFunctions = linearFunctionsLessonContent[lessonId];
+  if (linearFunctions != null) return linearFunctions;
 
   throw StateError('No lesson content registered for $lessonId');
 }
