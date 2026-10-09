@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:midad/features/curriculum/data/grade2_math_data.dart';
 import 'package:midad/features/lessons/data/grade2_math_lesson_registry.dart';
+import 'package:midad/features/lessons/widgets/lesson_visual_aid.dart';
 import 'package:midad/features/quizzes/data/grade2_math_quiz_registry.dart';
 
 void main() {
@@ -66,6 +67,11 @@ void main() {
           content.summaryPoints.length,
           greaterThanOrEqualTo(3),
           reason: 'Missing summary points for ${lesson.id}',
+        );
+        expect(
+          hasVisualAidForLesson(lesson.id),
+          isTrue,
+          reason: 'Missing visual aid for ${lesson.id}',
         );
         expect(content.practiceOptions.length, greaterThanOrEqualTo(3));
         expect(
