@@ -14,11 +14,13 @@ class QuizScreen extends StatefulWidget {
     required this.lesson,
     required this.questions,
     this.markLessonComplete = true,
+    this.examProgressKey,
   });
 
   final Lesson lesson;
   final List<QuizQuestion> questions;
   final bool markLessonComplete;
+  final String? examProgressKey;
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -78,6 +80,15 @@ class _QuizScreenState extends State<QuizScreen> {
 
     if (passed && widget.markLessonComplete) {
       await _progressService.markLessonCompleted(widget.lesson);
+    }
+
+    final examProgressKey = widget.examProgressKey;
+    if (examProgressKey != null) {
+      await _progressService.recordExamResult(
+        examId: examProgressKey,
+        score: _score,
+        total: widget.questions.length,
+      );
     }
 
     if (!mounted) return;
