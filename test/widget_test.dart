@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:midad/features/curriculum/data/grade2_math_data.dart';
 import 'package:midad/features/lessons/data/grade2_math_lesson_registry.dart';
 import 'package:midad/features/lessons/widgets/lesson_visual_aid.dart';
+import 'package:midad/features/quizzes/data/chapter_exam_builder.dart';
 import 'package:midad/features/quizzes/data/grade2_math_quiz_registry.dart';
 
 void main() {
@@ -80,6 +81,22 @@ void main() {
         );
         expect(quiz, hasLength(5));
       }
+    }
+  });
+
+  test('every chapter builds a balanced ten question exam', () {
+    for (final chapter in grade2MathChapters) {
+      final exam = chapterExamQuestions(chapter);
+      expect(
+        exam,
+        hasLength(10),
+        reason: 'Chapter exam should have 10 questions for ${chapter.id}',
+      );
+      expect(
+        exam.map((question) => question.id).toSet(),
+        hasLength(10),
+        reason: 'Chapter exam has duplicate questions for ${chapter.id}',
+      );
     }
   });
 
