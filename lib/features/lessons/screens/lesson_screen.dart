@@ -248,6 +248,9 @@ class _LessonScreenState extends State<LessonScreen> {
                 const SizedBox(height: 22),
                 LessonVisualAid(
                   lessonId: widget.lesson.id,
+                  lessonTitle: widget.lesson.title,
+                  simpleExplanation: lessonData.conceptMain,
+                  simpleHint: lessonData.conceptHint,
                   steps: lessonData.steps,
                 ).animate(delay: 112.ms).fadeIn(duration: 360.ms),
                 const SizedBox(height: 30),
