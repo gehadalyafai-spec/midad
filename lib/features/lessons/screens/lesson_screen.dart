@@ -290,6 +290,10 @@ class _LessonScreenState extends State<LessonScreen> {
                   options: lessonData.practiceOptions,
                   correctIndex: lessonData.practiceCorrectIndex,
                   feedback: lessonData.practiceFeedback,
+                  reviewHint: lessonData.warning,
+                  reviewStep: lessonData.steps.isNotEmpty
+                      ? lessonData.steps.first
+                      : lessonData.sectionTwoBody,
                   selectedIndex: _practiceSelected,
                   checked: _practiceChecked,
                   paper: paper,
@@ -889,6 +893,8 @@ class _QuickPractice extends StatelessWidget {
     required this.options,
     required this.correctIndex,
     required this.feedback,
+    required this.reviewHint,
+    required this.reviewStep,
     required this.selectedIndex,
     required this.checked,
     required this.paper,
@@ -903,6 +909,8 @@ class _QuickPractice extends StatelessWidget {
   final List<String> options;
   final int correctIndex;
   final String feedback;
+  final String reviewHint;
+  final String reviewStep;
   final int? selectedIndex;
   final bool checked;
   final Color paper;
@@ -1042,16 +1050,63 @@ class _QuickPractice extends StatelessWidget {
                     .withValues(alpha: 0.09),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Text(
-                correct
-                    ? feedback
-                    : 'راجع الإجابة المظللة ثم حاول السؤال مرة أخرى.',
-                style: TextStyle(
-                  color: textColor,
-                  height: 1.55,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              child: correct
+                  ? Text(
+                      feedback,
+                      style: TextStyle(
+                        color: textColor,
+                        height: 1.55,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'لماذا لم تنجح هذه الإجابة؟',
+                          style: TextStyle(
+                            color: textColor,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        const SizedBox(height: 7),
+                        Text(
+                          feedback,
+                          style: TextStyle(
+                            color: textColor,
+                            height: 1.6,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'راجع هذه الخطوة:',
+                          style: TextStyle(
+                            color: mutedColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          reviewStep,
+                          style: TextStyle(
+                            color: mutedColor,
+                            height: 1.55,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'وانتبه: $reviewHint',
+                          style: const TextStyle(
+                            color: AppColors.accent,
+                            height: 1.5,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
             ),
             if (!correct) ...[
               const SizedBox(height: 8),
