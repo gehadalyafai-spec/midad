@@ -343,14 +343,15 @@ class _StudyCanvas extends StatelessWidget {
               mutedColor: muted,
               surface: surface,
             ).animate().fadeIn(duration: 300.ms),
-            const SizedBox(height: 34),
+            const SizedBox(height: 24),
             Text(
-              'اختر الفصل\nوابدأ التعلّم',
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+              'اختر فصلك وابدأ التعلّم',
+              maxLines: 2,
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                     color: text,
                     fontWeight: FontWeight.w900,
-                    height: 1.08,
-                    letterSpacing: -1.5,
+                    height: 1.18,
+                    letterSpacing: -0.5,
                   ),
             )
                 .animate(delay: 70.ms)
@@ -860,59 +861,78 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(14),
+    return Container(
+      padding: const EdgeInsetsDirectional.fromSTEB(16, 14, 12, 14),
+      decoration: BoxDecoration(
+        color: AppColors.primaryDark,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryDark.withValues(alpha: 0.12),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
           ),
-          child: const Text(
-            'م',
-            style: TextStyle(
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 54,
+            height: 54,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(17),
+              border: Border.all(color: Colors.white24),
+            ),
+            child: const Icon(
+              Icons.auto_stories_rounded,
               color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.w900,
+              size: 29,
             ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'مِداد',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: textColor,
+          const SizedBox(width: 13),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'مداد',
+                  maxLines: 1,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 23,
+                    height: 1.15,
                     fontWeight: FontWeight.w900,
                   ),
-            ),
-            Text(
-              'رحلتك الدراسية',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: mutedColor,
+                ),
+                SizedBox(height: 3),
+                Text(
+                  'معلمك الشخصي • ثاني متوسط',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
                   ),
+                ),
+              ],
             ),
-          ],
-        ),
-        const Spacer(),
-        Container(
-          decoration: BoxDecoration(
-            color: surface,
+          ),
+          const SizedBox(width: 8),
+          Material(
+            color: Colors.white.withValues(alpha: 0.10),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: mutedColor.withValues(alpha: 0.14),
+            child: IconButton(
+              onPressed: null,
+              icon: Icon(
+                Icons.notifications_none_rounded,
+                color: Colors.white,
+              ),
             ),
           ),
-          child: IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.notifications_none_rounded, color: textColor),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -1298,51 +1318,74 @@ class _ProgressTile extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(24),
       child: Container(
-      height: 138,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 58,
-            height: 58,
-            child: Stack(
-              alignment: Alignment.center,
+        height: 138,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.primary,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                CircularProgressIndicator(
-                  value: progress,
-                  strokeWidth: 6,
-                  backgroundColor: Colors.white24,
-                  valueColor:
-                      const AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-                Text(
-                  '$percent%',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 11,
+                SizedBox(
+                  width: 44,
+                  height: 44,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        value: progress,
+                        strokeWidth: 5,
+                        backgroundColor: Colors.white24,
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                      Text(
+                        '$percent%',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 9,
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+                const Spacer(),
+                const Icon(
+                  Icons.trending_up_rounded,
+                  color: Colors.white70,
+                  size: 20,
                 ),
               ],
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              '$completed من $total\nمكتمل',
+            const Spacer(),
+            Text(
+              '$completed من $total دروس',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textDirection: TextDirection.rtl,
               style: const TextStyle(
                 color: Colors.white,
-                fontWeight: FontWeight.w800,
-                height: 1.35,
+                fontSize: 13,
+                fontWeight: FontWeight.w900,
               ),
             ),
-          ),
-        ],
-      ),
+            const SizedBox(height: 2),
+            const Text(
+              'مكتملة في الفصل',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
