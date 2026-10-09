@@ -290,7 +290,7 @@ class _StudyCanvas extends StatelessWidget {
             ).animate().fadeIn(duration: 300.ms),
             const SizedBox(height: 34),
             Text(
-              'جاهز لدرس\nجديد اليوم؟',
+              'اختر الفصل\nوابدأ التعلّم',
               style: Theme.of(context).textTheme.displaySmall?.copyWith(
                     color: text,
                     fontWeight: FontWeight.w900,
@@ -303,7 +303,7 @@ class _StudyCanvas extends StatelessWidget {
                 .slideY(begin: 0.10, end: 0),
             const SizedBox(height: 10),
             Text(
-              'ثاني متوسط • الرياضيات • ${chapter.title}',
+              'ثاني متوسط • الرياضيات • ${grade2MathChapters.length} فصول',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: muted,
                     fontWeight: FontWeight.w700,
