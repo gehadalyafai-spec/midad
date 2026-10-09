@@ -21,6 +21,7 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
 
   bool _loading = true;
   Set<String> _completed = const <String>{};
+  int? _bestCourseExamScore;
 
   @override
   void initState() {
@@ -30,9 +31,13 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
 
   Future<void> _load() async {
     final completed = await _progressService.getCompletedLessonIds();
+    final bestCourseExamScore = await _progressService.getExamBestScore(
+      'grade2-math-course-exam',
+    );
     if (!mounted) return;
     setState(() {
       _completed = completed;
+      _bestCourseExamScore = bestCourseExamScore;
       _loading = false;
     });
   }
@@ -56,8 +61,9 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
     final questions = courseExamQuestions(grade2MathChapters);
     if (questions.isEmpty) return;
 
+    const examId = 'grade2-math-course-exam';
     final examLesson = const Lesson(
-      id: 'grade2-math-course-exam',
+      id: examId,
       title: 'الاختبار الشامل لرياضيات ثاني متوسط',
       subtitle: 'مراجعة شاملة تغطي الفصول العشرة.',
     );
@@ -68,9 +74,11 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
           lesson: examLesson,
           questions: questions,
           markLessonComplete: false,
+          examProgressKey: examId,
         ),
       ),
     );
+    await _load();
   }
 
   @override
@@ -216,6 +224,7 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
                   _CourseExamCard(
                     completedLessons: completedLessons,
                     totalLessons: allLessons.length,
+                    bestScore: _bestCourseExamScore,
                     onTap: _openCourseExam,
                   ).animate(delay: 760.ms).fadeIn(duration: 360.ms),
                 ],
@@ -229,11 +238,13 @@ class _CourseExamCard extends StatelessWidget {
   const _CourseExamCard({
     required this.completedLessons,
     required this.totalLessons,
+    this.bestScore,
     required this.onTap,
   });
 
   final int completedLessons;
   final int totalLessons;
+  final int? bestScore;
   final VoidCallback onTap;
 
   @override
@@ -303,6 +314,27 @@ class _CourseExamCard extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                       ),
                     ),
+                    if (bestScore != null) ...[
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          'أفضل نتيجة: $bestScore%',
+                          style: const TextStyle(
+                            color: AppColors.secondary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
