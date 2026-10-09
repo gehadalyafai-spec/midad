@@ -28,6 +28,10 @@ enum LessonVisualKind {
   sampling,
   compositeArea,
   lineGraph,
+  squareGrid,
+  angleDiagram,
+  symmetryDiagram,
+  coordinatePlane,
 }
 
 const _numberLineLessons = <String>{
@@ -144,6 +148,18 @@ const _functionLessons = <String>{
 };
 
 LessonVisualKind? visualKindForLesson(String lessonId) {
+  if (lessonId == 'powers' || lessonId == 'square-roots') {
+    return LessonVisualKind.squareGrid;
+  }
+  if (lessonId == 'angles-lines' || lessonId == 'logical-reasoning') {
+    return LessonVisualKind.angleDiagram;
+  }
+  if (lessonId == 'congruent-polygons' || lessonId == 'symmetry') {
+    return LessonVisualKind.symmetryDiagram;
+  }
+  if (lessonId == 'coordinate-distance') {
+    return LessonVisualKind.coordinatePlane;
+  }
   if (lessonId == 'scientific-notation') return LessonVisualKind.scientific;
   if (lessonId == 'histograms') return LessonVisualKind.histogram;
   if (lessonId == 'circle-sectors') return LessonVisualKind.pie;
@@ -449,6 +465,30 @@ class LessonVisualAid extends StatelessWidget {
           'الميل = rise ÷ run.',
           'الخط المستقيم يعني أن معدل التغير ثابت.',
         ];
+      case LessonVisualKind.squareGrid:
+        return const [
+          'المربع 3×3 يحتوي 9 مربعات صغيرة، لذلك 3²=9.',
+          'الجذر التربيعي يعكس السؤال: ما طول ضلع مربع مساحته معلومة؟',
+          'إذا كانت المساحة 49 فطول الضلع 7 لأن 7×7=49.',
+        ];
+      case LessonVisualKind.angleDiagram:
+        return const [
+          'الخط المستقيم يصنع زاوية مجموعها 180°.',
+          'إذا عرفت زاوية واحدة يمكنك إيجاد المجاورة بالطرح من 180°.',
+          'علامة الزاوية القائمة تعني 90° ولا تعتمد على شكل الرسم فقط.',
+        ];
+      case LessonVisualKind.symmetryDiagram:
+        return const [
+          'في التطابق يجب أن يتساوى الشكل والحجم معًا.',
+          'في التماثل يمكن طي الشكل على محور لينطبق النصفان.',
+          'حدد النقاط أو الرؤوس المتناظرة قبل مقارنة الأطوال والزوايا.',
+        ];
+      case LessonVisualKind.coordinatePlane:
+        return const [
+          'الفرق الأفقي بين النقطتين يمثل ضلعًا في مثلث قائم.',
+          'الفرق الرأسي يمثل الضلع الثاني.',
+          'المسافة المباشرة بين النقطتين هي الوتر وتُحسب بفيثاغورس.',
+        ];
     }
   }
 
@@ -500,6 +540,14 @@ class LessonVisualAid extends StatelessWidget {
         return 'قسّم الشكل المركب إلى مستطيلات أو مثلثات بسيطة ثم اجمع أو اطرح المساحات.';
       case LessonVisualKind.lineGraph:
         return 'راقب ارتفاع الخط وانخفاضه؛ الميل يصف مقدار التغير الرأسي مقابل الأفقي.';
+      case LessonVisualKind.squareGrid:
+        return 'اربط التربيع بمساحة مربع، واربط الجذر بطول ضلع هذا المربع.';
+      case LessonVisualKind.angleDiagram:
+        return 'اقرأ الزوايا من الرسم: مستقيم، زاوية قائمة، وزوايا متجاورة قبل أن تبدأ الحساب.';
+      case LessonVisualKind.symmetryDiagram:
+        return 'قارن الشكلين أو نصفي الشكل بصريًا لتفهم التطابق ومحور التماثل.';
+      case LessonVisualKind.coordinatePlane:
+        return 'حوّل الفرق بين الإحداثيات إلى مثلث قائم على المستوى، ثم احسب المسافة كوتر.';
     }
   }
 }
@@ -595,6 +643,14 @@ class _LessonVisualPainter extends CustomPainter {
         _drawCompositeArea(canvas, size);
       case LessonVisualKind.lineGraph:
         _drawLineGraph(canvas, size);
+      case LessonVisualKind.squareGrid:
+        _drawSquareGrid(canvas, size);
+      case LessonVisualKind.angleDiagram:
+        _drawAngleDiagram(canvas, size);
+      case LessonVisualKind.symmetryDiagram:
+        _drawSymmetryDiagram(canvas, size);
+      case LessonVisualKind.coordinatePlane:
+        _drawCoordinatePlane(canvas, size);
     }
   }
 
@@ -1361,6 +1417,171 @@ class _LessonVisualPainter extends CustomPainter {
       Offset(s.width * .65, s.height * .41),
       fontSize: 9,
       color: AppColors.accent,
+    );
+  }
+
+  void _drawSquareGrid(Canvas c, Size s) {
+    final side = math.min(s.width, s.height) * .42;
+    final left = s.width * .34;
+    final top = s.height * .18;
+    final cell = side / 3;
+    final rect = Rect.fromLTWH(left, top, side, side);
+    c.drawRect(rect, _fill(AppColors.secondary.withValues(alpha: .18)));
+    c.drawRect(rect, _stroke(AppColors.secondary, 3));
+    for (var i = 1; i < 3; i++) {
+      c.drawLine(
+        Offset(left + cell * i, top),
+        Offset(left + cell * i, top + side),
+        _stroke(Colors.white.withValues(alpha: .45)),
+      );
+      c.drawLine(
+        Offset(left, top + cell * i),
+        Offset(left + side, top + cell * i),
+        _stroke(Colors.white.withValues(alpha: .45)),
+      );
+    }
+    _text(
+      c,
+      '3',
+      Offset(left + side / 2 - 4, top + side + 10),
+      fontSize: 13,
+      color: AppColors.secondary,
+    );
+    _text(
+      c,
+      '3',
+      Offset(left - 20, top + side / 2 - 8),
+      fontSize: 13,
+      color: AppColors.secondary,
+    );
+    _text(
+      c,
+      '3² = 9',
+      Offset(s.width * .64, s.height * .35),
+      fontSize: 18,
+      color: AppColors.accent,
+    );
+    _text(
+      c,
+      '√9 = 3',
+      Offset(s.width * .64, s.height * .55),
+      fontSize: 18,
+      color: Colors.white,
+    );
+  }
+
+  void _drawAngleDiagram(Canvas c, Size s) {
+    final o = Offset(s.width * .48, s.height * .58);
+    c.drawLine(
+      Offset(s.width * .14, o.dy),
+      Offset(s.width * .86, o.dy),
+      _stroke(Colors.white, 3),
+    );
+    c.drawLine(
+      o,
+      Offset(s.width * .72, s.height * .20),
+      _stroke(AppColors.secondary, 3),
+    );
+    c.drawArc(
+      Rect.fromCircle(center: o, radius: 42),
+      -math.pi / 3,
+      math.pi / 3,
+      false,
+      _stroke(AppColors.accent, 3),
+    );
+    _text(
+      c,
+      '70°',
+      Offset(o.dx + 22, o.dy - 50),
+      fontSize: 13,
+      color: AppColors.secondary,
+    );
+    _text(
+      c,
+      '110°',
+      Offset(o.dx - 74, o.dy - 34),
+      fontSize: 13,
+      color: Colors.white,
+    );
+    _text(
+      c,
+      '70 + 110 = 180',
+      Offset(s.width * .34, s.height * .76),
+      fontSize: 11,
+      color: AppColors.accent,
+    );
+  }
+
+  void _drawSymmetryDiagram(Canvas c, Size s) {
+    final midX = s.width * .50;
+    c.drawLine(
+      Offset(midX, s.height * .12),
+      Offset(midX, s.height * .86),
+      _stroke(Colors.white.withValues(alpha: .55), 2),
+    );
+    final left = Path()
+      ..moveTo(s.width * .22, s.height * .68)
+      ..lineTo(s.width * .34, s.height * .28)
+      ..lineTo(s.width * .44, s.height * .68)
+      ..close();
+    final right = Path()
+      ..moveTo(s.width * .78, s.height * .68)
+      ..lineTo(s.width * .66, s.height * .28)
+      ..lineTo(s.width * .56, s.height * .68)
+      ..close();
+    c.drawPath(left, _fill(AppColors.secondary.withValues(alpha: .70)));
+    c.drawPath(right, _fill(AppColors.accent.withValues(alpha: .62)));
+    c.drawPath(left, _stroke(Colors.white.withValues(alpha: .60)));
+    c.drawPath(right, _stroke(Colors.white.withValues(alpha: .60)));
+    _text(
+      c,
+      'محور التماثل',
+      Offset(midX - 38, s.height * .78),
+      fontSize: 10,
+      color: AppColors.secondary,
+    );
+  }
+
+  void _drawCoordinatePlane(Canvas c, Size s) {
+    final origin = Offset(s.width * .18, s.height * .80);
+    final xEnd = Offset(s.width * .88, origin.dy);
+    final yEnd = Offset(origin.dx, s.height * .14);
+    c.drawLine(origin, xEnd, _stroke(Colors.white.withValues(alpha: .75), 2));
+    c.drawLine(origin, yEnd, _stroke(Colors.white.withValues(alpha: .75), 2));
+
+    final p1 = Offset(s.width * .34, s.height * .66);
+    final p2 = Offset(s.width * .72, s.height * .30);
+    final corner = Offset(p2.dx, p1.dy);
+
+    c.drawLine(p1, corner, _stroke(AppColors.accent, 3));
+    c.drawLine(corner, p2, _stroke(AppColors.accent, 3));
+    c.drawLine(p1, p2, _stroke(AppColors.secondary, 4));
+
+    c.drawCircle(p1, 7, _fill(Colors.white));
+    c.drawCircle(p2, 7, _fill(Colors.white));
+
+    _text(c, 'A', Offset(p1.dx - 18, p1.dy - 12), fontSize: 12);
+    _text(c, 'B', Offset(p2.dx + 8, p2.dy - 12), fontSize: 12);
+    _text(
+      c,
+      'Δx',
+      Offset((p1.dx + corner.dx) / 2 - 8, p1.dy + 8),
+      fontSize: 10,
+      color: AppColors.accent,
+    );
+    _text(
+      c,
+      'Δy',
+      Offset(corner.dx + 8, (corner.dy + p2.dy) / 2 - 8),
+      fontSize: 10,
+      color: AppColors.accent,
+    );
+    _text(
+      c,
+      'المسافة',
+      Offset((p1.dx + p2.dx) / 2 - 18, (p1.dy + p2.dy) / 2 - 24),
+      fontSize: 10,
+      color: AppColors.secondary,
     );
   }
 
