@@ -3,6 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../../app/theme/app_theme.dart';
 import '../../../services/progress_service.dart';
+import '../../quizzes/data/course_exam_builder.dart';
+import '../../quizzes/screens/quiz_screen.dart';
 import '../data/grade2_math_data.dart';
 import '../models/curriculum_models.dart';
 import 'chapter_screen.dart';
@@ -48,6 +50,27 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
       ),
     );
     await _load();
+  }
+
+  Future<void> _openCourseExam() async {
+    final questions = courseExamQuestions(grade2MathChapters);
+    if (questions.isEmpty) return;
+
+    final examLesson = const Lesson(
+      id: 'grade2-math-course-exam',
+      title: 'الاختبار الشامل لرياضيات ثاني متوسط',
+      subtitle: 'مراجعة شاملة تغطي الفصول العشرة.',
+    );
+
+    await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => QuizScreen(
+          lesson: examLesson,
+          questions: questions,
+          markLessonComplete: false,
+        ),
+      ),
+    );
   }
 
   @override
@@ -189,8 +212,107 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
                       ],
                     );
                   }),
+                  const SizedBox(height: 10),
+                  _CourseExamCard(
+                    completedLessons: completedLessons,
+                    totalLessons: allLessons.length,
+                    onTap: _openCourseExam,
+                  ).animate(delay: 760.ms).fadeIn(duration: 360.ms),
                 ],
               ),
+      ),
+    );
+  }
+}
+
+class _CourseExamCard extends StatelessWidget {
+  const _CourseExamCard({
+    required this.completedLessons,
+    required this.totalLessons,
+    required this.onTap,
+  });
+
+  final int completedLessons;
+  final int totalLessons;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final allDone = totalLessons > 0 && completedLessons == totalLessons;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(30),
+        child: Container(
+          padding: const EdgeInsets.all(22),
+          decoration: BoxDecoration(
+            color: AppColors.primaryDark,
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 62,
+                height: 62,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.secondary,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(
+                  Icons.emoji_events_rounded,
+                  color: AppColors.primaryDark,
+                  size: 32,
+                ),
+              ),
+              const SizedBox(width: 15),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'الاختبار الشامل للمادة',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      '20 سؤالًا • سؤالان من مناطق مختلفة في كل فصل',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        height: 1.5,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      allDone
+                          ? 'أكملت جميع الدروس • جاهز للمراجعة النهائية'
+                          : '$completedLessons من $totalLessons درسًا مكتملًا',
+                      style: TextStyle(
+                        color: allDone
+                            ? AppColors.secondary
+                            : Colors.white60,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_back_rounded,
+                color: Colors.white70,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
