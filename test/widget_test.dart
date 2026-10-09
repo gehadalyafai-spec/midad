@@ -3,6 +3,7 @@ import 'package:midad/features/curriculum/data/grade2_math_data.dart';
 import 'package:midad/features/lessons/data/grade2_math_lesson_registry.dart';
 import 'package:midad/features/lessons/widgets/lesson_visual_aid.dart';
 import 'package:midad/features/quizzes/data/chapter_exam_builder.dart';
+import 'package:midad/features/quizzes/data/course_exam_builder.dart';
 import 'package:midad/features/quizzes/data/grade2_math_quiz_registry.dart';
 
 void main() {
@@ -98,6 +99,12 @@ void main() {
         reason: 'Chapter exam has duplicate questions for ${chapter.id}',
       );
     }
+  });
+
+  test('full course exam covers all ten chapters with twenty questions', () {
+    final exam = courseExamQuestions(grade2MathChapters);
+    expect(exam, hasLength(20));
+    expect(exam.map((question) => question.id).toSet(), hasLength(20));
   });
 
   test('all registered quiz questions have valid and unique ids', () {
