@@ -100,6 +100,23 @@ void main() {
     }
   });
 
+  test('every available lesson has a unique visual teaching fingerprint', () {
+    final lessons = grade2MathChapters
+        .expand((chapter) => chapter.lessons)
+        .where((lesson) => lesson.isAvailable)
+        .toList();
+
+    final fingerprints = lessons
+        .map((lesson) => visualVariantKeyForLesson(lesson.id))
+        .toList();
+
+    expect(
+      fingerprints.toSet(),
+      hasLength(lessons.length),
+      reason: 'Two math lessons still share the same visual teaching fingerprint.',
+    );
+  });
+
   test('every chapter builds a balanced ten question exam', () {
     for (final chapter in grade2MathChapters) {
       final exam = chapterExamQuestions(chapter);
