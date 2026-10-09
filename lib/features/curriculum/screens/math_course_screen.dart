@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../../app/theme/app_theme.dart';
 import '../../../services/progress_service.dart';
+import '../../lessons/screens/lesson_screen.dart';
 import '../../quizzes/data/course_exam_builder.dart';
 import '../../quizzes/screens/quiz_screen.dart';
 import '../data/grade2_math_data.dart';
@@ -57,6 +58,15 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
     await _load();
   }
 
+  Future<void> _openLesson(Lesson lesson) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => LessonScreen(lesson: lesson),
+      ),
+    );
+    await _load();
+  }
+
   Future<void> _openCourseExam() async {
     final questions = courseExamQuestions(grade2MathChapters);
     if (questions.isEmpty) return;
@@ -75,6 +85,7 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
           questions: questions,
           markLessonComplete: false,
           examProgressKey: examId,
+          onReviewLesson: _openLesson,
         ),
       ),
     );
