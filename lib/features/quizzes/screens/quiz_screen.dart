@@ -33,6 +33,7 @@ class _QuizScreenState extends State<QuizScreen> {
   bool _answered = false;
   bool _finished = false;
   bool _passed = false;
+  final List<QuizQuestion> _missedQuestions = <QuizQuestion>[];
 
   QuizQuestion get _question => widget.questions[_currentIndex];
 
@@ -47,7 +48,11 @@ class _QuizScreenState extends State<QuizScreen> {
     final isCorrect = _selectedIndex == _question.correctIndex;
     setState(() {
       _answered = true;
-      if (isCorrect) _score++;
+      if (isCorrect) {
+        _score++;
+      } else {
+        _missedQuestions.add(_question);
+      }
     });
 
     await _progressService.recordQuestionResult(
@@ -90,6 +95,7 @@ class _QuizScreenState extends State<QuizScreen> {
       _answered = false;
       _finished = false;
       _passed = false;
+      _missedQuestions.clear();
     });
   }
 
@@ -100,6 +106,7 @@ class _QuizScreenState extends State<QuizScreen> {
         score: _score,
         total: widget.questions.length,
         passed: _passed,
+        missedQuestions: List<QuizQuestion>.unmodifiable(_missedQuestions),
         onRetry: _retry,
         onDone: () => Navigator.of(context).pop(_passed),
       );
@@ -457,6 +464,7 @@ class _ResultView extends StatelessWidget {
     required this.score,
     required this.total,
     required this.passed,
+    required this.missedQuestions,
     required this.onRetry,
     required this.onDone,
   });
@@ -464,6 +472,7 @@ class _ResultView extends StatelessWidget {
   final int score;
   final int total;
   final bool passed;
+  final List<QuizQuestion> missedQuestions;
   final VoidCallback onRetry;
   final VoidCallback onDone;
 
@@ -527,7 +536,92 @@ class _ResultView extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 34),
+                if (missedQuestions.isNotEmpty) ...[
+                  const SizedBox(height: 28),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      'راجع أخطاء هذا الاختبار',
+                      style: TextStyle(
+                        color: text,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 17,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ...missedQuestions.asMap().entries.map((entry) {
+                    final question = entry.value;
+                    final correctAnswer =
+                        question.options[question.correctIndex];
+
+                    return Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? AppColors.darkSurface
+                            : const Color(0xFFFFFDF8),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: AppColors.accent.withValues(alpha: 0.18),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'خطأ ${entry.key + 1}',
+                            style: const TextStyle(
+                              color: AppColors.accent,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 11,
+                            ),
+                          ),
+                          const SizedBox(height: 7),
+                          Text(
+                            question.question,
+                            style: TextStyle(
+                              color: text,
+                              height: 1.45,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              'الإجابة الصحيحة: $correctAnswer',
+                              style: const TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 9),
+                          Text(
+                            question.explanation,
+                            style: TextStyle(
+                              color: muted,
+                              height: 1.6,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
+                const SizedBox(height: 22),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
