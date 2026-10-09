@@ -37,6 +37,36 @@ void main() {
         expect(content.sectionTwoBody, isNotEmpty);
         expect(content.exampleBody, isNotEmpty);
         expect(content.warning, isNotEmpty);
+        expect(
+          content.hasExtendedExplanation,
+          isTrue,
+          reason: 'Missing guided explanation for ${lesson.id}',
+        );
+        expect(
+          content.intro,
+          isNotEmpty,
+          reason: 'Missing intro for ${lesson.id}',
+        );
+        expect(
+          content.whyItMatters,
+          isNotEmpty,
+          reason: 'Missing why-it-matters for ${lesson.id}',
+        );
+        expect(
+          content.steps.length,
+          greaterThanOrEqualTo(4),
+          reason: 'Not enough guided steps for ${lesson.id}',
+        );
+        expect(
+          content.secondExampleBody,
+          isNotEmpty,
+          reason: 'Missing second example for ${lesson.id}',
+        );
+        expect(
+          content.summaryPoints.length,
+          greaterThanOrEqualTo(3),
+          reason: 'Missing summary points for ${lesson.id}',
+        );
         expect(content.practiceOptions.length, greaterThanOrEqualTo(3));
         expect(
           content.practiceCorrectIndex,
