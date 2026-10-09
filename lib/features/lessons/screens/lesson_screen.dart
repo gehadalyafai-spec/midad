@@ -317,6 +317,15 @@ class _LessonScreenState extends State<LessonScreen> {
                     textColor: text,
                   ).animate(delay: 290.ms).fadeIn(),
                 ],
+                if (!_isCompleted && lessonData.summaryPoints.isNotEmpty) ...[
+                  const SizedBox(height: 18),
+                  _ReadyForQuizCard(
+                    points: lessonData.summaryPoints,
+                    paper: paper,
+                    textColor: text,
+                    mutedColor: muted,
+                  ).animate(delay: 310.ms).fadeIn(),
+                ],
                 if (_isCompleted) ...[
                   const SizedBox(height: 18),
                   _CompletedNote(
@@ -1169,6 +1178,94 @@ class _WarningNote extends StatelessWidget {
                     ),
                   ),
                   TextSpan(text: warning),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReadyForQuizCard extends StatelessWidget {
+  const _ReadyForQuizCard({
+    required this.points,
+    required this.paper,
+    required this.textColor,
+    required this.mutedColor,
+  });
+
+  final List<String> points;
+  final Color paper;
+  final Color textColor;
+  final Color mutedColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final checks = points.take(3).toList();
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: paper,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: AppColors.secondary.withValues(alpha: 0.28),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.fact_check_outlined,
+                color: AppColors.secondary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'هل أنت جاهز للاختبار؟',
+                style: TextStyle(
+                  color: textColor,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 15,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 7),
+          Text(
+            'إذا كنت تستطيع شرح هذه النقاط بكلماتك، فأنت غالبًا جاهز.',
+            style: TextStyle(
+              color: mutedColor,
+              height: 1.5,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...checks.map(
+            (point) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(
+                    Icons.check_box_outline_blank_rounded,
+                    color: AppColors.primary,
+                    size: 19,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      point,
+                      style: TextStyle(
+                        color: textColor,
+                        height: 1.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
