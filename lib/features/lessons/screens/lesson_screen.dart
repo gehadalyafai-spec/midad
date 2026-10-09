@@ -472,52 +472,139 @@ class _WorkedExample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final parts = formula.split('=');
+    final hasResult = parts.length > 1;
+    final statement = parts.first.trim();
+    final result = hasResult ? parts.sublist(1).join('=').trim() : '';
+
     return Container(
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.secondary,
         borderRadius: BorderRadius.circular(28),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
-            children: [
-              Icon(
-                Icons.auto_awesome_rounded,
-                color: AppColors.primaryDark,
-              ),
-              SizedBox(width: 8),
-              Text(
-                'مثال محلول',
-                style: TextStyle(
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Row(
+              children: [
+                Icon(
+                  Icons.auto_awesome_rounded,
                   color: AppColors.primaryDark,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 17,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'مثال محلول',
+                  style: TextStyle(
+                    color: AppColors.primaryDark,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 17,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.30),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'المثال',
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      color: AppColors.primaryDark,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 7),
+                  Text(
+                    statement,
+                    textAlign: TextAlign.right,
+                    textDirection: TextDirection.rtl,
+                    style: const TextStyle(
+                      color: AppColors.primaryDark,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 24,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+            const Text(
+              'خطوات الحل',
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                color: AppColors.primaryDark,
+                fontWeight: FontWeight.w900,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: 7),
+            Text(
+              body,
+              textAlign: TextAlign.right,
+              textDirection: TextDirection.rtl,
+              style: const TextStyle(
+                color: AppColors.primaryDark,
+                height: 1.75,
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
+              ),
+            ),
+            if (hasResult) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryDark,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    const Text(
+                      'النتيجة',
+                      style: TextStyle(
+                        color: AppColors.secondary,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const Spacer(),
+                    Flexible(
+                      child: Text(
+                        result,
+                        textAlign: TextAlign.left,
+                        textDirection: TextDirection.rtl,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            formula,
-            textDirection: TextDirection.ltr,
-            style: const TextStyle(
-              color: AppColors.primaryDark,
-              fontWeight: FontWeight.w900,
-              fontSize: 26,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            body,
-            style: const TextStyle(
-              color: AppColors.primaryDark,
-              height: 1.65,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
