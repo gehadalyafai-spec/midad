@@ -1176,13 +1176,32 @@ class _QuickPractice extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'لماذا لم تنجح هذه الإجابة؟',
+                          'كيف أصل للإجابة الصحيحة؟',
                           style: TextStyle(
                             color: textColor,
                             fontWeight: FontWeight.w900,
                           ),
                         ),
                         const SizedBox(height: 7),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 9,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'الإجابة الصحيحة: ${options[correctIndex]}',
+                            style: const TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 9),
                         Text(
                           feedback,
                           style: TextStyle(
