@@ -41,11 +41,6 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
         lessons.every((lesson) => _completed.contains(lesson.id));
   }
 
-  bool _chapterUnlocked(int index) {
-    if (index == 0) return true;
-    return _chapterComplete(grade2MathChapters[index - 1]);
-  }
-
   Future<void> _openChapter(Chapter chapter) async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -144,7 +139,7 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
                   const SizedBox(height: 28),
                   ...List.generate(grade2MathChapters.length, (index) {
                     final chapter = grade2MathChapters[index];
-                    final unlocked = _chapterUnlocked(index);
+                    const unlocked = true;
                     final complete = _chapterComplete(chapter);
                     final lessons =
                         chapter.lessons.where((lesson) => lesson.isAvailable);
@@ -458,16 +453,14 @@ class _ChapterCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 7),
                     Text(
-                      unlocked
-                          ? '$completed من $total دروس مكتملة'
-                          : 'أكمل الفصل السابق لفتحه',
+                      '$completed من $total دروس مكتملة',
                       style: TextStyle(
                         color: complete ? AppColors.primary : mutedColor,
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    if (unlocked) ...[
+                    ...[
                       const SizedBox(height: 12),
                       ClipRRect(
                         borderRadius: BorderRadius.circular(99),
@@ -484,8 +477,7 @@ class _ChapterCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (unlocked)
-                Padding(
+              Padding(
                   padding: const EdgeInsets.only(top: 18),
                   child: Icon(
                     Icons.arrow_back_rounded,
