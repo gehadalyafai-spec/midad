@@ -320,9 +320,112 @@ class LessonVisualAid extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: 10),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppColors.secondary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.public_rounded,
+                  color: AppColors.secondary,
+                  size: 20,
+                ),
+                const SizedBox(width: 9),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'أين أرى هذه الفكرة في الحياة؟',
+                        style: TextStyle(
+                          color: text,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        _realLifeExample(kind),
+                        style: TextStyle(
+                          color: muted,
+                          height: 1.55,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  String _realLifeExample(LessonVisualKind kind) {
+    switch (kind) {
+      case LessonVisualKind.numberLine:
+        return 'درجات الحرارة: -3° أبرد من -1° لأن -3 يقع أكثر إلى اليسار على خط الأعداد.';
+      case LessonVisualKind.fraction:
+        return 'تقسيم بيتزا إلى 4 أجزاء متساوية وأخذ 3 منها يمثل 3/4 بصورة مباشرة.';
+      case LessonVisualKind.pattern:
+        return 'زيادة الادخار كل أسبوع بمبلغ ثابت تصنع نمطًا يمكن استخدامه للتنبؤ بالمبلغ بعد عدة أسابيع.';
+      case LessonVisualKind.venn:
+        return 'طلاب يلعبون كرة القدم وطلاب يشاركون في السباحة؛ منطقة التداخل تمثل من يشاركون في النشاطين.';
+      case LessonVisualKind.triangle:
+        return 'سلم مسنود إلى جدار يصنع مثلثًا قائمًا: السلم هو الوتر ويمكن إيجاد الارتفاع بفيثاغورس.';
+      case LessonVisualKind.ratio:
+        return 'في وصفة تحتاج كوبين دقيق لكل كوب ماء، مضاعفة الوصفة تحافظ على النسبة نفسها.';
+      case LessonVisualKind.percent:
+        return 'خصم 25% من سعر منتج يعني أنك توفر ربع السعر الأصلي.';
+      case LessonVisualKind.geometry:
+        return 'زوايا الأبواب والبلاط وتصميم الغرف تعتمد على علاقات الزوايا والأشكال.';
+      case LessonVisualKind.transform:
+        return 'شعار منعكس في مرآة أو رمز تم تدويره في تصميم يوضح التحويلات الهندسية.';
+      case LessonVisualKind.statistics:
+        return 'درجات فصل كامل تصبح أسهل للفهم عندما تعرض في جدول أو رسم بدل قائمة طويلة.';
+      case LessonVisualKind.probability:
+        return 'اختيار لون ثم رقم يشبه تجربة ذات مرحلتين، وكل مسار في الشجرة يمثل نتيجة ممكنة.';
+      case LessonVisualKind.measurement:
+        return 'معرفة كمية الماء التي يملؤها خزان تحتاج الحجم، أما كمية الطلاء لتغطيته فتحتاج مساحة السطح.';
+      case LessonVisualKind.algebra:
+        return 'إذا دفعت مبلغًا ثابتًا ثم مبلغًا لكل ساعة، يمكن تمثيل التكلفة بمعادلة وحل المجهول.';
+      case LessonVisualKind.function:
+        return 'أجرة سيارة تبدأ بمبلغ ثابت ثم تزيد مع كل كيلومتر مثال واضح لدالة تربط المسافة بالتكلفة.';
+      case LessonVisualKind.scientific:
+        return 'المسافات الفلكية وأحجام الخلايا تستخدم الصيغة العلمية حتى لا نكتب أصفارًا كثيرة.';
+      case LessonVisualKind.histogram:
+        return 'تجميع أعمار مجموعة كبيرة في فئات 10–19 و20–29 يجعل توزيع الأعمار واضحًا بسرعة.';
+      case LessonVisualKind.pie:
+        return 'تقسيم مصروف شهري إلى طعام ونقل وادخار يمكن عرضه كقطاعات من دائرة واحدة.';
+      case LessonVisualKind.boxPlot:
+        return 'مقارنة درجات فصلين بالصندوق وطرفيه تكشف أي فصل أكثر استقرارًا وأيهما أكثر تشتتًا.';
+      case LessonVisualKind.stemLeaf:
+        return 'عرض درجات مثل 42 و45 و47 و51 و53 مع الاحتفاظ بالقيم الأصلية يناسب الساق والورقة.';
+      case LessonVisualKind.probabilityMeter:
+        return 'عملة عادلة تتوقع نظريًا 50% صورة، لكن في 100 رمية قد تظهر الصورة 47 مرة فعليًا.';
+      case LessonVisualKind.sampling:
+        return 'استطلاع رأي المدرسة يحتاج طلابًا من صفوف مختلفة، لا عينة من فصل واحد فقط.';
+      case LessonVisualKind.compositeArea:
+        return 'أرضية على شكل حرف L يمكن تقسيمها إلى مستطيلين لحساب كمية البلاط المطلوبة.';
+      case LessonVisualKind.lineGraph:
+        return 'الرسم الذي يوضح المسافة مع الزمن يكشف السرعة من ميل الخط.';
+      case LessonVisualKind.squareGrid:
+        return 'بلاط مربع 3×3 يعطي 9 قطع؛ المساحة 9 تعني أن طول الضلع 3.';
+      case LessonVisualKind.angleDiagram:
+        return 'زاويتان متجاورتان على طريق مستقيم مجموعهما 180°، لذلك معرفة إحداهما تكشف الأخرى.';
+      case LessonVisualKind.symmetryDiagram:
+        return 'الفراشة أو كثير من الشعارات تظهر تماثلًا حول محور يقسم الشكل إلى نصفين متقابلين.';
+      case LessonVisualKind.coordinatePlane:
+        return 'على خريطة شبكية، فرق الشوارع أفقيًا ورأسيًا يصنع مثلثًا، والمسافة المباشرة هي الوتر.';
+    }
   }
 
   List<String> _insights(LessonVisualKind kind) {
