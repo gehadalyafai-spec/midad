@@ -38,9 +38,22 @@ class _QuizScreenState extends State<QuizScreen> {
   bool _answered = false;
   bool _finished = false;
   bool _passed = false;
+  Set<String> _reviewQuestionIds = const <String>{};
   final List<QuizQuestion> _missedQuestions = <QuizQuestion>[];
 
   QuizQuestion get _question => widget.questions[_currentIndex];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReviewQuestions();
+  }
+
+  Future<void> _loadReviewQuestions() async {
+    final mistakes = await _progressService.getMistakeQuestionIds();
+    if (!mounted) return;
+    setState(() => _reviewQuestionIds = mistakes);
+  }
 
   void _selectOption(int index) {
     if (_answered) return;
@@ -154,14 +167,62 @@ class _QuizScreenState extends State<QuizScreen> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(20, 28, 20, 120),
                 children: [
-                  Text(
-                    'ركّز في هذا السؤال',
-                    style: const TextStyle(
-                      color: AppColors.accent,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 13,
-                    ),
+                  Row(
+                    children: [
+                      const Text(
+                        'ركّز في هذا السؤال',
+                        style: TextStyle(
+                          color: AppColors.accent,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 13,
+                        ),
+                      ),
+                      if (_reviewQuestionIds.contains(_question.id)) ...[
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 9,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.secondary.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.replay_rounded,
+                                size: 14,
+                                color: AppColors.primaryDark,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'سؤال مراجعة',
+                                style: TextStyle(
+                                  color: AppColors.primaryDark,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
+                  if (_reviewQuestionIds.contains(_question.id)) ...[
+                    const SizedBox(height: 7),
+                    Text(
+                      'هذا السؤال موجود في قائمة أخطائك السابقة. إذا أجبت عنه صحيحًا سيُزال منها.',
+                      style: TextStyle(
+                        color: muted,
+                        height: 1.45,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 10),
                   Text(
                     _question.question,
