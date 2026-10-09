@@ -6,6 +6,7 @@ import '../../app/theme/app_theme.dart';
 import '../../services/progress_service.dart';
 import '../curriculum/data/grade2_math_data.dart';
 import '../curriculum/models/curriculum_models.dart';
+import '../curriculum/screens/chapter_screen.dart';
 import '../curriculum/screens/math_course_screen.dart';
 import '../lessons/screens/lesson_screen.dart';
 import '../mistakes/screens/mistakes_screen.dart';
@@ -150,6 +151,15 @@ class _HomeScreenState extends State<HomeScreen> {
     await _loadProgress();
   }
 
+  Future<void> _openChapter(Chapter chapter) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ChapterScreen(chapter: chapter),
+      ),
+    );
+    await _loadProgress();
+  }
+
   @override
   Widget build(BuildContext context) {
     final chapter = _activeChapter();
@@ -200,6 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ? _openCourseOverview
                       : () => _continueLearning(chapter),
                   onOpenCourse: _openCourseOverview,
+                  onOpenChapter: _openChapter,
                   onQuiz: () => _openQuiz(chapter),
                   onMistakes: () => _openMistakes(chapter),
                   onProgress: _openProgress,
@@ -226,6 +237,7 @@ class _StudyCanvas extends StatelessWidget {
     required this.completedLessonIds,
     required this.onContinue,
     required this.onOpenCourse,
+    required this.onOpenChapter,
     required this.onQuiz,
     required this.onMistakes,
     required this.onProgress,
@@ -244,6 +256,7 @@ class _StudyCanvas extends StatelessWidget {
   final Set<String> completedLessonIds;
   final VoidCallback onContinue;
   final VoidCallback onOpenCourse;
+  final ValueChanged<Chapter> onOpenChapter;
   final VoidCallback onQuiz;
   final VoidCallback onMistakes;
   final VoidCallback onProgress;
@@ -310,7 +323,16 @@ class _StudyCanvas extends StatelessWidget {
               mutedColor: muted,
               onTap: onProgress,
             ).animate(delay: 130.ms).fadeIn(duration: 320.ms),
-            const SizedBox(height: 22),
+            const SizedBox(height: 18),
+            _AllChaptersSection(
+              completedLessonIds: completedLessonIds,
+              surface: surface,
+              textColor: text,
+              mutedColor: muted,
+              onOpenCourse: onOpenCourse,
+              onOpenChapter: onOpenChapter,
+            ).animate(delay: 145.ms).fadeIn(duration: 380.ms),
+            const SizedBox(height: 24),
             _ContinuePanel(
               progress: progress,
               lastLessonTitle: lastLessonTitle,
@@ -327,14 +349,6 @@ class _StudyCanvas extends StatelessWidget {
               onCourse: onOpenCourse,
               onQuiz: onQuiz,
             ).animate(delay: 220.ms).fadeIn(duration: 400.ms),
-            const SizedBox(height: 28),
-            _AllChaptersSection(
-              completedLessonIds: completedLessonIds,
-              surface: surface,
-              textColor: text,
-              mutedColor: muted,
-              onOpenCourse: onOpenCourse,
-            ).animate(delay: 255.ms).fadeIn(duration: 380.ms),
             const SizedBox(height: 28),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -520,6 +534,7 @@ class _AllChaptersSection extends StatelessWidget {
     required this.textColor,
     required this.mutedColor,
     required this.onOpenCourse,
+    required this.onOpenChapter,
   });
 
   final Set<String> completedLessonIds;
@@ -527,16 +542,12 @@ class _AllChaptersSection extends StatelessWidget {
   final Color textColor;
   final Color mutedColor;
   final VoidCallback onOpenCourse;
+  final ValueChanged<Chapter> onOpenChapter;
 
   bool _chapterComplete(Chapter chapter) {
     final lessons = chapter.lessons.where((lesson) => lesson.isAvailable);
     return lessons.isNotEmpty &&
         lessons.every((lesson) => completedLessonIds.contains(lesson.id));
-  }
-
-  bool _chapterUnlocked(int index) {
-    if (index == 0) return true;
-    return _chapterComplete(grade2MathChapters[index - 1]);
   }
 
   @override
@@ -563,7 +574,7 @@ class _AllChaptersSection extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          'جميع فصول ثاني متوسط ظاهرة هنا، ويُفتح كل فصل بعد إكمال السابق.',
+          'جميع فصول ثاني متوسط هنا. اضغط على أي فصل لفتحه مباشرة.',
           style: TextStyle(
             color: mutedColor,
             fontSize: 12,
@@ -574,7 +585,6 @@ class _AllChaptersSection extends StatelessWidget {
         const SizedBox(height: 14),
         ...List.generate(grade2MathChapters.length, (index) {
           final chapter = grade2MathChapters[index];
-          final unlocked = _chapterUnlocked(index);
           final complete = _chapterComplete(chapter);
           final total =
               chapter.lessons.where((lesson) => lesson.isAvailable).length;
@@ -591,7 +601,7 @@ class _AllChaptersSection extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: onOpenCourse,
+                onTap: () => onOpenChapter(chapter),
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
@@ -604,9 +614,7 @@ class _AllChaptersSection extends StatelessWidget {
                     border: Border.all(
                       color: (complete
                               ? AppColors.primary
-                              : unlocked
-                                  ? AppColors.secondary
-                                  : mutedColor)
+                              : AppColors.secondary)
                           .withValues(alpha: 0.18),
                     ),
                   ),
@@ -619,9 +627,7 @@ class _AllChaptersSection extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: complete
                               ? AppColors.primary
-                              : unlocked
-                                  ? AppColors.secondary
-                                  : mutedColor.withValues(alpha: 0.08),
+                              : AppColors.secondary,
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: complete
@@ -629,19 +635,13 @@ class _AllChaptersSection extends StatelessWidget {
                                 Icons.check_rounded,
                                 color: Colors.white,
                               )
-                            : unlocked
-                                ? Text(
-                                    '${index + 1}',
-                                    style: const TextStyle(
-                                      color: AppColors.primaryDark,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  )
-                                : Icon(
-                                    Icons.lock_outline_rounded,
-                                    size: 18,
-                                    color: mutedColor,
-                                  ),
+                            : Text(
+                                '${index + 1}',
+                                style: const TextStyle(
+                                  color: AppColors.primaryDark,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -660,9 +660,7 @@ class _AllChaptersSection extends StatelessWidget {
                             Text(
                               complete
                                   ? 'مكتمل'
-                                  : unlocked
-                                      ? '$completed من $total دروس'
-                                      : '$total دروس • مقفول مؤقتًا',
+                                  : '$completed من $total دروس • متاح',
                               style: TextStyle(
                                 color: complete
                                     ? AppColors.primary
