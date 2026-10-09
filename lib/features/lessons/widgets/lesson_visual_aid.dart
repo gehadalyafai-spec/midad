@@ -241,9 +241,134 @@ class LessonVisualAid extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: 16),
+          Text(
+            'ماذا تلاحظ؟',
+            style: TextStyle(
+              color: text,
+              fontWeight: FontWeight.w900,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ..._insights(kind).map(
+            (insight) => Padding(
+              padding: const EdgeInsets.only(bottom: 7),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(
+                    Icons.arrow_left_rounded,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      insight,
+                      style: TextStyle(
+                        color: muted,
+                        height: 1.55,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  List<String> _insights(LessonVisualKind kind) {
+    switch (kind) {
+      case LessonVisualKind.numberLine:
+        return const [
+          'القيم تزداد كلما اتجهنا يمينًا وتقل كلما اتجهنا يسارًا.',
+          'العدد السالب الأقرب إلى الصفر أكبر من السالب الأبعد عنه.',
+          'تمثيل القيمة على الخط يساعدك على التحقق من المقارنة قبل الحساب.',
+        ];
+      case LessonVisualKind.fraction:
+        return const [
+          'المقام يحدد عدد الأجزاء المتساوية التي قُسم إليها الكل.',
+          'البسط يحدد عدد الأجزاء التي نأخذها أو نتعامل معها.',
+          'عندما تختلف أحجام الأجزاء نحتاج أولًا إلى توحيدها قبل الجمع أو الطرح.',
+        ];
+      case LessonVisualKind.pattern:
+        return const [
+          'لا تنظر إلى الحد الأخير فقط؛ قارن كل حد بالذي قبله.',
+          'القاعدة الصحيحة يجب أن تعمل على أكثر من انتقال واحد.',
+          'قد يكون النمط جمعًا أو طرحًا أو ضربًا أو تغيرًا منتظمًا آخر.',
+        ];
+      case LessonVisualKind.venn:
+        return const [
+          'كل دائرة تمثل مجموعة مختلفة.',
+          'منطقة التداخل تمثل العناصر المشتركة بين المجموعتين.',
+          'العناصر خارج التداخل تنتمي إلى مجموعة واحدة فقط.',
+        ];
+      case LessonVisualKind.triangle:
+        return const [
+          'الوتر يقابل الزاوية القائمة وهو أطول ضلع في المثلث القائم.',
+          'الضلعان الآخران يصنعان الزاوية القائمة.',
+          'إذا لم توجد زاوية قائمة فلا نستخدم علاقة فيثاغورس مباشرة.',
+        ];
+      case LessonVisualKind.ratio:
+        return const [
+          'كل صف يمثل زوجًا من القيم المتناظرة.',
+          'إذا كان عامل التحويل نفسه في كل الصفوف فالعلاقة ثابتة.',
+          'يمكن إيجاد قيمة مجهولة بتطبيق العامل نفسه على الصف الجديد.',
+        ];
+      case LessonVisualKind.percent:
+        return const [
+          'الكل دائمًا يمثل 100%.',
+          '25% تعني ربع الكل، و50% تعني نصفه.',
+          'قبل الحساب قدّر حجم الجزء المظلل لتعرف هل إجابتك منطقية.',
+        ];
+      case LessonVisualKind.geometry:
+        return const [
+          'قسّم الشكل إلى أجزاء مألوفة بدل محاولة فهمه دفعة واحدة.',
+          'العلاقات بين الزوايا أهم من شكل الرسم نفسه.',
+          'التناظر والتطابق والتشابه تحتاج تحديد الأجزاء المتناظرة بدقة.',
+        ];
+      case LessonVisualKind.transform:
+        return const [
+          'الشكل والحجم لا يتغيران في الانعكاس والانسحاب والدوران.',
+          'الذي يتغير هو الموقع أو الاتجاه.',
+          'قارن نقطة واحدة قبل التحويل وبعده لتفهم قاعدة التحويل.',
+        ];
+      case LessonVisualKind.statistics:
+        return const [
+          'ارتفاع العمود أو حجم القطاع يمثل مقدارًا من البيانات.',
+          'التمثيل البصري يكشف التجمعات والفروق أسرع من القائمة الخام.',
+          'اختر الرسم بحسب السؤال الذي تريد أن تجيب عنه، لا بحسب شكله.',
+        ];
+      case LessonVisualKind.probability:
+        return const [
+          'كل فرع يمثل اختيارًا ممكنًا في خطوة من التجربة.',
+          'النهايات تمثل جميع النواتج الممكنة.',
+          'عد النواتج الملائمة بعد التأكد أن الشجرة كاملة.',
+        ];
+      case LessonVisualKind.measurement:
+        return const [
+          'القاعدة والارتفاع يحددان كثيرًا من قوانين المساحة والحجم.',
+          'الحجم يقيس ما بداخل المجسم، ومساحة السطح تقيس الغلاف الخارجي.',
+          'قسّم الشكل المركب إلى مجسمات أو أشكال أبسط ثم اجمع النتائج.',
+        ];
+      case LessonVisualKind.algebra:
+        return const [
+          'المعادلة تبقى صحيحة فقط إذا حافظنا على توازن الطرفين.',
+          'هدف الحل هو عزل المتغير وحده.',
+          'استخدم العملية العكسية وأجرها على الطرفين معًا.',
+        ];
+      case LessonVisualKind.function:
+        return const [
+          'المدخل يمر بقاعدة واحدة ثم يعطي مخرجًا واحدًا.',
+          'الجدول والرسم والمعادلة طرق مختلفة لوصف العلاقة نفسها.',
+          'في الدالة الخطية يظهر معدل التغير كثبات في الميل.',
+        ];
+    }
   }
 
   String _caption(LessonVisualKind kind) {
