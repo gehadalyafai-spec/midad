@@ -263,10 +263,16 @@ class LessonVisualAid extends StatelessWidget {
   const LessonVisualAid({
     super.key,
     required this.lessonId,
+    required this.lessonTitle,
+    this.simpleExplanation = '',
+    this.simpleHint = '',
     this.steps = const <String>[],
   });
 
   final String lessonId;
+  final String lessonTitle;
+  final String simpleExplanation;
+  final String simpleHint;
   final List<String> steps;
 
   @override
@@ -312,13 +318,27 @@ class LessonVisualAid extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  'شاهد الفكرة قبل حفظ القاعدة',
-                  style: TextStyle(
-                    color: text,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 16,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'شاهد الفكرة قبل حفظ القاعدة',
+                      style: TextStyle(
+                        color: text,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      lessonTitle,
+                      style: TextStyle(
+                        color: muted,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -351,6 +371,15 @@ class LessonVisualAid extends StatelessWidget {
             const SizedBox(height: 14),
             _VisualStepGuide(
               steps: steps,
+              textColor: text,
+              mutedColor: muted,
+            ),
+          ],
+          if (simpleExplanation.isNotEmpty || simpleHint.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            _ExplainSimpler(
+              explanation: simpleExplanation,
+              hint: simpleHint,
               textColor: text,
               mutedColor: muted,
             ),
@@ -1039,6 +1068,104 @@ class _VisualStepGuideState extends State<_VisualStepGuide> {
           ],
         ],
       ),
+    );
+  }
+}
+
+class _ExplainSimpler extends StatefulWidget {
+  const _ExplainSimpler({
+    required this.explanation,
+    required this.hint,
+    required this.textColor,
+    required this.mutedColor,
+  });
+
+  final String explanation;
+  final String hint;
+  final Color textColor;
+  final Color mutedColor;
+
+  @override
+  State<_ExplainSimpler> createState() => _ExplainSimplerState();
+}
+
+class _ExplainSimplerState extends State<_ExplainSimpler> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.centerRight,
+          child: OutlinedButton.icon(
+            onPressed: () => setState(() => _open = !_open),
+            icon: Icon(
+              _open
+                  ? Icons.keyboard_arrow_up_rounded
+                  : Icons.psychology_alt_rounded,
+              size: 18,
+            ),
+            label: Text(
+              _open ? 'إخفاء التبسيط' : 'اشرحها أبسط',
+            ),
+          ),
+        ),
+        AnimatedCrossFade(
+          duration: const Duration(milliseconds: 220),
+          crossFadeState:
+              _open ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          firstChild: const SizedBox.shrink(),
+          secondChild: Container(
+            width: double.infinity,
+            margin: const EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppColors.secondary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppColors.secondary.withValues(alpha: 0.22),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'بأبسط صورة:',
+                  style: TextStyle(
+                    color: AppColors.primaryDark,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 12,
+                  ),
+                ),
+                if (widget.explanation.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    widget.explanation,
+                    style: TextStyle(
+                      color: widget.textColor,
+                      height: 1.65,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+                if (widget.hint.isNotEmpty) ...[
+                  const SizedBox(height: 7),
+                  Text(
+                    widget.hint,
+                    style: TextStyle(
+                      color: widget.mutedColor,
+                      height: 1.55,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
