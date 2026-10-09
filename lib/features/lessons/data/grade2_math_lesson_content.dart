@@ -14,6 +14,12 @@ class LessonContent {
     required this.practiceOptions,
     required this.practiceCorrectIndex,
     required this.practiceFeedback,
+    this.intro = '',
+    this.whyItMatters = '',
+    this.steps = const <String>[],
+    this.secondExampleFormula = '',
+    this.secondExampleBody = '',
+    this.summaryPoints = const <String>[],
   });
 
   final String conceptLabel;
@@ -30,6 +36,20 @@ class LessonContent {
   final List<String> practiceOptions;
   final int practiceCorrectIndex;
   final String practiceFeedback;
+  final String intro;
+  final String whyItMatters;
+  final List<String> steps;
+  final String secondExampleFormula;
+  final String secondExampleBody;
+  final List<String> summaryPoints;
+
+  bool get hasExtendedExplanation =>
+      intro.isNotEmpty ||
+      whyItMatters.isNotEmpty ||
+      steps.isNotEmpty ||
+      secondExampleFormula.isNotEmpty ||
+      secondExampleBody.isNotEmpty ||
+      summaryPoints.isNotEmpty;
 }
 
 const grade2MathLessonContent = <String, LessonContent>{
