@@ -195,6 +195,66 @@ LessonVisualKind? visualKindForLesson(String lessonId) {
   return null;
 }
 
+const _lessonSpecificVisualVariants = <String>{
+  'compare-rational',
+  'multiply-rational',
+  'divide-rational',
+  'add-subtract-like-denominators',
+  'add-subtract-rational',
+  'estimate-square-roots',
+  'irrational-representation',
+  'inequalities',
+  'solve-inequalities',
+  'square-roots',
+  'real-numbers',
+  'pythagorean-applications',
+  'rate-of-change',
+  'constant-rate',
+  'solve-proportions',
+  'drawing-strategy',
+  'similar-polygons',
+  'scale-up-down',
+  'indirect-measurement',
+  'percent-estimation',
+  'reasonableness-strategy',
+  'percent-equation',
+  'percent-change',
+  'logical-reasoning',
+  'congruent-polygons',
+  'translation',
+  'rotation',
+  'table-strategy',
+  'central-tendency-range',
+  'dispersion',
+  'choose-display',
+  'compound-events',
+  'represent-problem',
+  'simpler-problem-strategy',
+  'three-dimensional-shapes',
+  'prism-cylinder-volume',
+  'pyramid-cone-volume',
+  'prism-cylinder-surface-area',
+  'pyramid-surface-area',
+  'simplify-expressions',
+  'write-two-step-equations',
+  'variables-both-sides',
+  'guess-check-strategy',
+  'model-strategy',
+  'graph-linear-functions',
+  'direct-variation',
+};
+
+String visualVariantKeyForLesson(String lessonId) {
+  final kind = visualKindForLesson(lessonId);
+  if (kind == null) return 'none';
+
+  if (_lessonSpecificVisualVariants.contains(lessonId)) {
+    return '${kind.name}:$lessonId';
+  }
+
+  return kind.name;
+}
+
 bool hasVisualAidForLesson(String lessonId) =>
     visualKindForLesson(lessonId) != null;
 
