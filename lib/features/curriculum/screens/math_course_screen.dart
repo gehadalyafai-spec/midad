@@ -153,7 +153,7 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'تقدّم فصلًا بعد فصل، ويمكنك الرجوع لأي فصل مكتمل في أي وقت.',
+                    'اختر أي فصل تريد مراجعته، وسيبقى تقدمك محفوظًا في كل درس.',
                     style: TextStyle(
                       color: muted,
                       height: 1.6,
