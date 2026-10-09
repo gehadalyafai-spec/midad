@@ -141,8 +141,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _continueLearning(Chapter chapter) async {
-    final reviewRecommendation = _reviewRecommendation();
-
     final lastLesson = _findLesson(chapter, _lastLessonId);
     final lesson = lastLesson == null ||
             _completedLessonIds.contains(lastLesson.id)
@@ -230,6 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .length;
     final overallProgress =
         allLessons.isEmpty ? 0.0 : overallCompleted / allLessons.length;
+    final reviewRecommendation = _reviewRecommendation();
 
     final lastLesson = _findLesson(chapter, _lastLessonId);
     final continueLesson = lastLesson == null ||
