@@ -221,7 +221,13 @@ class _LessonScreenState extends State<LessonScreen> {
                         height: 1.6,
                       ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
+                _LessonRoadmap(
+                  paper: paper,
+                  textColor: text,
+                  mutedColor: muted,
+                ).animate(delay: 45.ms).fadeIn(duration: 320.ms),
+                const SizedBox(height: 28),
                 _ConceptBoard(
                   label: lessonData.conceptLabel,
                   main: lessonData.conceptMain,
@@ -348,6 +354,104 @@ class _LessonScreenState extends State<LessonScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _LessonRoadmap extends StatelessWidget {
+  const _LessonRoadmap({
+    required this.paper,
+    required this.textColor,
+    required this.mutedColor,
+  });
+
+  final Color paper;
+  final Color textColor;
+  final Color mutedColor;
+
+  static const _stages = <({IconData icon, String label})>[
+    (icon: Icons.lightbulb_outline_rounded, label: 'افهم'),
+    (icon: Icons.visibility_rounded, label: 'شاهد'),
+    (icon: Icons.format_list_numbered_rounded, label: 'طبّق'),
+    (icon: Icons.edit_rounded, label: 'جرّب'),
+    (icon: Icons.bolt_rounded, label: 'اختبر'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+      decoration: BoxDecoration(
+        color: paper,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.12),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'خارطة الدرس',
+            style: TextStyle(
+              color: textColor,
+              fontWeight: FontWeight.w900,
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: List.generate(_stages.length, (index) {
+              final stage = _stages[index];
+              return Expanded(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 34,
+                            height: 34,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: index == 0
+                                  ? AppColors.primary
+                                  : AppColors.primary.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              stage.icon,
+                              size: 17,
+                              color: index == 0
+                                  ? Colors.white
+                                  : AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            stage.label,
+                            style: TextStyle(
+                              color: index == 0 ? textColor : mutedColor,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (index != _stages.length - 1)
+                      Container(
+                        width: 10,
+                        height: 1.5,
+                        color: mutedColor.withValues(alpha: 0.18),
+                      ),
+                  ],
+                ),
+              );
+            }),
+          ),
+        ],
       ),
     );
   }
