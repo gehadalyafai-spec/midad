@@ -930,6 +930,34 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawRatio(Canvas c, Size s) {
+    if (lessonId == 'rate-of-change') {
+      _drawRateOfChange(c, s);
+      return;
+    }
+    if (lessonId == 'constant-rate') {
+      _drawConstantRate(c, s);
+      return;
+    }
+    if (lessonId == 'solve-proportions') {
+      _drawSolveProportion(c, s);
+      return;
+    }
+    if (lessonId == 'drawing-strategy') {
+      _drawScaleSketch(c, s);
+      return;
+    }
+    if (lessonId == 'similar-polygons') {
+      _drawSimilarPolygons(c, s);
+      return;
+    }
+    if (lessonId == 'scale-up-down') {
+      _drawScaleChange(c, s);
+      return;
+    }
+    if (lessonId == 'indirect-measurement') {
+      _drawIndirectMeasurement(c, s);
+      return;
+    }
     final left = s.width * .24;
     final top = s.height * .18;
     final w = s.width * .52;
@@ -978,6 +1006,22 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawPercent(Canvas c, Size s) {
+    if (lessonId == 'percent-estimation') {
+      _drawPercentEstimate(c, s);
+      return;
+    }
+    if (lessonId == 'reasonableness-strategy') {
+      _drawPercentReasonableness(c, s);
+      return;
+    }
+    if (lessonId == 'percent-equation') {
+      _drawPercentEquation(c, s);
+      return;
+    }
+    if (lessonId == 'percent-change') {
+      _drawPercentChange(c, s);
+      return;
+    }
     final rect = Rect.fromLTWH(
       s.width * .12,
       s.height * .36,
@@ -1015,6 +1059,14 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawGeometry(Canvas c, Size s) {
+    if (lessonId == 'logical-reasoning') {
+      _drawLogicalReasoning(c, s);
+      return;
+    }
+    if (lessonId == 'congruent-polygons') {
+      _drawCongruentPolygons(c, s);
+      return;
+    }
     final center = Offset(s.width * .50, s.height * .50);
     final radius = s.height * .28;
     final points = <Offset>[];
@@ -1053,6 +1105,14 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawTransform(Canvas c, Size s) {
+    if (lessonId == 'translation') {
+      _drawTranslation(c, s);
+      return;
+    }
+    if (lessonId == 'rotation') {
+      _drawRotation(c, s);
+      return;
+    }
     final midX = s.width * .50;
     c.drawLine(
       Offset(midX, s.height * .12),
@@ -1892,6 +1952,178 @@ class _LessonVisualPainter extends CustomPainter {
       Offset(s.width * .31, s.height * .74),
       fontSize: 10,
     );
+  }
+
+  void _drawRateOfChange(Canvas c, Size s) {
+    final a = Offset(s.width * .24, s.height * .70);
+    final b = Offset(s.width * .72, s.height * .28);
+    c.drawLine(a, b, _stroke(AppColors.secondary, 4));
+    c.drawLine(a, Offset(b.dx, a.dy), _stroke(AppColors.accent, 3));
+    c.drawLine(Offset(b.dx, a.dy), b, _stroke(AppColors.accent, 3));
+    _text(c, 'Δx = 4', Offset(s.width * .43, s.height * .73), fontSize: 11, color: AppColors.accent);
+    _text(c, 'Δy = 8', Offset(s.width * .73, s.height * .47), fontSize: 11, color: AppColors.accent);
+    _text(c, 'معدل التغير = 8 ÷ 4 = 2', Offset(s.width * .30, s.height * .14), fontSize: 13);
+  }
+
+  void _drawConstantRate(Canvas c, Size s) {
+    _text(c, '6 كم', Offset(s.width * .18, s.height * .28), fontSize: 18);
+    _text(c, 'في', Offset(s.width * .40, s.height * .28), fontSize: 14, color: AppColors.accent);
+    _text(c, '3 ساعات', Offset(s.width * .52, s.height * .28), fontSize: 18);
+    c.drawLine(Offset(s.width * .24, s.height * .52), Offset(s.width * .76, s.height * .52), _stroke(Colors.white.withValues(alpha: .45), 2));
+    _text(c, '÷ 3', Offset(s.width * .45, s.height * .57), fontSize: 12, color: AppColors.secondary);
+    _text(c, '2 كم لكل ساعة', Offset(s.width * .35, s.height * .70), fontSize: 17, color: AppColors.secondary);
+  }
+
+  void _drawSolveProportion(Canvas c, Size s) {
+    _text(c, '3 / 5 = x / 20', Offset(s.width * .28, s.height * .22), fontSize: 22);
+    c.drawLine(Offset(s.width * .31, s.height * .50), Offset(s.width * .68, s.height * .30), _stroke(AppColors.accent, 3));
+    c.drawLine(Offset(s.width * .31, s.height * .30), Offset(s.width * .68, s.height * .50), _stroke(AppColors.secondary, 3));
+    _text(c, '3×20 = 5×x', Offset(s.width * .34, s.height * .58), fontSize: 15);
+    _text(c, 'x = 12', Offset(s.width * .42, s.height * .75), fontSize: 18, color: AppColors.secondary);
+  }
+
+  void _drawScaleSketch(Canvas c, Size s) {
+    final map = Rect.fromLTWH(s.width * .14, s.height * .22, s.width * .28, s.height * .42);
+    final real = Rect.fromLTWH(s.width * .58, s.height * .16, s.width * .28, s.height * .54);
+    c.drawRect(map, _stroke(AppColors.secondary, 3));
+    c.drawRect(real, _stroke(AppColors.accent, 3));
+    _text(c, 'رسم', Offset(map.center.dx - 14, map.center.dy - 8), fontSize: 14, color: AppColors.secondary);
+    _text(c, 'حقيقي', Offset(real.center.dx - 20, real.center.dy - 8), fontSize: 14, color: AppColors.accent);
+    _text(c, '1 سم : 2 م', Offset(s.width * .39, s.height * .76), fontSize: 13);
+  }
+
+  void _drawSimilarPolygons(Canvas c, Size s) {
+    final p1 = Path()
+      ..moveTo(s.width * .16, s.height * .66)
+      ..lineTo(s.width * .30, s.height * .28)
+      ..lineTo(s.width * .42, s.height * .66)
+      ..close();
+    final p2 = Path()
+      ..moveTo(s.width * .52, s.height * .72)
+      ..lineTo(s.width * .70, s.height * .18)
+      ..lineTo(s.width * .86, s.height * .72)
+      ..close();
+    c.drawPath(p1, _stroke(AppColors.secondary, 3));
+    c.drawPath(p2, _stroke(AppColors.accent, 3));
+    _text(c, '× 1.5', Offset(s.width * .43, s.height * .42), fontSize: 14);
+    _text(c, 'نفس الزوايا • أضلاع متناسبة', Offset(s.width * .29, s.height * .80), fontSize: 10);
+  }
+
+  void _drawScaleChange(Canvas c, Size s) {
+    final small = Rect.fromLTWH(s.width * .15, s.height * .35, s.width * .20, s.height * .28);
+    final large = Rect.fromLTWH(s.width * .58, s.height * .22, s.width * .28, s.height * .42);
+    c.drawRect(small, _fill(AppColors.secondary.withValues(alpha: .55)));
+    c.drawRect(large, _fill(AppColors.accent.withValues(alpha: .55)));
+    c.drawRect(small, _stroke(Colors.white, 2));
+    c.drawRect(large, _stroke(Colors.white, 2));
+    _text(c, '×2', Offset(s.width * .44, s.height * .39), fontSize: 20, color: AppColors.secondary);
+    _text(c, 'تكبير', Offset(s.width * .42, s.height * .64), fontSize: 11);
+  }
+
+  void _drawIndirectMeasurement(Canvas c, Size s) {
+    final groundY = s.height * .74;
+    c.drawLine(Offset(s.width * .10, groundY), Offset(s.width * .90, groundY), _whiteStroke);
+    final treeX = s.width * .30;
+    c.drawLine(Offset(treeX, groundY), Offset(treeX, s.height * .20), _stroke(AppColors.secondary, 5));
+    c.drawLine(Offset(treeX, s.height * .20), Offset(s.width * .55, groundY), _stroke(AppColors.secondary, 2));
+    final stickX = s.width * .68;
+    c.drawLine(Offset(stickX, groundY), Offset(stickX, s.height * .49), _stroke(AppColors.accent, 5));
+    c.drawLine(Offset(stickX, s.height * .49), Offset(s.width * .82, groundY), _stroke(AppColors.accent, 2));
+    _text(c, 'ظل الشجرة', Offset(s.width * .37, groundY + 8), fontSize: 10, color: AppColors.secondary);
+    _text(c, 'ظل العصا', Offset(s.width * .70, groundY + 8), fontSize: 10, color: AppColors.accent);
+  }
+
+  void _drawPercentEstimate(Canvas c, Size s) {
+    final rect = Rect.fromLTWH(s.width * .14, s.height * .38, s.width * .72, 42);
+    c.drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(12)), _fill(Colors.white.withValues(alpha: .12)));
+    c.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromLTWH(rect.left, rect.top, rect.width * .30, rect.height), const Radius.circular(12)),
+      _fill(AppColors.secondary),
+    );
+    _text(c, '≈ 30%', Offset(rect.left + rect.width * .10, rect.top + 11), fontSize: 12, color: AppColors.primaryDark);
+    _text(c, 'قريب من الثلث', Offset(s.width * .40, s.height * .67), fontSize: 13, color: AppColors.secondary);
+  }
+
+  void _drawPercentReasonableness(Canvas c, Size s) {
+    final center = Offset(s.width * .50, s.height * .65);
+    final radius = s.height * .35;
+    c.drawArc(Rect.fromCircle(center: center, radius: radius), math.pi, math.pi, false, _stroke(Colors.white.withValues(alpha: .35), 10));
+    c.drawArc(Rect.fromCircle(center: center, radius: radius), math.pi, math.pi * .72, false, _stroke(AppColors.secondary, 10));
+    final angle = math.pi + math.pi * .72;
+    final needle = Offset(center.dx + radius * .72 * math.cos(angle), center.dy + radius * .72 * math.sin(angle));
+    c.drawLine(center, needle, _stroke(AppColors.accent, 4));
+    _text(c, 'هل 72% منطقي؟', Offset(s.width * .36, s.height * .15), fontSize: 14);
+  }
+
+  void _drawPercentEquation(Canvas c, Size s) {
+    _text(c, 'الجزء', Offset(s.width * .17, s.height * .26), fontSize: 16, color: AppColors.secondary);
+    _text(c, '=', Offset(s.width * .36, s.height * .26), fontSize: 18);
+    _text(c, 'النسبة', Offset(s.width * .45, s.height * .26), fontSize: 16, color: AppColors.accent);
+    _text(c, '×', Offset(s.width * .63, s.height * .26), fontSize: 18);
+    _text(c, 'الكل', Offset(s.width * .72, s.height * .26), fontSize: 16);
+    _text(c, '30 = 25% × 120', Offset(s.width * .34, s.height * .56), fontSize: 18);
+    _text(c, '0.25 × 120 = 30', Offset(s.width * .36, s.height * .74), fontSize: 13, color: AppColors.secondary);
+  }
+
+  void _drawPercentChange(Canvas c, Size s) {
+    final base = s.height * .72;
+    final oldRect = Rect.fromLTWH(s.width * .22, base - s.height * .34, s.width * .18, s.height * .34);
+    final newRect = Rect.fromLTWH(s.width * .60, base - s.height * .50, s.width * .18, s.height * .50);
+    c.drawRect(oldRect, _fill(AppColors.primary.withValues(alpha: .65)));
+    c.drawRect(newRect, _fill(AppColors.secondary));
+    _text(c, '80', Offset(oldRect.center.dx - 8, oldRect.top - 24), fontSize: 13);
+    _text(c, '100', Offset(newRect.center.dx - 11, newRect.top - 24), fontSize: 13);
+    _text(c, '+25%', Offset(s.width * .43, s.height * .33), fontSize: 18, color: AppColors.accent);
+    _text(c, 'قديم', Offset(oldRect.center.dx - 12, base + 8), fontSize: 10);
+    _text(c, 'جديد', Offset(newRect.center.dx - 12, base + 8), fontSize: 10);
+  }
+
+  void _drawLogicalReasoning(Canvas c, Size s) {
+    final boxes = <String>['معطى', 'قاعدة', 'نتيجة'];
+    for (var i = 0; i < boxes.length; i++) {
+      final x = s.width * (.10 + i * .30);
+      final rect = RRect.fromRectAndRadius(
+        Rect.fromLTWH(x, s.height * .36, s.width * .20, 48),
+        const Radius.circular(12),
+      );
+      c.drawRRect(rect, _fill(i == 2 ? AppColors.secondary : AppColors.primary.withValues(alpha: .75)));
+      _text(c, boxes[i], Offset(x + s.width * .055, s.height * .44), fontSize: 12, color: i == 2 ? AppColors.primaryDark : Colors.white);
+      if (i < 2) {
+        _text(c, '→', Offset(x + s.width * .22, s.height * .42), fontSize: 18, color: AppColors.accent);
+      }
+    }
+  }
+
+  void _drawCongruentPolygons(Canvas c, Size s) {
+    final left = Rect.fromLTWH(s.width * .16, s.height * .28, s.width * .24, s.height * .36);
+    final right = Rect.fromLTWH(s.width * .60, s.height * .28, s.width * .24, s.height * .36);
+    c.drawRect(left, _fill(AppColors.secondary.withValues(alpha: .30)));
+    c.drawRect(right, _fill(AppColors.accent.withValues(alpha: .30)));
+    c.drawRect(left, _stroke(AppColors.secondary, 3));
+    c.drawRect(right, _stroke(AppColors.accent, 3));
+    _text(c, '≅', Offset(s.width * .47, s.height * .40), fontSize: 24);
+    _text(c, 'نفس الشكل والحجم', Offset(s.width * .36, s.height * .74), fontSize: 11);
+  }
+
+  void _drawTranslation(Canvas c, Size s) {
+    final p1 = Rect.fromLTWH(s.width * .18, s.height * .40, 54, 54);
+    final p2 = Rect.fromLTWH(s.width * .66, s.height * .24, 54, 54);
+    c.drawRect(p1, _fill(AppColors.secondary.withValues(alpha: .60)));
+    c.drawRect(p2, _fill(AppColors.accent.withValues(alpha: .60)));
+    c.drawLine(p1.center, p2.center, _stroke(Colors.white, 3));
+    _text(c, '→ 4 ، ↑ 2', Offset(s.width * .40, s.height * .55), fontSize: 12, color: AppColors.secondary);
+  }
+
+  void _drawRotation(Canvas c, Size s) {
+    final center = Offset(s.width * .50, s.height * .50);
+    c.drawCircle(center, 6, _fill(Colors.white));
+    final p1 = Offset(s.width * .30, s.height * .50);
+    final p2 = Offset(s.width * .50, s.height * .25);
+    c.drawCircle(p1, 9, _fill(AppColors.secondary));
+    c.drawCircle(p2, 9, _fill(AppColors.accent));
+    c.drawArc(Rect.fromCircle(center: center, radius: s.width * .16), math.pi, math.pi / 2, false, _stroke(Colors.white, 3));
+    _text(c, '90°', Offset(s.width * .41, s.height * .28), fontSize: 14, color: AppColors.secondary);
+    _text(c, 'مركز الدوران', Offset(s.width * .43, s.height * .58), fontSize: 10);
   }
 
   @override
