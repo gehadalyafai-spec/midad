@@ -262,7 +262,7 @@ class LessonVisualAid extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            _caption(kind),
+            _captionForLesson(kind),
             style: TextStyle(
               color: muted,
               height: 1.65,
@@ -294,7 +294,7 @@ class LessonVisualAid extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          ..._insights(kind).map(
+          ..._insightsForLesson(kind).map(
             (insight) => Padding(
               padding: const EdgeInsets.only(bottom: 7),
               child: Row(
@@ -351,7 +351,7 @@ class LessonVisualAid extends StatelessWidget {
                       ),
                       const SizedBox(height: 5),
                       Text(
-                        _realLifeExample(kind),
+                        _realLifeExampleForLesson(kind),
                         style: TextStyle(
                           color: muted,
                           height: 1.55,
@@ -367,6 +367,165 @@ class LessonVisualAid extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _captionForLesson(LessonVisualKind kind) {
+    switch (lessonId) {
+      case 'rational-numbers-intro':
+        return 'شاهد كيف تعيش الأعداد الموجبة والسالبة والكسور معًا على خط واحد.';
+      case 'compare-rational':
+        return 'ضع العددين على خط الأعداد؛ العدد الواقع أكثر إلى اليمين هو الأكبر.';
+      case 'multiply-rational':
+        return 'افصل بين مهمتين: اضرب القيم أولًا، ثم حدّد إشارة الناتج من إشارات العوامل.';
+      case 'divide-rational':
+        return 'القسمة على كسر تتحول إلى ضرب في مقلوبه؛ الرسم يريك التحول قبل الحساب.';
+      case 'add-subtract-like-denominators':
+        return 'عندما تكون الأجزاء بالحجم نفسه نجمع عدد الأجزاء فقط ويبقى المقام نفسه.';
+      case 'add-subtract-rational':
+        return 'عندما تختلف المقامات، وحّد حجم الأجزاء أولًا ثم اجمع أو اطرح.';
+      case 'pattern-strategy':
+        return 'قارن كل حد بالذي قبله حتى ترى التغير المتكرر.';
+      case 'powers':
+        return 'القوة تعني تكرار الضرب؛ لا تخلط بين 3² و3×2.';
+      case 'scientific-notation':
+        return 'حرّك الفاصلة حتى يصبح العدد بين 1 و10، وعدّ عدد الحركات.';
+      case 'square-roots':
+        return 'الجذر التربيعي يسأل: ما طول ضلع مربع مساحته معلومة؟';
+      case 'venn-strategy':
+        return 'استخدم دوائر فن لتنظيم الشروط والمعلومات المشتركة قبل الحل.';
+      case 'real-numbers':
+        return 'صنّف العدد من المجموعة الأصغر إلى الأكبر: طبيعي، صحيح، نسبي أو غير نسبي.';
+      case 'pythagorean-theorem':
+        return 'المربعات على أضلاع المثلث القائم توضح لماذا a²+b²=c².';
+      case 'pythagorean-applications':
+        return 'حوّل الموقف الواقعي إلى مثلث قائم، ثم حدّد الوتر قبل الحساب.';
+      case 'angles-lines':
+        return 'ابدأ بعلاقة الخطوط ثم استخدم مجموع الزوايا المناسب.';
+      case 'logical-reasoning':
+        return 'التبرير ليس شكلًا؛ هو سلسلة: معطى ثم قاعدة ثم نتيجة.';
+      case 'congruent-polygons':
+        return 'طابق الرؤوس المتناظرة ثم قارن الأضلاع والزوايا بالترتيب نفسه.';
+      case 'symmetry':
+        return 'تخيّل طي الشكل حول المحور؛ إذا انطبق النصفان فهناك تماثل.';
+      default:
+        return _caption(kind);
+    }
+  }
+
+  List<String> _insightsForLesson(LessonVisualKind kind) {
+    switch (lessonId) {
+      case 'multiply-rational':
+        return const [
+          'إشارة الناتج تعتمد على إشارتَي العددين، لا على حجمهما.',
+          'إشارتان متماثلتان تعطيان موجبًا، ومختلفتان تعطيان سالبًا.',
+          'بعد تحديد الإشارة اضرب القيم المطلقة بالطريقة المعتادة.',
+        ];
+      case 'divide-rational':
+        return const [
+          'لا تقسم البسط على البسط والمقام على المقام مباشرة.',
+          'احتفظ بالكسر الأول، واقلب الثاني، ثم حوّل القسمة إلى ضرب.',
+          'بسّط قبل أو بعد الضرب عندما يكون ذلك ممكنًا.',
+        ];
+      case 'add-subtract-like-denominators':
+        return const [
+          'المقام نفسه يعني أن حجم الأجزاء متساوٍ.',
+          'اجمع أو اطرح البسط فقط.',
+          'بسّط الناتج في النهاية إن أمكن.',
+        ];
+      case 'add-subtract-rational':
+        return const [
+          'لا يمكن جمع أجزاء بأحجام مختلفة مباشرة.',
+          'ابحث عن مقام مشترك أولًا.',
+          'بعد توحيد المقامات اجمع البسوط واترك المقام المشترك.',
+        ];
+      case 'powers':
+        return const [
+          'الأس يخبرك بعدد مرات استخدام الأساس عاملًا في الضرب.',
+          '3² يعني 3×3 وليس 3×2.',
+          'القيمة 3² يمكن رؤيتها كمساحة مربع ضلعُه 3.',
+        ];
+      case 'square-roots':
+        return const [
+          '√49 يبحث عن عدد إذا ضرب في نفسه أعطى 49.',
+          'المربعات الكاملة مثل 1 و4 و9 و16 و25 تساعد على معرفة الجذور بسرعة.',
+          'الجذر يعكس عملية التربيع.',
+        ];
+      case 'venn-strategy':
+        return const [
+          'اكتب كل شرط في منطقته المناسبة.',
+          'ضع المعلومات المشتركة في منطقة التقاطع.',
+          'الرسم يساعدك على منع تكرار الحالة أو نسيانها.',
+        ];
+      case 'real-numbers':
+        return const [
+          'كل عدد صحيح هو نسبي لأنه يمكن كتابته على صورة كسر.',
+          'الأعداد غير النسبية لا تنتهي ولا تتكرر عشريًا بنمط ثابت.',
+          'مجموعة الأعداد الحقيقية تضم النسبي وغير النسبي.',
+        ];
+      case 'pythagorean-theorem':
+        return const [
+          'العلاقة تعمل فقط في مثلث قائم.',
+          'c يمثل الوتر وهو المقابل للزاوية القائمة.',
+          'مساحة مربعي الضلعين القائمين تساوي مساحة مربع الوتر.',
+        ];
+      case 'pythagorean-applications':
+        return const [
+          'ارسم الموقف قبل التعويض في القانون.',
+          'حدد أي طول هو الوتر من موقع الزاوية القائمة.',
+          'تحقق أن الناتج مناسب للموقف والوحدة.',
+        ];
+      case 'logical-reasoning':
+        return const [
+          'كل نتيجة يجب أن تستند إلى قاعدة أو معطى.',
+          'لا تعتمد على أن الرسم يبدو متوازيًا أو متساويًا.',
+          'رتّب حجتك في خطوات قصيرة يمكن التحقق منها.',
+        ];
+      case 'congruent-polygons':
+        return const [
+          'التطابق يعني الشكل والحجم نفسيهما.',
+          'ترتيب الحروف يحدد أي رأس يقابل الآخر.',
+          'الأضلاع والزوايا المتناظرة تكون متساوية.',
+        ];
+      case 'symmetry':
+        return const [
+          'محور التماثل يقسم الشكل إلى صورتين متطابقتين.',
+          'مرور خط بالمركز لا يكفي وحده.',
+          'قد يكون للشكل محور واحد أو عدة محاور أو لا يوجد.',
+        ];
+      default:
+        return _insights(kind);
+    }
+  }
+
+  String _realLifeExampleForLesson(LessonVisualKind kind) {
+    switch (lessonId) {
+      case 'compare-rational':
+        return 'في درجات الحرارة، -2° أدفأ من -5° لأنه يقع إلى يمينه على خط الأعداد.';
+      case 'multiply-rational':
+        return 'تغير بمقدار -3 يتكرر 4 مرات يمكن تمثيله بـ4×(-3)=-12.';
+      case 'divide-rational':
+        return 'إذا كان لديك 3/4 لتر وتريد تقسيمه إلى حصص مقدار كل منها 1/4 لتر، فالقسمة تخبرك بعدد الحصص.';
+      case 'add-subtract-like-denominators':
+        return 'أكلت 2/8 من بيتزا ثم 3/8 أخرى؛ الأجزاء بالحجم نفسه، لذلك المجموع 5/8.';
+      case 'add-subtract-rational':
+        return 'نصف كوب + ثلث كوب يحتاجان تحويلًا إلى أجزاء بالحجم نفسه قبل جمعهما.';
+      case 'powers':
+        return 'ترتيب 5 صفوف وكل صف فيه 5 مقاعد يعطي 5²=25 مقعدًا.';
+      case 'square-roots':
+        return 'إذا كانت مساحة بلاطة مربعة 64 سم²، فإن طول ضلعها √64=8 سم.';
+      case 'pythagorean-theorem':
+        return 'يمكن إيجاد طول قطر شاشة مستطيلة من ارتفاعها وعرضها إذا شكّلا مثلثًا قائمًا.';
+      case 'pythagorean-applications':
+        return 'سلم يصل من الأرض إلى أعلى جدار يشكل وترًا في مثلث قائم.';
+      case 'logical-reasoning':
+        return 'في مخطط هندسي، لا يكفي أن يبدو خطان متوازيين؛ تحتاج علامة أو قاعدة تثبت ذلك.';
+      case 'congruent-polygons':
+        return 'قطعتان صُنعتا بالقالب نفسه يجب أن تتطابقا في الشكل والحجم.';
+      case 'symmetry':
+        return 'واجهة مبنى متناظرة يمكن تقسيمها بمحور رأسي إلى نصفين متطابقين.';
+      default:
+        return _realLifeExample(kind);
+    }
   }
 
   String _realLifeExample(LessonVisualKind kind) {
@@ -879,6 +1038,10 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawVenn(Canvas c, Size s) {
+    if (lessonId == 'real-numbers') {
+      _drawRealNumberClassification(c, s);
+      return;
+    }
     final r = s.height * .25;
     final a = Offset(s.width * .43, s.height * .50);
     final b = Offset(s.width * .58, s.height * .50);
@@ -905,6 +1068,10 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawTriangle(Canvas c, Size s) {
+    if (lessonId == 'pythagorean-applications') {
+      _drawPythagoreanApplication(c, s);
+      return;
+    }
     final a = Offset(s.width * .25, s.height * .76);
     final b = Offset(s.width * .72, s.height * .76);
     final d = Offset(s.width * .25, s.height * .20);
@@ -1693,6 +1860,10 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawSquareGrid(Canvas c, Size s) {
+    if (lessonId == 'square-roots') {
+      _drawSquareRootVisual(c, s);
+      return;
+    }
     final side = math.min(s.width, s.height) * .42;
     final left = s.width * .34;
     final top = s.height * .18;
@@ -1743,6 +1914,10 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawAngleDiagram(Canvas c, Size s) {
+    if (lessonId == 'logical-reasoning') {
+      _drawLogicalReasoning(c, s);
+      return;
+    }
     final o = Offset(s.width * .48, s.height * .58);
     c.drawLine(
       Offset(s.width * .14, o.dy),
@@ -1785,6 +1960,10 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawSymmetryDiagram(Canvas c, Size s) {
+    if (lessonId == 'congruent-polygons') {
+      _drawCongruentPolygons(c, s);
+      return;
+    }
     final midX = s.width * .50;
     c.drawLine(
       Offset(midX, s.height * .12),
@@ -2423,6 +2602,61 @@ class _LessonVisualPainter extends CustomPainter {
     c.drawCircle(origin,8,_fill(AppColors.accent));
     _text(c,'يمر بالأصل',Offset(origin.dx+12,origin.dy-26),fontSize:10,color:AppColors.accent);
     _text(c,'y = kx',Offset(s.width*.57,s.height*.23),fontSize:17,color:AppColors.secondary);
+  }
+
+  void _drawSquareRootVisual(Canvas c, Size s) {
+    final side = math.min(s.width, s.height) * .48;
+    final left = s.width * .28;
+    final top = s.height * .17;
+    final rect = Rect.fromLTWH(left, top, side, side);
+    c.drawRect(rect, _fill(AppColors.secondary.withValues(alpha: .22)));
+    c.drawRect(rect, _stroke(AppColors.secondary, 3));
+    _text(c, 'المساحة = 49', Offset(left + side * .22, top + side * .40), fontSize: 15);
+    _text(c, '؟', Offset(left + side + 16, top + side * .45), fontSize: 18, color: AppColors.accent);
+    _text(c, '√49 = 7', Offset(s.width * .39, s.height * .76), fontSize: 18, color: AppColors.secondary);
+  }
+
+  void _drawRealNumberClassification(Canvas c, Size s) {
+    final labels = <String>['حقيقية', 'نسبية', 'صحيحة', 'طبيعية'];
+    for (var i = 0; i < labels.length; i++) {
+      final inset = 14.0 + i * 22;
+      final rect = RRect.fromRectAndRadius(
+        Rect.fromLTRB(
+          s.width * .10 + inset,
+          s.height * .13 + inset * .45,
+          s.width * .90 - inset,
+          s.height * .80 - inset * .25,
+        ),
+        const Radius.circular(18),
+      );
+      c.drawRRect(
+        rect,
+        _stroke(
+          i.isEven ? AppColors.secondary : AppColors.accent,
+          2,
+        ),
+      );
+      _text(
+        c,
+        labels[i],
+        Offset(rect.left + 8, rect.top + 7),
+        fontSize: 10,
+        color: i.isEven ? AppColors.secondary : AppColors.accent,
+      );
+    }
+    _text(c, '√2 غير نسبي لكنه حقيقي', Offset(s.width * .37, s.height * .84), fontSize: 10);
+  }
+
+  void _drawPythagoreanApplication(Canvas c, Size s) {
+    final groundY=s.height*.76;
+    final wallX=s.width*.28;
+    c.drawLine(Offset(wallX,s.height*.16),Offset(wallX,groundY),_stroke(Colors.white,4));
+    c.drawLine(Offset(wallX,groundY),Offset(s.width*.82,groundY),_stroke(Colors.white,4));
+    c.drawLine(Offset(wallX,s.height*.25),Offset(s.width*.72,groundY),_stroke(AppColors.secondary,5));
+    c.drawRect(Rect.fromLTWH(wallX,groundY-18,18,18),_stroke(AppColors.accent,2));
+    _text(c,'الجدار 4م',Offset(s.width*.12,s.height*.44),fontSize:11);
+    _text(c,'الأرض 3م',Offset(s.width*.46,groundY+8),fontSize:11);
+    _text(c,'السلم ؟',Offset(s.width*.52,s.height*.42),fontSize:13,color:AppColors.secondary);
   }
 
   @override
