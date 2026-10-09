@@ -1,3 +1,5 @@
+import '../../curriculum/data/grade2_math_data.dart';
+import '../../curriculum/models/curriculum_models.dart';
 import '../models/quiz_question.dart';
 import 'equations_inequalities_quiz.dart';
 import 'geometry_quiz.dart';
@@ -53,3 +55,17 @@ const allGrade2MathQuestions = <QuizQuestion>[
   ...allEquationsInequalitiesQuestions,
   ...allLinearFunctionsQuestions,
 ];
+
+
+Lesson? lessonForGrade2MathQuestion(String questionId) {
+  for (final chapter in grade2MathChapters) {
+    for (final lesson in chapter.lessons.where((lesson) => lesson.isAvailable)) {
+      final questions = quizForGrade2MathLesson(lesson.id);
+      if (questions.any((question) => question.id == questionId)) {
+        return lesson;
+      }
+    }
+  }
+
+  return null;
+}
