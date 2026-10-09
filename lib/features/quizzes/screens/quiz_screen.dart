@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../services/progress_service.dart';
 import '../../curriculum/models/curriculum_models.dart';
+import '../data/grade2_math_quiz_registry.dart';
 import '../models/quiz_question.dart';
 
 class QuizScreen extends StatefulWidget {
@@ -15,12 +16,14 @@ class QuizScreen extends StatefulWidget {
     required this.questions,
     this.markLessonComplete = true,
     this.examProgressKey,
+    this.onReviewLesson,
   });
 
   final Lesson lesson;
   final List<QuizQuestion> questions;
   final bool markLessonComplete;
   final String? examProgressKey;
+  final ValueChanged<Lesson>? onReviewLesson;
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -118,6 +121,7 @@ class _QuizScreenState extends State<QuizScreen> {
         total: widget.questions.length,
         passed: _passed,
         missedQuestions: List<QuizQuestion>.unmodifiable(_missedQuestions),
+        onReviewLesson: widget.onReviewLesson,
         onRetry: _retry,
         onDone: () => Navigator.of(context).pop(_passed),
       );
@@ -476,6 +480,7 @@ class _ResultView extends StatelessWidget {
     required this.total,
     required this.passed,
     required this.missedQuestions,
+    required this.onReviewLesson,
     required this.onRetry,
     required this.onDone,
   });
@@ -484,6 +489,7 @@ class _ResultView extends StatelessWidget {
   final int total;
   final bool passed;
   final List<QuizQuestion> missedQuestions;
+  final ValueChanged<Lesson>? onReviewLesson;
   final VoidCallback onRetry;
   final VoidCallback onDone;
 
@@ -565,6 +571,8 @@ class _ResultView extends StatelessWidget {
                     final question = entry.value;
                     final correctAnswer =
                         question.options[question.correctIndex];
+                    final sourceLesson =
+                        lessonForGrade2MathQuestion(question.id);
 
                     return Container(
                       width: double.infinity,
@@ -582,13 +590,31 @@ class _ResultView extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'خطأ ${entry.key + 1}',
-                            style: const TextStyle(
-                              color: AppColors.accent,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 11,
-                            ),
+                          Row(
+                            children: [
+                              Text(
+                                'خطأ ${entry.key + 1}',
+                                style: const TextStyle(
+                                  color: AppColors.accent,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 11,
+                                ),
+                              ),
+                              if (sourceLesson != null) ...[
+                                const Spacer(),
+                                Flexible(
+                                  child: Text(
+                                    'من درس: ${sourceLesson.title}',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: muted,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                           const SizedBox(height: 7),
                           Text(
@@ -627,6 +653,22 @@ class _ResultView extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
+                          if (sourceLesson != null &&
+                              onReviewLesson != null) ...[
+                            const SizedBox(height: 8),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextButton.icon(
+                                onPressed: () =>
+                                    onReviewLesson!(sourceLesson),
+                                icon: const Icon(
+                                  Icons.menu_book_rounded,
+                                  size: 17,
+                                ),
+                                label: const Text('راجع هذا الدرس'),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     );
