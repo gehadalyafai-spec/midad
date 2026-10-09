@@ -85,6 +85,21 @@ void main() {
     }
   });
 
+  test('visuals are not duplicated inside the same chapter', () {
+    for (final chapter in grade2MathChapters) {
+      final lessons =
+          chapter.lessons.where((lesson) => lesson.isAvailable).toList();
+      final variants =
+          lessons.map((lesson) => visualVariantKeyForLesson(lesson.id)).toList();
+
+      expect(
+        variants.toSet(),
+        hasLength(variants.length),
+        reason: 'Duplicate visual variant found inside ${chapter.id}: $variants',
+      );
+    }
+  });
+
   test('every chapter builds a balanced ten question exam', () {
     for (final chapter in grade2MathChapters) {
       final exam = chapterExamQuestions(chapter);
