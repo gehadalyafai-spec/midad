@@ -279,7 +279,7 @@ class LessonVisualAid extends StatelessWidget {
                 borderRadius: BorderRadius.circular(22),
               ),
               child: CustomPaint(
-                painter: _LessonVisualPainter(kind),
+                painter: _LessonVisualPainter(kind, lessonId),
                 child: const SizedBox.expand(),
               ),
             ),
@@ -656,9 +656,10 @@ class LessonVisualAid extends StatelessWidget {
 }
 
 class _LessonVisualPainter extends CustomPainter {
-  _LessonVisualPainter(this.kind);
+  _LessonVisualPainter(this.kind, this.lessonId);
 
   final LessonVisualKind kind;
+  final String lessonId;
 
   Paint get _whiteStroke => Paint()
     ..color = Colors.white
@@ -758,6 +759,22 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawNumberLine(Canvas c, Size s) {
+    if (lessonId == 'compare-rational') {
+      _drawCompareRational(c, s);
+      return;
+    }
+    if (lessonId == 'estimate-square-roots') {
+      _drawEstimateSquareRoot(c, s);
+      return;
+    }
+    if (lessonId == 'irrational-representation') {
+      _drawIrrationalPoint(c, s);
+      return;
+    }
+    if (lessonId == 'inequalities' || lessonId == 'solve-inequalities') {
+      _drawInequalityLine(c, s);
+      return;
+    }
     final y = s.height * .55;
     final left = s.width * .10;
     final right = s.width * .90;
@@ -780,6 +797,22 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawFraction(Canvas c, Size s) {
+    if (lessonId == 'multiply-rational') {
+      _drawRationalMultiply(c, s);
+      return;
+    }
+    if (lessonId == 'divide-rational') {
+      _drawRationalDivide(c, s);
+      return;
+    }
+    if (lessonId == 'add-subtract-like-denominators') {
+      _drawLikeDenominators(c, s);
+      return;
+    }
+    if (lessonId == 'add-subtract-rational') {
+      _drawUnlikeDenominators(c, s);
+      return;
+    }
     final rect = Rect.fromLTWH(
       s.width * .12,
       s.height * .30,
@@ -1688,7 +1721,180 @@ class _LessonVisualPainter extends CustomPainter {
     );
   }
 
+  void _drawCompareRational(Canvas c, Size s) {
+    final y = s.height * .55;
+    final left = s.width * .10;
+    final right = s.width * .90;
+    c.drawLine(Offset(left, y), Offset(right, y), _whiteStroke);
+
+    const values = <String>['-2', '-1', '0', '1', '2'];
+    for (var i = 0; i < values.length; i++) {
+      final x = left + (right - left) * i / 4;
+      c.drawLine(Offset(x, y - 9), Offset(x, y + 9), _whiteStroke);
+      _text(c, values[i], Offset(x - 8, y + 16), fontSize: 10);
+    }
+
+    final a = Offset(left + (right - left) * .22, y);
+    final b = Offset(left + (right - left) * .40, y);
+    c.drawCircle(a, 8, _fill(AppColors.accent));
+    c.drawCircle(b, 8, _fill(AppColors.secondary));
+    _text(c, '-1.1', Offset(a.dx - 18, y - 36), fontSize: 11, color: AppColors.accent);
+    _text(c, '-0.4', Offset(b.dx - 18, y - 36), fontSize: 11, color: AppColors.secondary);
+    _text(c, '-0.4 > -1.1', Offset(s.width * .38, s.height * .18), fontSize: 16);
+  }
+
+  void _drawRationalMultiply(Canvas c, Size s) {
+    _text(c, '(-) × (+)', Offset(s.width * .15, s.height * .22), fontSize: 20);
+    _text(c, '→', Offset(s.width * .47, s.height * .22), fontSize: 20, color: AppColors.secondary);
+    _text(c, '(-)', Offset(s.width * .66, s.height * .22), fontSize: 22, color: AppColors.accent);
+
+    final start = s.width * .16;
+    final y = s.height * .62;
+    for (var i = 0; i < 6; i++) {
+      c.drawCircle(
+        Offset(start + i * s.width * .12, y),
+        8,
+        _fill(i < 3 ? AppColors.accent : AppColors.secondary),
+      );
+    }
+    _text(c, 'اضرب القيم ثم حدّد الإشارة', Offset(s.width * .29, s.height * .76), fontSize: 10);
+  }
+
+  void _drawRationalDivide(Canvas c, Size s) {
+    _text(c, '3/4 ÷ 1/2', Offset(s.width * .18, s.height * .23), fontSize: 21);
+    _text(c, 'اقلب الثاني', Offset(s.width * .42, s.height * .43), fontSize: 11, color: AppColors.secondary);
+    _text(c, '3/4 × 2/1', Offset(s.width * .57, s.height * .23), fontSize: 21, color: AppColors.secondary);
+
+    c.drawLine(
+      Offset(s.width * .30, s.height * .64),
+      Offset(s.width * .70, s.height * .64),
+      _stroke(AppColors.accent, 3),
+    );
+    _text(c, '= 3/2', Offset(s.width * .44, s.height * .71), fontSize: 18, color: AppColors.accent);
+  }
+
+  void _drawLikeDenominators(Canvas c, Size s) {
+    final top = s.height * .26;
+    final left = s.width * .14;
+    final width = s.width * .30;
+    final cell = width / 5;
+
+    for (var block = 0; block < 2; block++) {
+      final x0 = block == 0 ? left : s.width * .56;
+      for (var i = 0; i < 5; i++) {
+        final rect = Rect.fromLTWH(x0 + i * cell, top, cell, 42);
+        c.drawRect(
+          rect,
+          _fill(
+            i < (block == 0 ? 2 : 1)
+                ? AppColors.secondary
+                : Colors.white.withValues(alpha: .12),
+          ),
+        );
+        c.drawRect(rect, _stroke(Colors.white.withValues(alpha: .55)));
+      }
+    }
+
+    _text(c, '2/5', Offset(left + width * .36, top + 52), fontSize: 13);
+    _text(c, '+', Offset(s.width * .48, top + 8), fontSize: 18, color: AppColors.accent);
+    _text(c, '1/5', Offset(s.width * .56 + width * .36, top + 52), fontSize: 13);
+    _text(c, '= 3/5  المقام بقي 5', Offset(s.width * .35, s.height * .72), fontSize: 11, color: AppColors.secondary);
+  }
+
+  void _drawUnlikeDenominators(Canvas c, Size s) {
+    _text(c, '1/2', Offset(s.width * .13, s.height * .20), fontSize: 17);
+    _text(c, '+', Offset(s.width * .28, s.height * .20), fontSize: 17, color: AppColors.accent);
+    _text(c, '1/3', Offset(s.width * .36, s.height * .20), fontSize: 17);
+    _text(c, '→', Offset(s.width * .50, s.height * .20), fontSize: 17, color: AppColors.secondary);
+    _text(c, '3/6 + 2/6', Offset(s.width * .60, s.height * .20), fontSize: 17, color: AppColors.secondary);
+
+    final y = s.height * .54;
+    final left = s.width * .16;
+    final total = s.width * .68;
+    final cell = total / 6;
+    for (var i = 0; i < 6; i++) {
+      final rect = Rect.fromLTWH(left + i * cell, y, cell, 38);
+      c.drawRect(
+        rect,
+        _fill(i < 5 ? AppColors.secondary : Colors.white.withValues(alpha: .12)),
+      );
+      c.drawRect(rect, _stroke(Colors.white.withValues(alpha: .50)));
+    }
+    _text(c, '= 5/6', Offset(s.width * .44, s.height * .72), fontSize: 17, color: AppColors.accent);
+  }
+
+  void _drawEstimateSquareRoot(Canvas c, Size s) {
+    final y = s.height * .57;
+    final left = s.width * .18;
+    final right = s.width * .82;
+    c.drawLine(Offset(left, y), Offset(right, y), _whiteStroke);
+
+    final x4 = left;
+    final x5 = right;
+    c.drawLine(Offset(x4, y - 10), Offset(x4, y + 10), _whiteStroke);
+    c.drawLine(Offset(x5, y - 10), Offset(x5, y + 10), _whiteStroke);
+    _text(c, '4', Offset(x4 - 4, y + 16), fontSize: 11);
+    _text(c, '5', Offset(x5 - 4, y + 16), fontSize: 11);
+    _text(c, '√20', Offset(s.width * .50, y - 42), fontSize: 16, color: AppColors.secondary);
+    c.drawCircle(Offset(s.width * .55, y), 8, _fill(AppColors.secondary));
+    _text(c, '16 < 20 < 25', Offset(s.width * .36, s.height * .20), fontSize: 13);
+  }
+
+  void _drawIrrationalPoint(Canvas c, Size s) {
+    final y = s.height * .60;
+    final left = s.width * .16;
+    final right = s.width * .84;
+    c.drawLine(Offset(left, y), Offset(right, y), _whiteStroke);
+
+    const labels = <String>['1', '1.4', '1.5', '2'];
+    const fractions = <double>[0, .40, .50, 1];
+    for (var i = 0; i < labels.length; i++) {
+      final x = left + (right - left) * fractions[i];
+      c.drawLine(Offset(x, y - 9), Offset(x, y + 9), _whiteStroke);
+      _text(c, labels[i], Offset(x - 9, y + 15), fontSize: 10);
+    }
+    final root2 = left + (right - left) * .414;
+    c.drawCircle(Offset(root2, y), 8, _fill(AppColors.accent));
+    _text(c, '√2 ≈ 1.414', Offset(root2 - 38, y - 42), fontSize: 12, color: AppColors.accent);
+  }
+
+  void _drawInequalityLine(Canvas c, Size s) {
+    final y = s.height * .56;
+    final left = s.width * .14;
+    final right = s.width * .86;
+    c.drawLine(Offset(left, y), Offset(right, y), _whiteStroke);
+
+    final boundary = s.width * .50;
+    c.drawCircle(
+      Offset(boundary, y),
+      9,
+      lessonId == 'solve-inequalities'
+          ? _fill(AppColors.secondary)
+          : _stroke(AppColors.secondary, 3),
+    );
+    c.drawLine(
+      Offset(boundary + 10, y),
+      Offset(right, y),
+      _stroke(AppColors.secondary, 5),
+    );
+    _text(
+      c,
+      lessonId == 'solve-inequalities' ? 'x ≥ 2' : 'x > 2',
+      Offset(s.width * .43, s.height * .26),
+      fontSize: 18,
+      color: AppColors.secondary,
+    );
+    _text(
+      c,
+      lessonId == 'solve-inequalities'
+          ? 'الدائرة مغلقة: 2 مشمولة'
+          : 'الدائرة مفتوحة: 2 غير مشمولة',
+      Offset(s.width * .31, s.height * .74),
+      fontSize: 10,
+    );
+  }
+
   @override
   bool shouldRepaint(covariant _LessonVisualPainter oldDelegate) =>
-      oldDelegate.kind != kind;
+      oldDelegate.kind != kind || oldDelegate.lessonId != lessonId;
 }
