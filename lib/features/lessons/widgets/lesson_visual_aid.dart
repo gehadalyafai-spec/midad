@@ -262,9 +262,11 @@ class LessonVisualAid extends StatelessWidget {
   const LessonVisualAid({
     super.key,
     required this.lessonId,
+    this.steps = const <String>[],
   });
 
   final String lessonId;
+  final List<String> steps;
 
   @override
   Widget build(BuildContext context) {
@@ -344,6 +346,14 @@ class LessonVisualAid extends StatelessWidget {
               ),
             ),
           ),
+          if (steps.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            _VisualStepGuide(
+              steps: steps,
+              textColor: text,
+              mutedColor: muted,
+            ),
+          ],
           const SizedBox(height: 16),
           Text(
             'ماذا تلاحظ؟',
@@ -871,6 +881,154 @@ class LessonVisualAid extends StatelessWidget {
       case LessonVisualKind.coordinatePlane:
         return 'حوّل الفرق بين الإحداثيات إلى مثلث قائم على المستوى، ثم احسب المسافة كوتر.';
     }
+  }
+}
+
+class _VisualStepGuide extends StatefulWidget {
+  const _VisualStepGuide({
+    required this.steps,
+    required this.textColor,
+    required this.mutedColor,
+  });
+
+  final List<String> steps;
+  final Color textColor;
+  final Color mutedColor;
+
+  @override
+  State<_VisualStepGuide> createState() => _VisualStepGuideState();
+}
+
+class _VisualStepGuideState extends State<_VisualStepGuide> {
+  int _index = 0;
+
+  List<String> get _visibleSteps => widget.steps.take(3).toList();
+
+  @override
+  Widget build(BuildContext context) {
+    final steps = _visibleSteps;
+    if (steps.isEmpty) return const SizedBox.shrink();
+
+    final selected = _index.clamp(0, steps.length - 1);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.10),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.touch_app_rounded,
+                color: AppColors.primary,
+                size: 19,
+              ),
+              const SizedBox(width: 7),
+              Text(
+                'حرّك الشرح خطوة بخطوة',
+                style: TextStyle(
+                  color: widget.textColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: List.generate(steps.length, (index) {
+              final active = index == selected;
+
+              return Expanded(
+                child: Padding(
+                  padding: EdgeInsetsDirectional.only(
+                    end: index == steps.length - 1 ? 0 : 7,
+                  ),
+                  child: InkWell(
+                    onTap: () => setState(() => _index = index),
+                    borderRadius: BorderRadius.circular(12),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      height: 38,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: active
+                            ? AppColors.primary
+                            : AppColors.primary.withValues(alpha: 0.07),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        'الخطوة ${index + 1}',
+                        style: TextStyle(
+                          color: active
+                              ? Colors.white
+                              : AppColors.primary,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 12),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 220),
+            child: Container(
+              key: ValueKey<int>(selected),
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.primaryDark,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Text(
+                steps[selected],
+                style: const TextStyle(
+                  color: Colors.white,
+                  height: 1.65,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+          if (steps.length > 1) ...[
+            const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _index = selected == steps.length - 1
+                        ? 0
+                        : selected + 1;
+                  });
+                },
+                icon: const Icon(
+                  Icons.arrow_back_rounded,
+                  size: 17,
+                ),
+                label: Text(
+                  selected == steps.length - 1
+                      ? 'أعد الخطوات'
+                      : 'الخطوة التالية',
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
   }
 }
 
