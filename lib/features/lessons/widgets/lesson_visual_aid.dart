@@ -1,0 +1,871 @@
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+
+import '../../../app/theme/app_theme.dart';
+
+enum LessonVisualKind {
+  numberLine,
+  fraction,
+  pattern,
+  venn,
+  triangle,
+  ratio,
+  percent,
+  geometry,
+  transform,
+  statistics,
+  probability,
+  measurement,
+  algebra,
+  function,
+}
+
+const _numberLineLessons = <String>{
+  'rational-numbers-intro',
+  'compare-rational',
+  'estimate-square-roots',
+  'irrational-representation',
+  'inequalities',
+  'solve-inequalities',
+};
+
+const _fractionLessons = <String>{
+  'multiply-rational',
+  'divide-rational',
+  'add-subtract-like-denominators',
+  'add-subtract-rational',
+  'powers',
+  'scientific-notation',
+  'square-roots',
+};
+
+const _patternLessons = <String>{
+  'pattern-strategy',
+  'sequences',
+};
+
+const _vennLessons = <String>{
+  'venn-strategy',
+  'real-numbers',
+};
+
+const _triangleLessons = <String>{
+  'pythagorean-theorem',
+  'pythagorean-applications',
+  'coordinate-distance',
+};
+
+const _ratioLessons = <String>{
+  'proportional-relationships',
+  'rate-of-change',
+  'constant-rate',
+  'solve-proportions',
+  'drawing-strategy',
+  'similar-polygons',
+  'scale-up-down',
+  'indirect-measurement',
+};
+
+const _percentLessons = <String>{
+  'mental-percent',
+  'percent-estimation',
+  'reasonableness-strategy',
+  'percent-equation',
+  'percent-change',
+};
+
+const _geometryLessons = <String>{
+  'angles-lines',
+  'logical-reasoning',
+  'polygons-angles',
+  'congruent-polygons',
+  'symmetry',
+};
+
+const _transformLessons = <String>{
+  'reflection',
+  'translation',
+  'rotation',
+};
+
+const _statisticsLessons = <String>{
+  'table-strategy',
+  'histograms',
+  'circle-sectors',
+  'central-tendency-range',
+  'dispersion',
+  'box-plot',
+  'stem-leaf',
+  'choose-display',
+};
+
+const _probabilityLessons = <String>{
+  'count-outcomes',
+  'compound-events',
+  'theoretical-experimental',
+  'represent-problem',
+  'sampling-prediction',
+};
+
+const _measurementLessons = <String>{
+  'composite-areas',
+  'simpler-problem-strategy',
+  'three-dimensional-shapes',
+  'prism-cylinder-volume',
+  'pyramid-cone-volume',
+  'prism-cylinder-surface-area',
+  'pyramid-surface-area',
+};
+
+const _algebraLessons = <String>{
+  'simplify-expressions',
+  'two-step-equations',
+  'write-two-step-equations',
+  'variables-both-sides',
+  'guess-check-strategy',
+};
+
+const _functionLessons = <String>{
+  'functions',
+  'graph-linear-functions',
+  'slope',
+  'direct-variation',
+  'model-strategy',
+};
+
+LessonVisualKind? visualKindForLesson(String lessonId) {
+  if (_numberLineLessons.contains(lessonId)) return LessonVisualKind.numberLine;
+  if (_fractionLessons.contains(lessonId)) return LessonVisualKind.fraction;
+  if (_patternLessons.contains(lessonId)) return LessonVisualKind.pattern;
+  if (_vennLessons.contains(lessonId)) return LessonVisualKind.venn;
+  if (_triangleLessons.contains(lessonId)) return LessonVisualKind.triangle;
+  if (_ratioLessons.contains(lessonId)) return LessonVisualKind.ratio;
+  if (_percentLessons.contains(lessonId)) return LessonVisualKind.percent;
+  if (_geometryLessons.contains(lessonId)) return LessonVisualKind.geometry;
+  if (_transformLessons.contains(lessonId)) return LessonVisualKind.transform;
+  if (_statisticsLessons.contains(lessonId)) return LessonVisualKind.statistics;
+  if (_probabilityLessons.contains(lessonId)) return LessonVisualKind.probability;
+  if (_measurementLessons.contains(lessonId)) return LessonVisualKind.measurement;
+  if (_algebraLessons.contains(lessonId)) return LessonVisualKind.algebra;
+  if (_functionLessons.contains(lessonId)) return LessonVisualKind.function;
+  return null;
+}
+
+bool hasVisualAidForLesson(String lessonId) =>
+    visualKindForLesson(lessonId) != null;
+
+class LessonVisualAid extends StatelessWidget {
+  const LessonVisualAid({
+    super.key,
+    required this.lessonId,
+  });
+
+  final String lessonId;
+
+  @override
+  Widget build(BuildContext context) {
+    final kind = visualKindForLesson(lessonId);
+    if (kind == null) return const SizedBox.shrink();
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final text =
+        isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final muted =
+        isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+    final surface =
+        isDark ? AppColors.darkSurface : const Color(0xFFFFFDF8);
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.16),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: const Icon(
+                  Icons.visibility_rounded,
+                  color: AppColors.primary,
+                  size: 21,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'شاهد الفكرة قبل حفظ القاعدة',
+                  style: TextStyle(
+                    color: text,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _caption(kind),
+            style: TextStyle(
+              color: muted,
+              height: 1.65,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 16),
+          AspectRatio(
+            aspectRatio: 2.05,
+            child: Container(
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                color: AppColors.primaryDark,
+                borderRadius: BorderRadius.circular(22),
+              ),
+              child: CustomPaint(
+                painter: _LessonVisualPainter(kind),
+                child: const SizedBox.expand(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _caption(LessonVisualKind kind) {
+    switch (kind) {
+      case LessonVisualKind.numberLine:
+        return 'حدد مكان القيمة على خط الأعداد؛ الموقع غالبًا يشرح معنى الأكبر والأصغر والإشارة أفضل من الكلمات.';
+      case LessonVisualKind.fraction:
+        return 'تخيّل الكسر أجزاء متساوية من شريط واحد، ثم انظر ماذا يحدث للأجزاء عند العملية.';
+      case LessonVisualKind.pattern:
+        return 'تابع التغير من خطوة إلى أخرى، وابحث عن قاعدة تتكرر بدل تخمين الحد التالي.';
+      case LessonVisualKind.venn:
+        return 'ضع كل مجموعة في دائرة، واجعل الجزء المشترك في منطقة التداخل حتى ترى العلاقة مباشرة.';
+      case LessonVisualKind.triangle:
+        return 'حوّل الموقف إلى مثلث قائم، وحدد الوتر أولًا ثم طبّق العلاقة على الضلعين الآخرين.';
+      case LessonVisualKind.ratio:
+        return 'رتب القيم في جدول متناظر؛ إذا بقي العامل نفسه فالعلاقة ثابتة ويسهل اكتشاف المجهول.';
+      case LessonVisualKind.percent:
+        return 'تخيّل الكل شريطًا من 100 جزء؛ النسبة هي الجزء المظلل من هذا الكل.';
+      case LessonVisualKind.geometry:
+        return 'ارسم العلاقات والزوايا والأجزاء بدل الاعتماد على شكل المسألة في ذهنك فقط.';
+      case LessonVisualKind.transform:
+        return 'قارن موقع النقطة قبل التحويل وبعده؛ الشكل يبقى نفسه لكن الموقع أو الاتجاه يتغير.';
+      case LessonVisualKind.statistics:
+        return 'حوّل البيانات إلى صورة: جدول أو أعمدة أو قطاعات أو صندوق، ثم اقرأ ما تقوله الصورة.';
+      case LessonVisualKind.probability:
+        return 'افتح كل احتمال كفرع مستقل حتى ترى جميع النواتج ولا تنسى حالة أو تكررها.';
+      case LessonVisualKind.measurement:
+        return 'قسّم الشكل أو المجسم إلى أجزاء تعرفها، ثم اربط القاعدة والارتفاع والسطح والحجم بصريًا.';
+      case LessonVisualKind.algebra:
+        return 'تعامل مع المعادلة كميزان متعادل: أي تغيير في طرف يجب أن يحدث في الطرف الآخر.';
+      case LessonVisualKind.function:
+        return 'تخيّل الدالة آلة: يدخل x، تطبق القاعدة، ثم يخرج y. الرسم يوضح كيف يتغير المخرج.';
+    }
+  }
+}
+
+class _LessonVisualPainter extends CustomPainter {
+  _LessonVisualPainter(this.kind);
+
+  final LessonVisualKind kind;
+
+  Paint get _whiteStroke => Paint()
+    ..color = Colors.white
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 2.5
+    ..strokeCap = StrokeCap.round;
+
+  Paint _fill(Color color) => Paint()
+    ..color = color
+    ..style = PaintingStyle.fill;
+
+  Paint _stroke(Color color, [double width = 2]) => Paint()
+    ..color = color
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = width
+    ..strokeCap = StrokeCap.round;
+
+  void _text(
+    Canvas canvas,
+    String value,
+    Offset offset, {
+    double fontSize = 12,
+    Color color = Colors.white,
+  }) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: value,
+        style: TextStyle(
+          color: color,
+          fontSize: fontSize,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    painter.paint(canvas, offset);
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    switch (kind) {
+      case LessonVisualKind.numberLine:
+        _drawNumberLine(canvas, size);
+      case LessonVisualKind.fraction:
+        _drawFraction(canvas, size);
+      case LessonVisualKind.pattern:
+        _drawPattern(canvas, size);
+      case LessonVisualKind.venn:
+        _drawVenn(canvas, size);
+      case LessonVisualKind.triangle:
+        _drawTriangle(canvas, size);
+      case LessonVisualKind.ratio:
+        _drawRatio(canvas, size);
+      case LessonVisualKind.percent:
+        _drawPercent(canvas, size);
+      case LessonVisualKind.geometry:
+        _drawGeometry(canvas, size);
+      case LessonVisualKind.transform:
+        _drawTransform(canvas, size);
+      case LessonVisualKind.statistics:
+        _drawStatistics(canvas, size);
+      case LessonVisualKind.probability:
+        _drawProbability(canvas, size);
+      case LessonVisualKind.measurement:
+        _drawMeasurement(canvas, size);
+      case LessonVisualKind.algebra:
+        _drawAlgebra(canvas, size);
+      case LessonVisualKind.function:
+        _drawFunction(canvas, size);
+    }
+  }
+
+  void _drawNumberLine(Canvas c, Size s) {
+    final y = s.height * .55;
+    final left = s.width * .10;
+    final right = s.width * .90;
+    c.drawLine(Offset(left, y), Offset(right, y), _whiteStroke);
+    const labels = <String>['-2', '-1', '0', '1', '2'];
+    for (var i = 0; i < labels.length; i++) {
+      final x = left + (right - left) * i / 4;
+      c.drawLine(Offset(x, y - 10), Offset(x, y + 10), _whiteStroke);
+      _text(c, labels[i], Offset(x - 8, y + 17), fontSize: 11);
+    }
+    final point = Offset(left + (right - left) * .36, y);
+    c.drawCircle(point, 8, _fill(AppColors.secondary));
+    _text(
+      c,
+      'الموقع يحدد القيمة',
+      Offset(point.dx - 48, y - 42),
+      fontSize: 10,
+      color: AppColors.secondary,
+    );
+  }
+
+  void _drawFraction(Canvas c, Size s) {
+    final rect = Rect.fromLTWH(
+      s.width * .12,
+      s.height * .30,
+      s.width * .76,
+      44,
+    );
+    final piece = rect.width / 4;
+    for (var i = 0; i < 4; i++) {
+      final cell = Rect.fromLTWH(
+        rect.left + piece * i,
+        rect.top,
+        piece,
+        rect.height,
+      );
+      c.drawRect(
+        cell,
+        _fill(
+          i < 3
+              ? AppColors.secondary
+              : Colors.white.withValues(alpha: .12),
+        ),
+      );
+      c.drawRect(cell, _stroke(Colors.white.withValues(alpha: .7)));
+    }
+    _text(
+      c,
+      '3 / 4',
+      Offset(s.width * .45, s.height * .60),
+      fontSize: 20,
+      color: AppColors.secondary,
+    );
+    _text(
+      c,
+      'أجزاء متساوية من كل واحد',
+      Offset(s.width * .33, s.height * .76),
+      fontSize: 10,
+    );
+  }
+
+  void _drawPattern(Canvas c, Size s) {
+    for (var i = 0; i < 5; i++) {
+      final x = s.width * (.14 + i * .17);
+      final y = s.height * .50;
+      final radius = 9.0 + i * 3;
+      c.drawCircle(
+        Offset(x, y),
+        radius,
+        _fill(i.isEven ? AppColors.secondary : AppColors.accent),
+      );
+      if (i < 4) {
+        c.drawLine(
+          Offset(x + radius + 5, y),
+          Offset(x + s.width * .13, y),
+          _stroke(Colors.white.withValues(alpha: .55)),
+        );
+      }
+    }
+    _text(
+      c,
+      'ما القاعدة التي تتكرر؟',
+      Offset(s.width * .35, s.height * .72),
+      fontSize: 11,
+    );
+  }
+
+  void _drawVenn(Canvas c, Size s) {
+    final r = s.height * .25;
+    final a = Offset(s.width * .43, s.height * .50);
+    final b = Offset(s.width * .58, s.height * .50);
+    c.drawCircle(
+      a,
+      r,
+      _fill(AppColors.secondary.withValues(alpha: .55)),
+    );
+    c.drawCircle(
+      b,
+      r,
+      _fill(AppColors.accent.withValues(alpha: .52)),
+    );
+    c.drawCircle(a, r, _whiteStroke);
+    c.drawCircle(b, r, _whiteStroke);
+    _text(c, 'A', Offset(a.dx - r * .65, a.dy - 8), fontSize: 15);
+    _text(c, 'B', Offset(b.dx + r * .45, b.dy - 8), fontSize: 15);
+    _text(
+      c,
+      'مشترك',
+      Offset(s.width * .45, s.height * .47),
+      fontSize: 10,
+    );
+  }
+
+  void _drawTriangle(Canvas c, Size s) {
+    final a = Offset(s.width * .25, s.height * .76);
+    final b = Offset(s.width * .72, s.height * .76);
+    final d = Offset(s.width * .25, s.height * .20);
+    final path = Path()
+      ..moveTo(a.dx, a.dy)
+      ..lineTo(b.dx, b.dy)
+      ..lineTo(d.dx, d.dy)
+      ..close();
+    c.drawPath(path, _whiteStroke);
+    c.drawRect(
+      Rect.fromLTWH(a.dx, a.dy - 20, 20, 20),
+      _stroke(AppColors.secondary, 2),
+    );
+    _text(c, '3', Offset(s.width * .46, s.height * .78), fontSize: 13);
+    _text(c, '4', Offset(s.width * .18, s.height * .47), fontSize: 13);
+    _text(
+      c,
+      '5  الوتر',
+      Offset(s.width * .54, s.height * .40),
+      fontSize: 13,
+      color: AppColors.secondary,
+    );
+  }
+
+  void _drawRatio(Canvas c, Size s) {
+    final left = s.width * .24;
+    final top = s.height * .18;
+    final w = s.width * .52;
+    final h = s.height * .62;
+    c.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(left, top, w, h),
+        const Radius.circular(12),
+      ),
+      _whiteStroke,
+    );
+    c.drawLine(
+      Offset(left + w / 2, top),
+      Offset(left + w / 2, top + h),
+      _whiteStroke,
+    );
+    for (var i = 1; i < 4; i++) {
+      c.drawLine(
+        Offset(left, top + h * i / 4),
+        Offset(left + w, top + h * i / 4),
+        _stroke(Colors.white.withValues(alpha: .35)),
+      );
+    }
+    const xValues = <String>['1', '2', '3'];
+    const yValues = <String>['4', '8', '12'];
+    for (var i = 0; i < 3; i++) {
+      _text(
+        c,
+        xValues[i],
+        Offset(left + w * .22, top + h * (.29 + i * .25)),
+      );
+      _text(
+        c,
+        yValues[i],
+        Offset(left + w * .70, top + h * (.29 + i * .25)),
+        color: AppColors.secondary,
+      );
+    }
+    _text(
+      c,
+      'العامل ثابت ×4',
+      Offset(left + w * .29, top + 8),
+      fontSize: 10,
+      color: AppColors.accent,
+    );
+  }
+
+  void _drawPercent(Canvas c, Size s) {
+    final rect = Rect.fromLTWH(
+      s.width * .12,
+      s.height * .36,
+      s.width * .76,
+      48,
+    );
+    c.drawRRect(
+      RRect.fromRectAndRadius(rect, const Radius.circular(12)),
+      _fill(Colors.white.withValues(alpha: .12)),
+    );
+    final quarter = Rect.fromLTWH(
+      rect.left,
+      rect.top,
+      rect.width * .25,
+      rect.height,
+    );
+    c.drawRRect(
+      RRect.fromRectAndRadius(quarter, const Radius.circular(12)),
+      _fill(AppColors.secondary),
+    );
+    _text(
+      c,
+      '25%',
+      Offset(quarter.center.dx - 15, quarter.center.dy - 8),
+      color: AppColors.primaryDark,
+    );
+    _text(c, '100%', Offset(rect.right - 42, rect.center.dy - 8));
+    _text(
+      c,
+      '25% = ربع الكل',
+      Offset(s.width * .39, s.height * .70),
+      color: AppColors.secondary,
+      fontSize: 12,
+    );
+  }
+
+  void _drawGeometry(Canvas c, Size s) {
+    final center = Offset(s.width * .50, s.height * .50);
+    final radius = s.height * .28;
+    final points = <Offset>[];
+    for (var i = 0; i < 6; i++) {
+      final angle = -math.pi / 2 + i * math.pi / 3;
+      points.add(
+        Offset(
+          center.dx + radius * math.cos(angle),
+          center.dy + radius * math.sin(angle),
+        ),
+      );
+    }
+    final path = Path()..moveTo(points.first.dx, points.first.dy);
+    for (final point in points.skip(1)) {
+      path.lineTo(point.dx, point.dy);
+    }
+    path.close();
+    c.drawPath(
+      path,
+      _fill(AppColors.secondary.withValues(alpha: .20)),
+    );
+    c.drawPath(path, _stroke(AppColors.secondary, 3));
+    for (var i = 2; i < 5; i++) {
+      c.drawLine(
+        points.first,
+        points[i],
+        _stroke(Colors.white.withValues(alpha: .50)),
+      );
+    }
+    _text(
+      c,
+      'قسّم الشكل إلى أجزاء أبسط',
+      Offset(s.width * .32, s.height * .80),
+      fontSize: 10,
+    );
+  }
+
+  void _drawTransform(Canvas c, Size s) {
+    final midX = s.width * .50;
+    c.drawLine(
+      Offset(midX, s.height * .12),
+      Offset(midX, s.height * .86),
+      _stroke(Colors.white.withValues(alpha: .45)),
+    );
+    final p1 = Path()
+      ..moveTo(s.width * .20, s.height * .68)
+      ..lineTo(s.width * .34, s.height * .28)
+      ..lineTo(s.width * .42, s.height * .68)
+      ..close();
+    final p2 = Path()
+      ..moveTo(s.width * .80, s.height * .68)
+      ..lineTo(s.width * .66, s.height * .28)
+      ..lineTo(s.width * .58, s.height * .68)
+      ..close();
+    c.drawPath(
+      p1,
+      _fill(AppColors.secondary.withValues(alpha: .72)),
+    );
+    c.drawPath(
+      p2,
+      _fill(AppColors.accent.withValues(alpha: .68)),
+    );
+    _text(c, 'قبل', Offset(s.width * .28, s.height * .73), fontSize: 10);
+    _text(c, 'بعد', Offset(s.width * .66, s.height * .73), fontSize: 10);
+  }
+
+  void _drawStatistics(Canvas c, Size s) {
+    final base = s.height * .77;
+    final left = s.width * .16;
+    c.drawLine(
+      Offset(left, base),
+      Offset(s.width * .86, base),
+      _whiteStroke,
+    );
+    c.drawLine(
+      Offset(left, base),
+      Offset(left, s.height * .18),
+      _whiteStroke,
+    );
+    final heights = <double>[.22, .50, .34, .62, .40];
+    final barWidth = s.width * .12;
+    for (var i = 0; i < heights.length; i++) {
+      final height = s.height * heights[i];
+      final bar = Rect.fromLTWH(
+        left + i * barWidth,
+        base - height,
+        barWidth,
+        height,
+      );
+      c.drawRect(
+        bar,
+        _fill(
+          i == 1
+              ? AppColors.secondary
+              : AppColors.primary.withValues(alpha: .78),
+        ),
+      );
+      c.drawRect(
+        bar,
+        _stroke(Colors.white.withValues(alpha: .25)),
+      );
+    }
+    _text(
+      c,
+      'حوّل البيانات إلى صورة يمكن قراءتها',
+      Offset(s.width * .28, s.height * .83),
+      fontSize: 10,
+    );
+  }
+
+  void _drawProbability(Canvas c, Size s) {
+    final root = Offset(s.width * .18, s.height * .50);
+    final a = Offset(s.width * .47, s.height * .30);
+    final b = Offset(s.width * .47, s.height * .70);
+    final ends = <Offset>[
+      Offset(s.width * .78, s.height * .18),
+      Offset(s.width * .78, s.height * .40),
+      Offset(s.width * .78, s.height * .60),
+      Offset(s.width * .78, s.height * .82),
+    ];
+    c.drawLine(root, a, _whiteStroke);
+    c.drawLine(root, b, _whiteStroke);
+    c.drawLine(a, ends[0], _stroke(AppColors.secondary, 2));
+    c.drawLine(a, ends[1], _stroke(AppColors.secondary, 2));
+    c.drawLine(b, ends[2], _stroke(AppColors.accent, 2));
+    c.drawLine(b, ends[3], _stroke(AppColors.accent, 2));
+    c.drawCircle(root, 7, _fill(Colors.white));
+    for (final end in ends) {
+      c.drawCircle(end, 6, _fill(Colors.white));
+    }
+    _text(
+      c,
+      'كل نهاية = ناتج ممكن',
+      Offset(s.width * .36, s.height * .84),
+      fontSize: 10,
+    );
+  }
+
+  void _drawMeasurement(Canvas c, Size s) {
+    final x = s.width * .34;
+    final y = s.height * .20;
+    final w = s.width * .28;
+    final h = s.height * .44;
+    const depth = 28.0;
+    c.drawRect(Rect.fromLTWH(x, y + depth, w, h), _whiteStroke);
+    c.drawLine(
+      Offset(x, y + depth),
+      Offset(x + depth, y),
+      _stroke(AppColors.secondary, 2),
+    );
+    c.drawLine(
+      Offset(x + w, y + depth),
+      Offset(x + w + depth, y),
+      _stroke(AppColors.secondary, 2),
+    );
+    c.drawLine(
+      Offset(x + w, y + depth + h),
+      Offset(x + w + depth, y + h),
+      _stroke(AppColors.secondary, 2),
+    );
+    c.drawLine(
+      Offset(x + depth, y),
+      Offset(x + w + depth, y),
+      _stroke(AppColors.secondary, 2),
+    );
+    c.drawLine(
+      Offset(x + w + depth, y),
+      Offset(x + w + depth, y + h),
+      _stroke(AppColors.secondary, 2),
+    );
+    _text(
+      c,
+      'القاعدة',
+      Offset(x + w * .32, y + depth + h + 10),
+      fontSize: 10,
+      color: AppColors.secondary,
+    );
+    _text(
+      c,
+      'الارتفاع',
+      Offset(x + w + depth + 8, y + h * .44),
+      fontSize: 10,
+    );
+  }
+
+  void _drawAlgebra(Canvas c, Size s) {
+    final centerX = s.width * .50;
+    final barY = s.height * .34;
+    c.drawLine(
+      Offset(centerX, s.height * .22),
+      Offset(centerX, s.height * .74),
+      _whiteStroke,
+    );
+    c.drawLine(
+      Offset(centerX - 105, barY),
+      Offset(centerX + 105, barY),
+      _stroke(AppColors.secondary, 4),
+    );
+    c.drawLine(
+      Offset(centerX - 75, barY),
+      Offset(centerX - 75, s.height * .58),
+      _whiteStroke,
+    );
+    c.drawLine(
+      Offset(centerX + 75, barY),
+      Offset(centerX + 75, s.height * .58),
+      _whiteStroke,
+    );
+    final leftBox = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: Offset(centerX - 75, s.height * .61),
+        width: 92,
+        height: 38,
+      ),
+      const Radius.circular(10),
+    );
+    final rightBox = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: Offset(centerX + 75, s.height * .61),
+        width: 92,
+        height: 38,
+      ),
+      const Radius.circular(10),
+    );
+    c.drawRRect(leftBox, _fill(AppColors.accent));
+    c.drawRRect(rightBox, _fill(AppColors.primary));
+    _text(c, '3x + 2', Offset(centerX - 103, s.height * .57));
+    _text(c, '11', Offset(centerX + 67, s.height * .57));
+    _text(
+      c,
+      'حافظ على توازن الطرفين',
+      Offset(s.width * .34, s.height * .80),
+      fontSize: 10,
+    );
+  }
+
+  void _drawFunction(Canvas c, Size s) {
+    _text(c, 'x = 3', Offset(s.width * .11, s.height * .43), fontSize: 14);
+    c.drawLine(
+      Offset(s.width * .27, s.height * .50),
+      Offset(s.width * .38, s.height * .50),
+      _whiteStroke,
+    );
+    final box = RRect.fromRectAndRadius(
+      Rect.fromLTWH(
+        s.width * .38,
+        s.height * .28,
+        s.width * .24,
+        s.height * .42,
+      ),
+      const Radius.circular(16),
+    );
+    c.drawRRect(box, _fill(AppColors.secondary));
+    _text(
+      c,
+      '×2 + 1',
+      Offset(s.width * .43, s.height * .46),
+      fontSize: 14,
+      color: AppColors.primaryDark,
+    );
+    c.drawLine(
+      Offset(s.width * .62, s.height * .50),
+      Offset(s.width * .73, s.height * .50),
+      _whiteStroke,
+    );
+    _text(
+      c,
+      'y = 7',
+      Offset(s.width * .74, s.height * .43),
+      fontSize: 14,
+      color: AppColors.accent,
+    );
+    c.drawLine(
+      Offset(s.width * .22, s.height * .78),
+      Offset(s.width * .82, s.height * .78),
+      _stroke(Colors.white.withValues(alpha: .30)),
+    );
+    c.drawLine(
+      Offset(s.width * .30, s.height * .73),
+      Offset(s.width * .76, s.height * .60),
+      _stroke(AppColors.secondary, 3),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _LessonVisualPainter oldDelegate) =>
+      oldDelegate.kind != kind;
+}
