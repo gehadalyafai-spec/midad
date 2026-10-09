@@ -860,12 +860,30 @@ class _WorkedExample extends StatelessWidget {
   final String formula;
   final String body;
 
+  TextDirection _directionFor(String value) {
+    final hasArabic = RegExp(r'[\u0600-\u06FF]').hasMatch(value);
+    return hasArabic ? TextDirection.rtl : TextDirection.ltr;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final parts = formula.split('=');
-    final hasResult = parts.length > 1;
-    final statement = parts.first.trim();
-    final result = hasResult ? parts.sublist(1).join('=').trim() : '';
+    final formulaParts = formula
+        .split('=')
+        .map((part) => part.trim())
+        .where((part) => part.isNotEmpty)
+        .toList();
+    final hasResult = formulaParts.length > 1;
+    final result = hasResult ? formulaParts.last : '';
+    final statement = hasResult
+        ? formulaParts.sublist(0, formulaParts.length - 1).join(' = ')
+        : formula.trim();
+
+    final bodySteps = body
+        .replaceAll('؛', '.')
+        .split(RegExp(r'[.!؟]\s*'))
+        .map((step) => step.trim())
+        .where((step) => step.isNotEmpty)
+        .toList();
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -878,16 +896,16 @@ class _WorkedExample extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Row(
+            Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.auto_awesome_rounded,
                   color: AppColors.primaryDark,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
-                  'مثال محلول',
-                  style: TextStyle(
+                  title,
+                  style: const TextStyle(
                     color: AppColors.primaryDark,
                     fontWeight: FontWeight.w900,
                     fontSize: 17,
@@ -907,7 +925,7 @@ class _WorkedExample extends StatelessWidget {
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text(
                     'المثال',
@@ -919,15 +937,19 @@ class _WorkedExample extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 7),
-                  Text(
-                    statement,
-                    textAlign: TextAlign.right,
-                    textDirection: TextDirection.rtl,
-                    style: const TextStyle(
-                      color: AppColors.primaryDark,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 24,
-                      height: 1.35,
+                  Directionality(
+                    textDirection: _directionFor(statement),
+                    child: Text(
+                      statement,
+                      textAlign: _directionFor(statement) == TextDirection.rtl
+                          ? TextAlign.right
+                          : TextAlign.left,
+                      style: const TextStyle(
+                        color: AppColors.primaryDark,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 23,
+                        height: 1.4,
+                      ),
                     ),
                   ),
                 ],
@@ -935,7 +957,7 @@ class _WorkedExample extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             const Text(
-              'خطوات الحل',
+              'فكّر معي خطوة بخطوة',
               textAlign: TextAlign.right,
               style: TextStyle(
                 color: AppColors.primaryDark,
@@ -943,20 +965,63 @@ class _WorkedExample extends StatelessWidget {
                 fontSize: 13,
               ),
             ),
-            const SizedBox(height: 7),
-            Text(
-              body,
-              textAlign: TextAlign.right,
-              textDirection: TextDirection.rtl,
-              style: const TextStyle(
-                color: AppColors.primaryDark,
-                height: 1.75,
-                fontWeight: FontWeight.w700,
-                fontSize: 14,
-              ),
-            ),
+            const SizedBox(height: 9),
+            if (bodySteps.length <= 1)
+              Text(
+                body,
+                textAlign: TextAlign.right,
+                textDirection: TextDirection.rtl,
+                style: const TextStyle(
+                  color: AppColors.primaryDark,
+                  height: 1.75,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                ),
+              )
+            else
+              ...List.generate(bodySteps.length, (index) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 9),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 28,
+                        height: 28,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryDark,
+                          borderRadius: BorderRadius.circular(9),
+                        ),
+                        child: Text(
+                          '${index + 1}',
+                          style: const TextStyle(
+                            color: AppColors.secondary,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 9),
+                      Expanded(
+                        child: Text(
+                          bodySteps[index],
+                          textAlign: TextAlign.right,
+                          textDirection: TextDirection.rtl,
+                          style: const TextStyle(
+                            color: AppColors.primaryDark,
+                            height: 1.65,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
             if (hasResult) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -969,7 +1034,7 @@ class _WorkedExample extends StatelessWidget {
                 child: Row(
                   children: [
                     const Text(
-                      'النتيجة',
+                      'النتيجة النهائية',
                       style: TextStyle(
                         color: AppColors.secondary,
                         fontWeight: FontWeight.w900,
@@ -978,14 +1043,18 @@ class _WorkedExample extends StatelessWidget {
                     ),
                     const Spacer(),
                     Flexible(
-                      child: Text(
-                        result,
-                        textAlign: TextAlign.left,
-                        textDirection: TextDirection.rtl,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 20,
+                      child: Directionality(
+                        textDirection: _directionFor(result),
+                        child: Text(
+                          result,
+                          textAlign: _directionFor(result) == TextDirection.rtl
+                              ? TextAlign.right
+                              : TextAlign.left,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 20,
+                          ),
                         ),
                       ),
                     ),
