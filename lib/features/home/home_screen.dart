@@ -195,6 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   overallProgress: overallProgress,
                   overallCompleted: overallCompleted,
                   overallTotal: allLessons.length,
+                  completedLessonIds: _completedLessonIds,
                   onContinue: courseComplete
                       ? _openCourseOverview
                       : () => _continueLearning(chapter),
@@ -222,6 +223,7 @@ class _StudyCanvas extends StatelessWidget {
     required this.overallProgress,
     required this.overallCompleted,
     required this.overallTotal,
+    required this.completedLessonIds,
     required this.onContinue,
     required this.onOpenCourse,
     required this.onQuiz,
@@ -239,6 +241,7 @@ class _StudyCanvas extends StatelessWidget {
   final double overallProgress;
   final int overallCompleted;
   final int overallTotal;
+  final Set<String> completedLessonIds;
   final VoidCallback onContinue;
   final VoidCallback onOpenCourse;
   final VoidCallback onQuiz;
@@ -324,6 +327,14 @@ class _StudyCanvas extends StatelessWidget {
               onCourse: onOpenCourse,
               onQuiz: onQuiz,
             ).animate(delay: 220.ms).fadeIn(duration: 400.ms),
+            const SizedBox(height: 28),
+            _AllChaptersSection(
+              completedLessonIds: completedLessonIds,
+              surface: surface,
+              textColor: text,
+              mutedColor: muted,
+              onOpenCourse: onOpenCourse,
+            ).animate(delay: 255.ms).fadeIn(duration: 380.ms),
             const SizedBox(height: 28),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -498,6 +509,184 @@ class _CoursePulse extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _AllChaptersSection extends StatelessWidget {
+  const _AllChaptersSection({
+    required this.completedLessonIds,
+    required this.surface,
+    required this.textColor,
+    required this.mutedColor,
+    required this.onOpenCourse,
+  });
+
+  final Set<String> completedLessonIds;
+  final Color surface;
+  final Color textColor;
+  final Color mutedColor;
+  final VoidCallback onOpenCourse;
+
+  bool _chapterComplete(Chapter chapter) {
+    final lessons = chapter.lessons.where((lesson) => lesson.isAvailable);
+    return lessons.isNotEmpty &&
+        lessons.every((lesson) => completedLessonIds.contains(lesson.id));
+  }
+
+  bool _chapterUnlocked(int index) {
+    if (index == 0) return true;
+    return _chapterComplete(grade2MathChapters[index - 1]);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'فصول الرياضيات',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w900,
+                    ),
+              ),
+            ),
+            TextButton(
+              onPressed: onOpenCourse,
+              child: const Text('عرض المسار الكامل'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'جميع فصول ثاني متوسط ظاهرة هنا، ويُفتح كل فصل بعد إكمال السابق.',
+          style: TextStyle(
+            color: mutedColor,
+            fontSize: 12,
+            height: 1.5,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 14),
+        ...List.generate(grade2MathChapters.length, (index) {
+          final chapter = grade2MathChapters[index];
+          final unlocked = _chapterUnlocked(index);
+          final complete = _chapterComplete(chapter);
+          final total =
+              chapter.lessons.where((lesson) => lesson.isAvailable).length;
+          final completed = chapter.lessons
+              .where(
+                (lesson) =>
+                    lesson.isAvailable &&
+                    completedLessonIds.contains(lesson.id),
+              )
+              .length;
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onOpenCourse,
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 13,
+                  ),
+                  decoration: BoxDecoration(
+                    color: surface,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: (complete
+                              ? AppColors.primary
+                              : unlocked
+                                  ? AppColors.secondary
+                                  : mutedColor)
+                          .withValues(alpha: 0.18),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 42,
+                        height: 42,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: complete
+                              ? AppColors.primary
+                              : unlocked
+                                  ? AppColors.secondary
+                                  : mutedColor.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: complete
+                            ? const Icon(
+                                Icons.check_rounded,
+                                color: Colors.white,
+                              )
+                            : unlocked
+                                ? Text(
+                                    '${index + 1}',
+                                    style: const TextStyle(
+                                      color: AppColors.primaryDark,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.lock_outline_rounded,
+                                    size: 18,
+                                    color: mutedColor,
+                                  ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              chapter.title,
+                              style: TextStyle(
+                                color: textColor,
+                                fontWeight: FontWeight.w900,
+                                height: 1.35,
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              complete
+                                  ? 'مكتمل'
+                                  : unlocked
+                                      ? '$completed من $total دروس'
+                                      : '$total دروس • مقفول مؤقتًا',
+                              style: TextStyle(
+                                color: complete
+                                    ? AppColors.primary
+                                    : mutedColor,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        Icons.arrow_back_rounded,
+                        size: 18,
+                        color: mutedColor,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+      ],
     );
   }
 }
