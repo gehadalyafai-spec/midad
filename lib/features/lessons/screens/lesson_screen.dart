@@ -9,6 +9,7 @@ import '../../quizzes/data/grade2_math_quiz_registry.dart';
 import '../../quizzes/screens/quiz_screen.dart';
 import '../../progress/screens/course_complete_screen.dart';
 import '../data/grade2_math_lesson_registry.dart';
+import '../widgets/lesson_visual_aid.dart';
 
 class LessonScreen extends StatefulWidget {
   const LessonScreen({super.key, required this.lesson});
@@ -238,6 +239,10 @@ class _LessonScreenState extends State<LessonScreen> {
                     mutedColor: muted,
                   ).animate(delay: 105.ms).fadeIn(),
                 ],
+                const SizedBox(height: 22),
+                LessonVisualAid(
+                  lessonId: widget.lesson.id,
+                ).animate(delay: 112.ms).fadeIn(duration: 360.ms),
                 const SizedBox(height: 30),
                 _LessonSection(
                   number: '01',
