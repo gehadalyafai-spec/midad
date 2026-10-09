@@ -1142,6 +1142,22 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawStatistics(Canvas c, Size s) {
+    if (lessonId == 'table-strategy') {
+      _drawDataTable(c, s);
+      return;
+    }
+    if (lessonId == 'central-tendency-range') {
+      _drawCentralTendency(c, s);
+      return;
+    }
+    if (lessonId == 'dispersion') {
+      _drawDispersion(c, s);
+      return;
+    }
+    if (lessonId == 'choose-display') {
+      _drawChooseDisplay(c, s);
+      return;
+    }
     final base = s.height * .77;
     final left = s.width * .16;
     c.drawLine(
@@ -1186,6 +1202,14 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawProbability(Canvas c, Size s) {
+    if (lessonId == 'compound-events') {
+      _drawCompoundOutcomes(c, s);
+      return;
+    }
+    if (lessonId == 'represent-problem') {
+      _drawProbabilityRepresentation(c, s);
+      return;
+    }
     final root = Offset(s.width * .18, s.height * .50);
     final a = Offset(s.width * .47, s.height * .30);
     final b = Offset(s.width * .47, s.height * .70);
@@ -1214,6 +1238,26 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawMeasurement(Canvas c, Size s) {
+    if (lessonId == 'three-dimensional-shapes') {
+      _drawThreeDimensionalShapes(c, s);
+      return;
+    }
+    if (lessonId == 'prism-cylinder-volume') {
+      _drawPrismCylinderVolume(c, s);
+      return;
+    }
+    if (lessonId == 'pyramid-cone-volume') {
+      _drawPyramidConeVolume(c, s);
+      return;
+    }
+    if (lessonId == 'prism-cylinder-surface-area') {
+      _drawCylinderNet(c, s);
+      return;
+    }
+    if (lessonId == 'pyramid-surface-area') {
+      _drawPyramidNet(c, s);
+      return;
+    }
     final x = s.width * .34;
     final y = s.height * .20;
     final w = s.width * .28;
@@ -1261,6 +1305,22 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawAlgebra(Canvas c, Size s) {
+    if (lessonId == 'simplify-expressions') {
+      _drawSimplifyExpressions(c, s);
+      return;
+    }
+    if (lessonId == 'write-two-step-equations') {
+      _drawWriteEquation(c, s);
+      return;
+    }
+    if (lessonId == 'variables-both-sides') {
+      _drawVariablesBothSides(c, s);
+      return;
+    }
+    if (lessonId == 'guess-check-strategy') {
+      _drawGuessCheck(c, s);
+      return;
+    }
     final centerX = s.width * .50;
     final barY = s.height * .34;
     c.drawLine(
@@ -1312,6 +1372,10 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawFunction(Canvas c, Size s) {
+    if (lessonId == 'model-strategy') {
+      _drawModelStrategy(c, s);
+      return;
+    }
     _text(c, 'x = 3', Offset(s.width * .11, s.height * .43), fontSize: 14);
     c.drawLine(
       Offset(s.width * .27, s.height * .50),
@@ -1550,6 +1614,10 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawCompositeArea(Canvas c, Size s) {
+    if (lessonId == 'simpler-problem-strategy') {
+      _drawSimplerProblem(c, s);
+      return;
+    }
     final a = Rect.fromLTWH(
       s.width * .18,
       s.height * .22,
@@ -1582,6 +1650,14 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawLineGraph(Canvas c, Size s) {
+    if (lessonId == 'graph-linear-functions') {
+      _drawGraphLinearFunction(c, s);
+      return;
+    }
+    if (lessonId == 'direct-variation') {
+      _drawDirectVariation(c, s);
+      return;
+    }
     final origin = Offset(s.width * .18, s.height * .78);
     c.drawLine(origin, Offset(s.width * .86, origin.dy), _whiteStroke);
     c.drawLine(origin, Offset(origin.dx, s.height * .16), _whiteStroke);
@@ -2124,6 +2200,229 @@ class _LessonVisualPainter extends CustomPainter {
     c.drawArc(Rect.fromCircle(center: center, radius: s.width * .16), math.pi, math.pi / 2, false, _stroke(Colors.white, 3));
     _text(c, '90°', Offset(s.width * .41, s.height * .28), fontSize: 14, color: AppColors.secondary);
     _text(c, 'مركز الدوران', Offset(s.width * .43, s.height * .58), fontSize: 10);
+  }
+
+  void _drawDataTable(Canvas c, Size s) {
+    final left=s.width*.22, top=s.height*.18, w=s.width*.56, h=s.height*.62;
+    c.drawRect(Rect.fromLTWH(left,top,w,h), _stroke(Colors.white,2));
+    c.drawLine(Offset(left+w*.58,top),Offset(left+w*.58,top+h),_stroke(Colors.white.withValues(alpha:.5)));
+    for(var i=1;i<4;i++){
+      c.drawLine(Offset(left,top+h*i/4),Offset(left+w,top+h*i/4),_stroke(Colors.white.withValues(alpha:.35)));
+    }
+    _text(c,'الفئة',Offset(left+18,top+8),fontSize:11,color:AppColors.secondary);
+    _text(c,'التكرار',Offset(left+w*.63,top+8),fontSize:11,color:AppColors.secondary);
+    const labels=['A','B','C']; const counts=['4','7','3'];
+    for(var i=0;i<3;i++){
+      _text(c,labels[i],Offset(left+28,top+h*(.30+i*.25)),fontSize:12);
+      _text(c,counts[i],Offset(left+w*.72,top+h*(.30+i*.25)),fontSize:12);
+    }
+  }
+
+  void _drawCentralTendency(Canvas c, Size s) {
+    final y=s.height*.55; final left=s.width*.14; final right=s.width*.86;
+    c.drawLine(Offset(left,y),Offset(right,y),_whiteStroke);
+    const vals=[2.0,4.0,4.0,6.0,9.0];
+    for(final v in vals){
+      final x=left+(right-left)*(v-2)/7;
+      c.drawCircle(Offset(x,y-16),7,_fill(v==4?AppColors.secondary:AppColors.accent));
+    }
+    _text(c,'2   4   4   6   9',Offset(s.width*.31,s.height*.67),fontSize:12);
+    _text(c,'الوسيط 4 • المنوال 4 • المدى 7',Offset(s.width*.25,s.height*.22),fontSize:12,color:AppColors.secondary);
+  }
+
+  void _drawDispersion(Canvas c, Size s) {
+    final left=s.width*.18, right=s.width*.82;
+    final y1=s.height*.34, y2=s.height*.68;
+    c.drawLine(Offset(left,y1),Offset(right,y1),_stroke(Colors.white.withValues(alpha:.45)));
+    c.drawLine(Offset(left,y2),Offset(right,y2),_stroke(Colors.white.withValues(alpha:.45)));
+    for(final frac in [.42,.48,.54]){
+      c.drawCircle(Offset(left+(right-left)*frac,y1),7,_fill(AppColors.secondary));
+    }
+    for(final frac in [.05,.50,.95]){
+      c.drawCircle(Offset(left+(right-left)*frac,y2),7,_fill(AppColors.accent));
+    }
+    _text(c,'تشتت قليل',Offset(s.width*.40,y1-34),fontSize:11,color:AppColors.secondary);
+    _text(c,'تشتت كبير',Offset(s.width*.39,y2-34),fontSize:11,color:AppColors.accent);
+  }
+
+  void _drawChooseDisplay(Canvas c, Size s) {
+    final xs=[s.width*.22,s.width*.50,s.width*.78];
+    final y=s.height*.46;
+    c.drawRect(Rect.fromLTWH(xs[0]-28,y-30,56,60),_fill(AppColors.secondary.withValues(alpha:.65)));
+    c.drawCircle(Offset(xs[1],y),30,_fill(AppColors.accent.withValues(alpha:.65)));
+    c.drawLine(Offset(xs[2]-28,y+20),Offset(xs[2]+28,y-20),_stroke(Colors.white,4));
+    _text(c,'أعمدة',Offset(xs[0]-19,y+38),fontSize:10);
+    _text(c,'قطاعات',Offset(xs[1]-20,y+38),fontSize:10);
+    _text(c,'اتجاه',Offset(xs[2]-16,y+38),fontSize:10);
+    _text(c,'اختر حسب السؤال',Offset(s.width*.38,s.height*.78),fontSize:11,color:AppColors.secondary);
+  }
+
+  void _drawCompoundOutcomes(Canvas c, Size s) {
+    final left=s.width*.20, top=s.height*.20, cellW=s.width*.20, cellH=s.height*.22;
+    const rows=['ص','ك']; const cols=['1','2','3'];
+    for(var r=0;r<2;r++){
+      for(var col=0;col<3;col++){
+        final rect=Rect.fromLTWH(left+col*cellW,top+r*cellH,cellW,cellH);
+        c.drawRect(rect,_fill((r+col).isEven?AppColors.primary.withValues(alpha:.55):AppColors.secondary.withValues(alpha:.35)));
+        c.drawRect(rect,_stroke(Colors.white.withValues(alpha:.5)));
+        _text(c,'${rows[r]}-${cols[col]}',Offset(rect.left+cellW*.32,rect.top+cellH*.35),fontSize:11);
+      }
+    }
+    _text(c,'2 × 3 = 6 نواتج',Offset(s.width*.36,s.height*.74),fontSize:13,color:AppColors.secondary);
+  }
+
+  void _drawProbabilityRepresentation(Canvas c, Size s) {
+    _text(c,'تجربة',Offset(s.width*.12,s.height*.42),fontSize:14,color:AppColors.secondary);
+    c.drawLine(Offset(s.width*.25,s.height*.48),Offset(s.width*.40,s.height*.30),_whiteStroke);
+    c.drawLine(Offset(s.width*.25,s.height*.48),Offset(s.width*.40,s.height*.66),_whiteStroke);
+    _text(c,'A',Offset(s.width*.42,s.height*.22),fontSize:13);
+    _text(c,'B',Offset(s.width*.42,s.height*.64),fontSize:13);
+    c.drawLine(Offset(s.width*.47,s.height*.30),Offset(s.width*.70,s.height*.22),_stroke(AppColors.secondary,2));
+    c.drawLine(Offset(s.width*.47,s.height*.30),Offset(s.width*.70,s.height*.38),_stroke(AppColors.secondary,2));
+    c.drawLine(Offset(s.width*.47,s.height*.66),Offset(s.width*.70,s.height*.58),_stroke(AppColors.accent,2));
+    c.drawLine(Offset(s.width*.47,s.height*.66),Offset(s.width*.70,s.height*.74),_stroke(AppColors.accent,2));
+    _text(c,'مثّل كل خطوة قبل العد',Offset(s.width*.36,s.height*.82),fontSize:10);
+  }
+
+  void _drawThreeDimensionalShapes(Canvas c, Size s) {
+    final centers=[s.width*.22,s.width*.50,s.width*.78];
+    c.drawRect(Rect.fromCenter(center:Offset(centers[0],s.height*.46),width:55,height:70),_stroke(AppColors.secondary,3));
+    c.drawOval(Rect.fromCenter(center:Offset(centers[1],s.height*.35),width:58,height:18),_stroke(AppColors.accent,3));
+    c.drawOval(Rect.fromCenter(center:Offset(centers[1],s.height*.61),width:58,height:18),_stroke(AppColors.accent,3));
+    c.drawLine(Offset(centers[1]-29,s.height*.35),Offset(centers[1]-29,s.height*.61),_stroke(AppColors.accent,3));
+    c.drawLine(Offset(centers[1]+29,s.height*.35),Offset(centers[1]+29,s.height*.61),_stroke(AppColors.accent,3));
+    final p=Path()..moveTo(centers[2],s.height*.24)..lineTo(centers[2]-34,s.height*.64)..lineTo(centers[2]+34,s.height*.64)..close();
+    c.drawPath(p,_stroke(Colors.white,3));
+    _text(c,'منشور',Offset(centers[0]-20,s.height*.72),fontSize:10);
+    _text(c,'أسطوانة',Offset(centers[1]-22,s.height*.72),fontSize:10);
+    _text(c,'هرم',Offset(centers[2]-11,s.height*.72),fontSize:10);
+  }
+
+  void _drawPrismCylinderVolume(Canvas c, Size s) {
+    final center=Offset(s.width*.50,s.height*.47);
+    final top=Rect.fromCenter(center:Offset(center.dx,s.height*.27),width:90,height:24);
+    final bottom=Rect.fromCenter(center:Offset(center.dx,s.height*.67),width:90,height:24);
+    c.drawOval(top,_stroke(AppColors.secondary,3)); c.drawOval(bottom,_stroke(AppColors.secondary,3));
+    c.drawLine(Offset(top.left,top.center.dy),Offset(bottom.left,bottom.center.dy),_stroke(AppColors.secondary,3));
+    c.drawLine(Offset(top.right,top.center.dy),Offset(bottom.right,bottom.center.dy),_stroke(AppColors.secondary,3));
+    _text(c,'B',Offset(center.dx-5,s.height*.24),fontSize:14,color:AppColors.secondary);
+    _text(c,'h',Offset(top.right+12,s.height*.45),fontSize:14,color:AppColors.accent);
+    _text(c,'V = B × h',Offset(s.width*.40,s.height*.78),fontSize:16);
+  }
+
+  void _drawPyramidConeVolume(Canvas c, Size s) {
+    final apex=Offset(s.width*.50,s.height*.18);
+    final left=Offset(s.width*.30,s.height*.68), right=Offset(s.width*.70,s.height*.68);
+    c.drawLine(apex,left,_stroke(AppColors.secondary,3));
+    c.drawLine(apex,right,_stroke(AppColors.secondary,3));
+    c.drawOval(Rect.fromCenter(center:Offset(s.width*.50,s.height*.68),width:s.width*.40,height:28),_stroke(AppColors.secondary,3));
+    c.drawLine(apex,Offset(s.width*.50,s.height*.68),_stroke(AppColors.accent,2));
+    _text(c,'h',Offset(s.width*.52,s.height*.40),fontSize:13,color:AppColors.accent);
+    _text(c,'V = ⅓ B h',Offset(s.width*.39,s.height*.79),fontSize:17);
+  }
+
+  void _drawCylinderNet(Canvas c, Size s) {
+    final rect=Rect.fromLTWH(s.width*.31,s.height*.28,s.width*.38,s.height*.36);
+    c.drawRect(rect,_fill(AppColors.secondary.withValues(alpha:.30)));
+    c.drawRect(rect,_stroke(AppColors.secondary,3));
+    c.drawCircle(Offset(s.width*.22,s.height*.46),28,_stroke(AppColors.accent,3));
+    c.drawCircle(Offset(s.width*.78,s.height*.46),28,_stroke(AppColors.accent,3));
+    _text(c,'مستطيل + دائرتان',Offset(s.width*.36,s.height*.73),fontSize:12);
+  }
+
+  void _drawPyramidNet(Canvas c, Size s) {
+    final center=Rect.fromCenter(center:Offset(s.width*.50,s.height*.50),width:70,height:70);
+    c.drawRect(center,_fill(AppColors.secondary.withValues(alpha:.25)));
+    c.drawRect(center,_stroke(AppColors.secondary,3));
+    final top=Path()..moveTo(center.left,center.top)..lineTo(center.center.dx,s.height*.18)..lineTo(center.right,center.top)..close();
+    final bottom=Path()..moveTo(center.left,center.bottom)..lineTo(center.center.dx,s.height*.82)..lineTo(center.right,center.bottom)..close();
+    final left=Path()..moveTo(center.left,center.top)..lineTo(s.width*.24,center.center.dy)..lineTo(center.left,center.bottom)..close();
+    final right=Path()..moveTo(center.right,center.top)..lineTo(s.width*.76,center.center.dy)..lineTo(center.right,center.bottom)..close();
+    for(final p in [top,bottom,left,right]){c.drawPath(p,_stroke(AppColors.accent,3));}
+    _text(c,'قاعدة + 4 مثلثات',Offset(s.width*.37,s.height*.86),fontSize:11);
+  }
+
+  void _drawSimplerProblem(Canvas c, Size s) {
+    final complex=Path()..moveTo(s.width*.12,s.height*.28)..lineTo(s.width*.36,s.height*.28)..lineTo(s.width*.36,s.height*.48)..lineTo(s.width*.48,s.height*.48)..lineTo(s.width*.48,s.height*.70)..lineTo(s.width*.12,s.height*.70)..close();
+    c.drawPath(complex,_stroke(AppColors.accent,3));
+    _text(c,'معقّد',Offset(s.width*.22,s.height*.74),fontSize:10,color:AppColors.accent);
+    _text(c,'→',Offset(s.width*.49,s.height*.45),fontSize:22,color:AppColors.secondary);
+    final r1=Rect.fromLTWH(s.width*.60,s.height*.30,s.width*.16,s.height*.38);
+    final r2=Rect.fromLTWH(s.width*.76,s.height*.50,s.width*.10,s.height*.18);
+    c.drawRect(r1,_fill(AppColors.secondary.withValues(alpha:.40))); c.drawRect(r1,_stroke(AppColors.secondary,2));
+    c.drawRect(r2,_fill(AppColors.primary.withValues(alpha:.50))); c.drawRect(r2,_stroke(Colors.white,2));
+    _text(c,'جزآن أبسط',Offset(s.width*.64,s.height*.74),fontSize:10);
+  }
+
+  void _drawSimplifyExpressions(Canvas c, Size s) {
+    _text(c,'3x + 2x + 4',Offset(s.width*.24,s.height*.22),fontSize:21);
+    c.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(s.width*.20,s.height*.45,s.width*.22,42),const Radius.circular(12)),_fill(AppColors.secondary));
+    c.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(s.width*.44,s.height*.45,s.width*.22,42),const Radius.circular(12)),_fill(AppColors.secondary.withValues(alpha:.75)));
+    _text(c,'3x',Offset(s.width*.27,s.height*.49),fontSize:14,color:AppColors.primaryDark);
+    _text(c,'2x',Offset(s.width*.51,s.height*.49),fontSize:14,color:AppColors.primaryDark);
+    _text(c,'→ 5x + 4',Offset(s.width*.38,s.height*.71),fontSize:18,color:AppColors.accent);
+  }
+
+  void _drawWriteEquation(Canvas c, Size s) {
+    _text(c,'"ضعف عدد + 3 = 11"',Offset(s.width*.24,s.height*.22),fontSize:15);
+    _text(c,'↓',Offset(s.width*.49,s.height*.38),fontSize:20,color:AppColors.secondary);
+    _text(c,'2x + 3 = 11',Offset(s.width*.35,s.height*.57),fontSize:22,color:AppColors.secondary);
+    _text(c,'الكلمات → معادلة',Offset(s.width*.39,s.height*.76),fontSize:11);
+  }
+
+  void _drawVariablesBothSides(Canvas c, Size s) {
+    _text(c,'6x + 1',Offset(s.width*.16,s.height*.28),fontSize:18,color:AppColors.secondary);
+    _text(c,'=',Offset(s.width*.48,s.height*.28),fontSize:20);
+    _text(c,'4x + 11',Offset(s.width*.60,s.height*.28),fontSize:18,color:AppColors.accent);
+    c.drawLine(Offset(s.width*.18,s.height*.56),Offset(s.width*.82,s.height*.56),_stroke(Colors.white.withValues(alpha:.45),2));
+    _text(c,'اطرح 4x من الطرفين',Offset(s.width*.34,s.height*.64),fontSize:12);
+    _text(c,'2x + 1 = 11',Offset(s.width*.38,s.height*.77),fontSize:16,color:AppColors.secondary);
+  }
+
+  void _drawGuessCheck(Canvas c, Size s) {
+    const guesses=['3','4','5']; const results=['14','17','20'];
+    _text(c,'تخمين',Offset(s.width*.22,s.height*.18),fontSize:12,color:AppColors.secondary);
+    _text(c,'نتيجة',Offset(s.width*.62,s.height*.18),fontSize:12,color:AppColors.secondary);
+    for(var i=0;i<3;i++){
+      final y=s.height*(.34+i*.17);
+      _text(c,guesses[i],Offset(s.width*.27,y),fontSize:14);
+      _text(c,results[i],Offset(s.width*.66,y),fontSize:14,color:i==2?AppColors.secondary:Colors.white);
+    }
+    _text(c,'الهدف = 20 ✓',Offset(s.width*.40,s.height*.82),fontSize:12,color:AppColors.secondary);
+  }
+
+  void _drawModelStrategy(Canvas c, Size s) {
+    _text(c,'12 ريال ثابتة',Offset(s.width*.12,s.height*.26),fontSize:14,color:AppColors.secondary);
+    _text(c,'+',Offset(s.width*.38,s.height*.26),fontSize:16);
+    _text(c,'5 لكل زيارة',Offset(s.width*.48,s.height*.26),fontSize:14,color:AppColors.accent);
+    _text(c,'↓',Offset(s.width*.49,s.height*.44),fontSize:18);
+    _text(c,'y = 5x + 12',Offset(s.width*.36,s.height*.60),fontSize:21);
+    _text(c,'موقف حقيقي → نموذج رياضي',Offset(s.width*.31,s.height*.78),fontSize:11);
+  }
+
+  void _drawGraphLinearFunction(Canvas c, Size s) {
+    final origin=Offset(s.width*.18,s.height*.78);
+    c.drawLine(origin,Offset(s.width*.86,origin.dy),_whiteStroke);
+    c.drawLine(origin,Offset(origin.dx,s.height*.16),_whiteStroke);
+    final points=[
+      Offset(s.width*.30,s.height*.66),
+      Offset(s.width*.46,s.height*.53),
+      Offset(s.width*.62,s.height*.40),
+      Offset(s.width*.78,s.height*.27),
+    ];
+    for(final p in points){c.drawCircle(p,7,_fill(AppColors.accent));}
+    c.drawLine(points.first,points.last,_stroke(AppColors.secondary,3));
+    _text(c,'جدول قيم → نقاط → خط',Offset(s.width*.34,s.height*.84),fontSize:10);
+  }
+
+  void _drawDirectVariation(Canvas c, Size s) {
+    final origin=Offset(s.width*.20,s.height*.76);
+    c.drawLine(origin,Offset(s.width*.86,origin.dy),_whiteStroke);
+    c.drawLine(origin,Offset(origin.dx,s.height*.16),_whiteStroke);
+    c.drawLine(origin,Offset(s.width*.78,s.height*.28),_stroke(AppColors.secondary,4));
+    c.drawCircle(origin,8,_fill(AppColors.accent));
+    _text(c,'يمر بالأصل',Offset(origin.dx+12,origin.dy-26),fontSize:10,color:AppColors.accent);
+    _text(c,'y = kx',Offset(s.width*.57,s.height*.23),fontSize:17,color:AppColors.secondary);
   }
 
   @override
