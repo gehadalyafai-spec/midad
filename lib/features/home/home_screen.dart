@@ -241,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 320),
           child: _isLoading
-              ? const _StudySkeleton(key: ValueKey('loading'))
+              ? const _MidadOpening(key: ValueKey('loading'))
               : _StudyCanvas(
                   key: const ValueKey('canvas'),
                   chapter: chapter,
@@ -1522,6 +1522,92 @@ class _CanvasDotsPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _CanvasDotsPainter oldDelegate) {
     return oldDelegate.color != color;
+  }
+}
+
+class _MidadOpening extends StatelessWidget {
+  const _MidadOpening({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: const Color(0xFFF3F0E9),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 112,
+              height: 112,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.bottomLeft,
+                  end: Alignment.topRight,
+                  colors: [
+                    Color(0xFF182C7D),
+                    Color(0xFF1769B0),
+                    Color(0xFF38BCEB),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(32),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF1769B0).withValues(alpha: 0.22),
+                    blurRadius: 30,
+                    offset: const Offset(0, 14),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.auto_stories_rounded,
+                color: Colors.white,
+                size: 58,
+              ),
+            )
+                .animate()
+                .fadeIn(duration: 380.ms)
+                .scale(
+                  begin: const Offset(0.88, 0.88),
+                  end: const Offset(1, 1),
+                  duration: 520.ms,
+                  curve: Curves.easeOutBack,
+                ),
+            const SizedBox(height: 22),
+            const Text(
+              'مداد',
+              style: TextStyle(
+                color: AppColors.primaryDark,
+                fontSize: 34,
+                height: 1.1,
+                fontWeight: FontWeight.w900,
+              ),
+            ).animate(delay: 130.ms).fadeIn(duration: 320.ms),
+            const SizedBox(height: 6),
+            const Text(
+              'معلمك الشخصي',
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ).animate(delay: 190.ms).fadeIn(duration: 320.ms),
+            const SizedBox(height: 28),
+            SizedBox(
+              width: 72,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(99),
+                child: const LinearProgressIndicator(
+                  minHeight: 4,
+                  backgroundColor: Color(0xFFE2DED6),
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(AppColors.primary),
+                ),
+              ),
+            ).animate(delay: 240.ms).fadeIn(),
+          ],
+        ),
+      ),
+    );
   }
 }
 
