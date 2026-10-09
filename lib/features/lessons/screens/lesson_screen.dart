@@ -228,6 +228,16 @@ class _LessonScreenState extends State<LessonScreen> {
                 )
                     .animate(delay: 80.ms)
                     .fadeIn(duration: 360.ms),
+                if (lessonData.hasExtendedExplanation) ...[
+                  const SizedBox(height: 26),
+                  _TeachingIntro(
+                    intro: lessonData.intro,
+                    whyItMatters: lessonData.whyItMatters,
+                    paper: paper,
+                    textColor: text,
+                    mutedColor: muted,
+                  ).animate(delay: 105.ms).fadeIn(),
+                ],
                 const SizedBox(height: 30),
                 _LessonSection(
                   number: '01',
@@ -246,11 +256,29 @@ class _LessonScreenState extends State<LessonScreen> {
                   textColor: text,
                   mutedColor: muted,
                 ).animate(delay: 170.ms).fadeIn(),
+                if (lessonData.steps.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  _StepsCard(
+                    steps: lessonData.steps,
+                    paper: paper,
+                    textColor: text,
+                    mutedColor: muted,
+                  ).animate(delay: 195.ms).fadeIn(),
+                ],
                 const SizedBox(height: 26),
                 _WorkedExample(
                   formula: lessonData.exampleFormula,
                   body: lessonData.exampleBody,
                 ).animate(delay: 210.ms).fadeIn(),
+                if (lessonData.secondExampleFormula.isNotEmpty ||
+                    lessonData.secondExampleBody.isNotEmpty) ...[
+                  const SizedBox(height: 18),
+                  _WorkedExample(
+                    title: 'مثال إضافي',
+                    formula: lessonData.secondExampleFormula,
+                    body: lessonData.secondExampleBody,
+                  ).animate(delay: 225.ms).fadeIn(),
+                ],
                 const SizedBox(height: 22),
                 _QuickPractice(
                   question: lessonData.practiceQuestion,
@@ -272,6 +300,14 @@ class _LessonScreenState extends State<LessonScreen> {
                   textColor: text,
                   mutedColor: muted,
                 ).animate(delay: 270.ms).fadeIn(),
+                if (lessonData.summaryPoints.isNotEmpty) ...[
+                  const SizedBox(height: 18),
+                  _SummaryCard(
+                    points: lessonData.summaryPoints,
+                    paper: paper,
+                    textColor: text,
+                  ).animate(delay: 290.ms).fadeIn(),
+                ],
                 if (_isCompleted) ...[
                   const SizedBox(height: 18),
                   _CompletedNote(
@@ -461,12 +497,244 @@ class _LessonSection extends StatelessWidget {
   }
 }
 
+class _TeachingIntro extends StatelessWidget {
+  const _TeachingIntro({
+    required this.intro,
+    required this.whyItMatters,
+    required this.paper,
+    required this.textColor,
+    required this.mutedColor,
+  });
+
+  final String intro;
+  final String whyItMatters;
+  final Color paper;
+  final Color textColor;
+  final Color mutedColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: paper,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.14),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (intro.isNotEmpty) ...[
+            const Text(
+              'افهمها ببساطة',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w900,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 9),
+            Text(
+              intro,
+              style: TextStyle(
+                color: textColor,
+                height: 1.85,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+          if (intro.isNotEmpty && whyItMatters.isNotEmpty)
+            const SizedBox(height: 18),
+          if (whyItMatters.isNotEmpty) ...[
+            Row(
+              children: [
+                const Icon(
+                  Icons.lightbulb_outline_rounded,
+                  color: AppColors.secondary,
+                  size: 20,
+                ),
+                const SizedBox(width: 7),
+                Text(
+                  'لماذا نحتاج هذه الفكرة؟',
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              whyItMatters,
+              style: TextStyle(
+                color: mutedColor,
+                height: 1.8,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _StepsCard extends StatelessWidget {
+  const _StepsCard({
+    required this.steps,
+    required this.paper,
+    required this.textColor,
+    required this.mutedColor,
+  });
+
+  final List<String> steps;
+  final Color paper;
+  final Color textColor;
+  final Color mutedColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: paper,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(
+          color: AppColors.secondary.withValues(alpha: 0.25),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'امشِ على هذه الخطوات',
+            style: TextStyle(
+              color: AppColors.primary,
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 14),
+          ...List.generate(steps.length, (index) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 30,
+                    height: 30,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryDark,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '${index + 1}',
+                      style: const TextStyle(
+                        color: AppColors.secondary,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 11),
+                  Expanded(
+                    child: Text(
+                      steps[index],
+                      style: TextStyle(
+                        color: textColor,
+                        height: 1.65,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryCard extends StatelessWidget {
+  const _SummaryCard({
+    required this.points,
+    required this.paper,
+    required this.textColor,
+  });
+
+  final List<String> points;
+  final Color paper;
+  final Color textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: paper,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.18),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'خلاصة الدرس في دقيقة',
+            style: TextStyle(
+              color: AppColors.primary,
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...points.map(
+            (point) => Padding(
+              padding: const EdgeInsets.only(bottom: 9),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(
+                    Icons.check_circle_outline_rounded,
+                    size: 19,
+                    color: AppColors.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      point,
+                      style: TextStyle(
+                        color: textColor,
+                        height: 1.55,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _WorkedExample extends StatelessWidget {
   const _WorkedExample({
+    this.title = 'مثال محلول',
     required this.formula,
     required this.body,
   });
 
+  final String title;
   final String formula;
   final String body;
 
