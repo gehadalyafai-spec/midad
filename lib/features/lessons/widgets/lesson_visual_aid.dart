@@ -242,6 +242,7 @@ const _lessonSpecificVisualVariants = <String>{
   'model-strategy',
   'graph-linear-functions',
   'direct-variation',
+  'sequences',
 };
 
 String visualVariantKeyForLesson(String lessonId) {
@@ -477,6 +478,8 @@ class LessonVisualAid extends StatelessWidget {
         return 'طابق الرؤوس المتناظرة ثم قارن الأضلاع والزوايا بالترتيب نفسه.';
       case 'symmetry':
         return 'تخيّل طي الشكل حول المحور؛ إذا انطبق النصفان فهناك تماثل.';
+      case 'sequences':
+        return 'المتتابعة ليست مجرد شكل متكرر؛ كل حد له ترتيب وقاعدة تحدد كيف نصل إلى الحد التالي.';
       default:
         return _caption(kind);
     }
@@ -562,6 +565,12 @@ class LessonVisualAid extends StatelessWidget {
           'مرور خط بالمركز لا يكفي وحده.',
           'قد يكون للشكل محور واحد أو عدة محاور أو لا يوجد.',
         ];
+      case 'sequences':
+        return const [
+          'كل حد له رقم ترتيب يحدد موقعه في المتتابعة.',
+          'احسب الفرق أو العامل بين حدود متتالية قبل اختيار القاعدة.',
+          'القاعدة الجيدة يجب أن تعطي جميع الحدود، لا حدًا واحدًا فقط.',
+        ];
       default:
         return _insights(kind);
     }
@@ -593,6 +602,8 @@ class LessonVisualAid extends StatelessWidget {
         return 'قطعتان صُنعتا بالقالب نفسه يجب أن تتطابقا في الشكل والحجم.';
       case 'symmetry':
         return 'واجهة مبنى متناظرة يمكن تقسيمها بمحور رأسي إلى نصفين متطابقين.';
+      case 'sequences':
+        return 'إذا كنت تدخر 5 ريالات إضافية كل أسبوع، فالمبالغ الأسبوعية تصنع متتابعة يمكن التنبؤ بحدودها.';
       default:
         return _realLifeExample(kind);
     }
@@ -1230,6 +1241,10 @@ class _LessonVisualPainter extends CustomPainter {
   }
 
   void _drawPattern(Canvas c, Size s) {
+    if (lessonId == 'sequences') {
+      _drawSequenceVisual(c, s);
+      return;
+    }
     for (var i = 0; i < 5; i++) {
       final x = s.width * (.14 + i * .17);
       final y = s.height * .50;
@@ -2875,6 +2890,55 @@ class _LessonVisualPainter extends CustomPainter {
     _text(c,'الجدار 4م',Offset(s.width*.12,s.height*.44),fontSize:11);
     _text(c,'الأرض 3م',Offset(s.width*.46,groundY+8),fontSize:11);
     _text(c,'السلم ؟',Offset(s.width*.52,s.height*.42),fontSize:13,color:AppColors.secondary);
+  }
+
+  void _drawSequenceVisual(Canvas c, Size s) {
+    const values = <String>['3', '7', '11', '15'];
+    final y = s.height * .50;
+
+    for (var i = 0; i < values.length; i++) {
+      final x = s.width * (.16 + i * .22);
+      c.drawCircle(
+        Offset(x, y),
+        24,
+        _fill(
+          i.isEven
+              ? AppColors.secondary
+              : AppColors.accent.withValues(alpha: .85),
+        ),
+      );
+      _text(
+        c,
+        values[i],
+        Offset(x - 8, y - 9),
+        fontSize: 14,
+        color: i.isEven ? AppColors.primaryDark : Colors.white,
+      );
+
+      if (i < values.length - 1) {
+        _text(
+          c,
+          '+4',
+          Offset(x + 34, y - 9),
+          fontSize: 11,
+          color: Colors.white70,
+        );
+      }
+    }
+
+    _text(
+      c,
+      'الحد التالي = 19',
+      Offset(s.width * .39, s.height * .73),
+      fontSize: 13,
+      color: AppColors.secondary,
+    );
+    _text(
+      c,
+      'الموقع  1     2     3     4',
+      Offset(s.width * .30, s.height * .22),
+      fontSize: 10,
+    );
   }
 
   @override
