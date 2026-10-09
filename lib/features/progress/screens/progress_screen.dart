@@ -21,6 +21,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
   bool _loading = true;
   Set<String> _completed = const <String>{};
   Set<String> _mistakes = const <String>{};
+  Map<String, int> _examScores = const <String, int>{};
 
   @override
   void initState() {
@@ -31,11 +32,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
   Future<void> _load() async {
     final completed = await _progressService.getCompletedLessonIds();
     final mistakes = await _progressService.getMistakeQuestionIds();
+    final examScores = await _progressService.getExamBestScores();
 
     if (!mounted) return;
     setState(() {
       _completed = completed;
       _mistakes = mistakes;
+      _examScores = examScores;
       _loading = false;
     });
   }
@@ -79,6 +82,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final overallProgress =
         totalLessons == 0 ? 0.0 : completedLessons / totalLessons;
     final percent = (overallProgress * 100).round();
+    final bestCourseExamScore = _examScores['grade2-math-course-exam'];
+    final attemptedChapterExams = grade2MathChapters
+        .where(
+          (chapter) =>
+              _examScores.containsKey('${chapter.id}-chapter-exam'),
+        )
+        .length;
 
     final weakLessons = <_WeakLessonInsight>[];
     for (final chapter in grade2MathChapters) {
@@ -195,6 +205,17 @@ class _ProgressScreenState extends State<ProgressScreen> {
                           onOpenLesson: _openLesson,
                         ).animate(delay: 80.ms).fadeIn(duration: 320.ms),
                       ],
+                      if (bestCourseExamScore != null ||
+                          attemptedChapterExams > 0) ...[
+                        const SizedBox(height: 18),
+                        _ExamProgressSummary(
+                          bestCourseExamScore: bestCourseExamScore,
+                          attemptedChapterExams: attemptedChapterExams,
+                          surface: surface,
+                          textColor: text,
+                          mutedColor: muted,
+                        ).animate(delay: 60.ms).fadeIn(duration: 320.ms),
+                      ],
                       const SizedBox(height: 30),
                       Text(
                         'رحلة المادة',
@@ -233,6 +254,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
                           progress: progress,
                           completed: completed,
                           total: lessons.length,
+                          examScore:
+                              _examScores['${chapter.id}-chapter-exam'],
                           isLast: index == grade2MathChapters.length - 1,
                           textColor: text,
                           mutedColor: muted,
@@ -406,6 +429,81 @@ class _WeakLessonsSection extends StatelessWidget {
                   ),
                 ),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ExamProgressSummary extends StatelessWidget {
+  const _ExamProgressSummary({
+    required this.bestCourseExamScore,
+    required this.attemptedChapterExams,
+    required this.surface,
+    required this.textColor,
+    required this.mutedColor,
+  });
+
+  final int? bestCourseExamScore;
+  final int attemptedChapterExams;
+  final Color surface;
+  final Color textColor;
+  final Color mutedColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: AppColors.secondary.withValues(alpha: 0.22),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppColors.secondary,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: const Icon(
+              Icons.military_tech_rounded,
+              color: AppColors.primaryDark,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'نتائج الاختبارات الكبرى',
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  bestCourseExamScore == null
+                      ? 'جربت $attemptedChapterExams من اختبارات الفصول'
+                      : 'أفضل نتيجة شاملة: $bestCourseExamScore% • اختبارات الفصول: $attemptedChapterExams/10',
+                  style: TextStyle(
+                    color: mutedColor,
+                    height: 1.45,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -590,6 +688,7 @@ class _ChapterMilestone extends StatelessWidget {
     required this.progress,
     required this.completed,
     required this.total,
+    this.examScore,
     required this.isLast,
     required this.textColor,
     required this.mutedColor,
@@ -603,6 +702,7 @@ class _ChapterMilestone extends StatelessWidget {
   final double progress;
   final int completed;
   final int total;
+  final int? examScore;
   final bool isLast;
   final Color textColor;
   final Color mutedColor;
@@ -717,6 +817,27 @@ class _ChapterMilestone extends StatelessWidget {
                       ),
                   ],
                 ),
+                if (examScore != null) ...[
+                  const SizedBox(height: 9),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      'أفضل اختبار للفصل: $examScore%',
+                      style: const TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ],
                 if (unlocked) ...[
                   const SizedBox(height: 10),
                   ClipRRect(
