@@ -180,8 +180,7 @@ class _MathCourseScreenState extends State<MathCourseScreen> {
                             surface: surface,
                             textColor: text,
                             mutedColor: muted,
-                            onTap:
-                                unlocked ? () => _openChapter(chapter) : null,
+                            onTap: () => _openChapter(chapter),
                           )
                               .animate(delay: (index * 70).ms)
                               .fadeIn(duration: 340.ms)
