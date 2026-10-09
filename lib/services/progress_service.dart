@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../features/curriculum/models/curriculum_models.dart';
@@ -10,6 +12,7 @@ class ProgressService {
   static const _lastLessonIdKey = 'last_lesson_id';
   static const _lastLessonTitleKey = 'last_lesson_title';
   static const _mistakeQuestionIdsKey = 'mistake_question_ids';
+  static const _examBestScoresKey = 'exam_best_scores_v1';
 
   final SharedPreferencesAsync _preferences;
 
@@ -21,6 +24,47 @@ class ProgressService {
   Future<Set<String>> getMistakeQuestionIds() async {
     final values = await _preferences.getStringList(_mistakeQuestionIdsKey);
     return (values ?? const <String>[]).toSet();
+  }
+
+  Future<Map<String, int>> getExamBestScores() async {
+    final raw = await _preferences.getString(_examBestScoresKey);
+    if (raw == null || raw.isEmpty) return <String, int>{};
+
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map<String, dynamic>) return <String, int>{};
+
+      return decoded.map(
+        (key, value) => MapEntry(key, (value as num).round()),
+      );
+    } catch (_) {
+      return <String, int>{};
+    }
+  }
+
+  Future<int?> getExamBestScore(String examId) async {
+    final scores = await getExamBestScores();
+    return scores[examId];
+  }
+
+  Future<void> recordExamResult({
+    required String examId,
+    required int score,
+    required int total,
+  }) async {
+    if (total <= 0) return;
+
+    final percent = ((score / total) * 100).round();
+    final scores = await getExamBestScores();
+    final previous = scores[examId];
+
+    if (previous != null && previous >= percent) return;
+
+    scores[examId] = percent;
+    await _preferences.setString(
+      _examBestScoresKey,
+      jsonEncode(scores),
+    );
   }
 
   Future<String?> getLastLessonId() {
