@@ -4,6 +4,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../services/progress_service.dart';
 import '../../lessons/screens/lesson_screen.dart';
+import '../../quizzes/data/chapter_exam_builder.dart';
+import '../../quizzes/screens/quiz_screen.dart';
 import '../models/curriculum_models.dart';
 
 class ChapterScreen extends StatefulWidget {
@@ -38,6 +40,27 @@ class _ChapterScreenState extends State<ChapterScreen> {
       ),
     );
     await _loadProgress();
+  }
+
+  Future<void> _openChapterExam() async {
+    final questions = chapterExamQuestions(widget.chapter);
+    if (questions.isEmpty) return;
+
+    final examLesson = Lesson(
+      id: '${widget.chapter.id}-chapter-exam',
+      title: 'اختبار الفصل: ${widget.chapter.title}',
+      subtitle: 'اختبار شامل يراجع أهم أفكار دروس الفصل.',
+    );
+
+    await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => QuizScreen(
+          lesson: examLesson,
+          questions: questions,
+          markLessonComplete: false,
+        ),
+      ),
+    );
   }
 
   @override
@@ -147,6 +170,16 @@ class _ChapterScreenState extends State<ChapterScreen> {
                       .fadeIn(duration: 320.ms)
                       .slideX(begin: 0.04, end: 0);
                 }),
+                const SizedBox(height: 8),
+                _ChapterExamCard(
+                  chapterTitle: widget.chapter.title,
+                  completed: completed,
+                  total: available.length,
+                  surface: surface,
+                  textColor: text,
+                  mutedColor: muted,
+                  onTap: _openChapterExam,
+                ).animate(delay: 520.ms).fadeIn(duration: 340.ms),
               ],
             ),
           ],
@@ -432,6 +465,107 @@ class _TimelineLesson extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _ChapterExamCard extends StatelessWidget {
+  const _ChapterExamCard({
+    required this.chapterTitle,
+    required this.completed,
+    required this.total,
+    required this.surface,
+    required this.textColor,
+    required this.mutedColor,
+    required this.onTap,
+  });
+
+  final String chapterTitle;
+  final int completed;
+  final int total;
+  final Color surface;
+  final Color textColor;
+  final Color mutedColor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final allLessonsDone = total > 0 && completed == total;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(26),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.primaryDark,
+            borderRadius: BorderRadius.circular(26),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 54,
+                height: 54,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.secondary,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: const Icon(
+                  Icons.workspace_premium_rounded,
+                  color: AppColors.primaryDark,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'اختبار الفصل',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 17,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      '10 أسئلة موزعة على دروس $chapterTitle',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        height: 1.45,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      allLessonsDone
+                          ? 'أكملت الدروس • وقت المراجعة الشاملة'
+                          : 'يمكنك تجربته الآن، والأفضل بعد إكمال دروس الفصل',
+                      style: TextStyle(
+                        color: allLessonsDone
+                            ? AppColors.secondary
+                            : Colors.white60,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_back_rounded,
+                color: Colors.white70,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
