@@ -67,6 +67,7 @@ class _ChapterScreenState extends State<ChapterScreen> {
           questions: questions,
           markLessonComplete: false,
           examProgressKey: examId,
+          onReviewLesson: _openLesson,
         ),
       ),
     );
