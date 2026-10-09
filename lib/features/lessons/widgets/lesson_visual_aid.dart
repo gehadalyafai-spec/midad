@@ -19,6 +19,15 @@ enum LessonVisualKind {
   measurement,
   algebra,
   function,
+  scientific,
+  histogram,
+  pie,
+  boxPlot,
+  stemLeaf,
+  probabilityMeter,
+  sampling,
+  compositeArea,
+  lineGraph,
 }
 
 const _numberLineLessons = <String>{
@@ -135,6 +144,24 @@ const _functionLessons = <String>{
 };
 
 LessonVisualKind? visualKindForLesson(String lessonId) {
+  if (lessonId == 'scientific-notation') return LessonVisualKind.scientific;
+  if (lessonId == 'histograms') return LessonVisualKind.histogram;
+  if (lessonId == 'circle-sectors') return LessonVisualKind.pie;
+  if (lessonId == 'box-plot') return LessonVisualKind.boxPlot;
+  if (lessonId == 'stem-leaf') return LessonVisualKind.stemLeaf;
+  if (lessonId == 'theoretical-experimental') {
+    return LessonVisualKind.probabilityMeter;
+  }
+  if (lessonId == 'sampling-prediction') return LessonVisualKind.sampling;
+  if (lessonId == 'composite-areas' ||
+      lessonId == 'simpler-problem-strategy') {
+    return LessonVisualKind.compositeArea;
+  }
+  if (lessonId == 'graph-linear-functions' ||
+      lessonId == 'slope' ||
+      lessonId == 'direct-variation') {
+    return LessonVisualKind.lineGraph;
+  }
   if (_numberLineLessons.contains(lessonId)) return LessonVisualKind.numberLine;
   if (_fractionLessons.contains(lessonId)) return LessonVisualKind.fraction;
   if (_patternLessons.contains(lessonId)) return LessonVisualKind.pattern;
@@ -368,6 +395,60 @@ class LessonVisualAid extends StatelessWidget {
           'الجدول والرسم والمعادلة طرق مختلفة لوصف العلاقة نفسها.',
           'في الدالة الخطية يظهر معدل التغير كثبات في الميل.',
         ];
+      case LessonVisualKind.scientific:
+        return const [
+          'اجعل العدد الأول بين 1 و10 قبل كتابة قوة 10.',
+          'الحركة لليسار في عدد كبير تعطي أسًا موجبًا.',
+          'الحركة لليمين في عدد صغير بين صفر و1 تعطي أسًا سالبًا.',
+        ];
+      case LessonVisualKind.histogram:
+        return const [
+          'الفئات متصلة لذلك أعمدة المدرج متجاورة.',
+          'عرض العمود يمثل الفئة وارتفاعه يمثل التكرار.',
+          'أعلى عمود يكشف الفئة الأكثر تكرارًا مباشرة.',
+        ];
+      case LessonVisualKind.pie:
+        return const [
+          'مجموع القطاعات يمثل 100% من البيانات.',
+          'نصف الدائرة يساوي 50% وربعها يساوي 25%.',
+          'زاوية القطاع = النسبة العشرية × 360°.',
+        ];
+      case LessonVisualKind.boxPlot:
+        return const [
+          'الصندوق نفسه يمثل النصف الأوسط من البيانات.',
+          'الخط داخل الصندوق هو الوسيط.',
+          'طول الصندوق والأطراف يساعد على مقارنة الانتشار.',
+        ];
+      case LessonVisualKind.stemLeaf:
+        return const [
+          'الساق تمثل الجزء الأكبر من العدد والورقة الرقم الأخير.',
+          'كل ورقة تعطي قيمة أصلية كاملة عند جمعها مع ساقها.',
+          'ترتيب الأوراق يجعل المركز والانتشار أسهل في القراءة.',
+        ];
+      case LessonVisualKind.probabilityMeter:
+        return const [
+          'النظري هو ما نتوقعه من نموذج الاحتمال.',
+          'التجريبي هو ما ظهر فعلًا بعد تنفيذ التجربة.',
+          'مع زيادة التجارب يميل التجريبي غالبًا إلى الاقتراب من النظري.',
+        ];
+      case LessonVisualKind.sampling:
+        return const [
+          'اختيار أفراد من أماكن مختلفة يقلل التحيز.',
+          'العينة يجب أن تشبه المجتمع الذي نريد التنبؤ عنه.',
+          'الحجم وحده لا يكفي إذا كانت العينة منحازة.',
+        ];
+      case LessonVisualKind.compositeArea:
+        return const [
+          'ابدأ بتحديد حدود الأشكال البسيطة داخل الشكل الكبير.',
+          'احسب كل مساحة بقانونها ثم اجمعها أو اطرح الجزء المفقود.',
+          'لا تجمع الأطوال عندما يكون المطلوب مساحة.',
+        ];
+      case LessonVisualKind.lineGraph:
+        return const [
+          'التغير الأفقي يسمى run والتغير الرأسي يسمى rise.',
+          'الميل = rise ÷ run.',
+          'الخط المستقيم يعني أن معدل التغير ثابت.',
+        ];
     }
   }
 
@@ -401,6 +482,24 @@ class LessonVisualAid extends StatelessWidget {
         return 'تعامل مع المعادلة كميزان متعادل: أي تغيير في طرف يجب أن يحدث في الطرف الآخر.';
       case LessonVisualKind.function:
         return 'تخيّل الدالة آلة: يدخل x، تطبق القاعدة، ثم يخرج y. الرسم يوضح كيف يتغير المخرج.';
+      case LessonVisualKind.scientific:
+        return 'تابع حركة الفاصلة؛ عدد المنازل واتجاه الحركة يحددان أس العدد 10.';
+      case LessonVisualKind.histogram:
+        return 'كل عمود يمثل فئة عددية، وارتفاعه يساوي عدد القيم الموجودة داخل هذه الفئة.';
+      case LessonVisualKind.pie:
+        return 'الدائرة تمثل الكل 100%، وكل قطاع يأخذ مساحة تتناسب مع نسبته.';
+      case LessonVisualKind.boxPlot:
+        return 'اقرأ القيم الخمس: الصغرى، الربيع الأول، الوسيط، الربيع الثالث، والكبرى.';
+      case LessonVisualKind.stemLeaf:
+        return 'اقرأ الساق أولًا ثم أضف الورقة؛ بهذه الطريقة تبقى القيم الأصلية ظاهرة.';
+      case LessonVisualKind.probabilityMeter:
+        return 'قارن الاحتمال المتوقع نظريًا بالنسبة التي ظهرت فعليًا بعد التجربة.';
+      case LessonVisualKind.sampling:
+        return 'العينة الجيدة موزعة داخل المجتمع ولا تتركز في مجموعة واحدة فقط.';
+      case LessonVisualKind.compositeArea:
+        return 'قسّم الشكل المركب إلى مستطيلات أو مثلثات بسيطة ثم اجمع أو اطرح المساحات.';
+      case LessonVisualKind.lineGraph:
+        return 'راقب ارتفاع الخط وانخفاضه؛ الميل يصف مقدار التغير الرأسي مقابل الأفقي.';
     }
   }
 }
@@ -478,6 +577,24 @@ class _LessonVisualPainter extends CustomPainter {
         _drawAlgebra(canvas, size);
       case LessonVisualKind.function:
         _drawFunction(canvas, size);
+      case LessonVisualKind.scientific:
+        _drawScientific(canvas, size);
+      case LessonVisualKind.histogram:
+        _drawHistogram(canvas, size);
+      case LessonVisualKind.pie:
+        _drawPie(canvas, size);
+      case LessonVisualKind.boxPlot:
+        _drawBoxPlot(canvas, size);
+      case LessonVisualKind.stemLeaf:
+        _drawStemLeaf(canvas, size);
+      case LessonVisualKind.probabilityMeter:
+        _drawProbabilityMeter(canvas, size);
+      case LessonVisualKind.sampling:
+        _drawSampling(canvas, size);
+      case LessonVisualKind.compositeArea:
+        _drawCompositeArea(canvas, size);
+      case LessonVisualKind.lineGraph:
+        _drawLineGraph(canvas, size);
     }
   }
 
@@ -987,6 +1104,263 @@ class _LessonVisualPainter extends CustomPainter {
       Offset(s.width * .30, s.height * .73),
       Offset(s.width * .76, s.height * .60),
       _stroke(AppColors.secondary, 3),
+    );
+  }
+
+  void _drawScientific(Canvas c, Size s) {
+    _text(c, '450000', Offset(s.width * .14, s.height * .31), fontSize: 22);
+    _text(
+      c,
+      '→',
+      Offset(s.width * .46, s.height * .31),
+      fontSize: 22,
+      color: AppColors.secondary,
+    );
+    _text(c, '4.5 × 10⁵', Offset(s.width * .57, s.height * .31), fontSize: 20);
+    c.drawLine(
+      Offset(s.width * .22, s.height * .64),
+      Offset(s.width * .73, s.height * .64),
+      _stroke(AppColors.accent, 3),
+    );
+    _text(
+      c,
+      '5 منازل لليسار',
+      Offset(s.width * .38, s.height * .70),
+      fontSize: 10,
+      color: AppColors.secondary,
+    );
+  }
+
+  void _drawHistogram(Canvas c, Size s) {
+    final base = s.height * .78;
+    final left = s.width * .16;
+    c.drawLine(Offset(left, base), Offset(s.width * .86, base), _whiteStroke);
+    c.drawLine(Offset(left, base), Offset(left, s.height * .16), _whiteStroke);
+    final heights = <double>[.28, .48, .65, .40];
+    final barWidth = s.width * .16;
+    for (var i = 0; i < heights.length; i++) {
+      final height = s.height * heights[i];
+      final bar = Rect.fromLTWH(
+        left + i * barWidth,
+        base - height,
+        barWidth,
+        height,
+      );
+      c.drawRect(
+        bar,
+        _fill(
+          i == 2
+              ? AppColors.secondary
+              : AppColors.primary.withValues(alpha: .75),
+        ),
+      );
+      c.drawRect(bar, _stroke(Colors.white.withValues(alpha: .28)));
+    }
+    _text(c, 'فئات متجاورة', Offset(s.width * .40, s.height * .84), fontSize: 10);
+  }
+
+  void _drawPie(Canvas c, Size s) {
+    final center = Offset(s.width * .50, s.height * .48);
+    final radius = s.height * .30;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+    c.drawArc(rect, -math.pi / 2, math.pi / 2, true, _fill(AppColors.secondary));
+    c.drawArc(rect, 0, math.pi * .65, true, _fill(AppColors.accent));
+    c.drawArc(
+      rect,
+      math.pi * .65,
+      math.pi * .85,
+      true,
+      _fill(AppColors.primary),
+    );
+    c.drawCircle(center, radius, _stroke(Colors.white, 2));
+    _text(
+      c,
+      '25%',
+      Offset(center.dx + 18, center.dy - 44),
+      color: AppColors.primaryDark,
+    );
+    _text(c, '50%', Offset(center.dx - 62, center.dy - 8));
+  }
+
+  void _drawBoxPlot(Canvas c, Size s) {
+    final y = s.height * .50;
+    final min = s.width * .14;
+    final q1 = s.width * .31;
+    final median = s.width * .50;
+    final q3 = s.width * .69;
+    final max = s.width * .86;
+    c.drawLine(Offset(min, y), Offset(max, y), _whiteStroke);
+    final box = Rect.fromLTRB(q1, y - 34, q3, y + 34);
+    c.drawRect(box, _fill(AppColors.secondary.withValues(alpha: .22)));
+    c.drawRect(box, _stroke(AppColors.secondary, 3));
+    c.drawLine(
+      Offset(median, y - 34),
+      Offset(median, y + 34),
+      _stroke(AppColors.accent, 3),
+    );
+    c.drawLine(Offset(min, y - 16), Offset(min, y + 16), _whiteStroke);
+    c.drawLine(Offset(max, y - 16), Offset(max, y + 16), _whiteStroke);
+    _text(
+      c,
+      'الوسيط',
+      Offset(median - 22, y + 44),
+      fontSize: 10,
+      color: AppColors.accent,
+    );
+  }
+
+  void _drawStemLeaf(Canvas c, Size s) {
+    _text(
+      c,
+      'الساق | الورقة',
+      Offset(s.width * .36, s.height * .17),
+      fontSize: 13,
+      color: AppColors.secondary,
+    );
+    _text(c, '4 | 2  5  7', Offset(s.width * .35, s.height * .36), fontSize: 18);
+    _text(c, '5 | 1  3  8', Offset(s.width * .35, s.height * .54), fontSize: 18);
+    _text(
+      c,
+      '4 | 7 = 47',
+      Offset(s.width * .40, s.height * .76),
+      fontSize: 11,
+      color: AppColors.accent,
+    );
+  }
+
+  void _drawProbabilityMeter(Canvas c, Size s) {
+    final rect = Rect.fromLTWH(
+      s.width * .14,
+      s.height * .38,
+      s.width * .72,
+      28,
+    );
+    c.drawRRect(
+      RRect.fromRectAndRadius(rect, const Radius.circular(14)),
+      _fill(Colors.white.withValues(alpha: .14)),
+    );
+    c.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(rect.left, rect.top, rect.width * .50, rect.height),
+        const Radius.circular(14),
+      ),
+      _fill(AppColors.secondary),
+    );
+    c.drawLine(
+      Offset(rect.left + rect.width * .47, rect.top - 18),
+      Offset(rect.left + rect.width * .47, rect.bottom + 18),
+      _stroke(AppColors.accent, 3),
+    );
+    _text(
+      c,
+      'نظري 50%',
+      Offset(s.width * .17, s.height * .61),
+      fontSize: 10,
+      color: AppColors.secondary,
+    );
+    _text(
+      c,
+      'تجريبي 47%',
+      Offset(s.width * .58, s.height * .61),
+      fontSize: 10,
+      color: AppColors.accent,
+    );
+  }
+
+  void _drawSampling(Canvas c, Size s) {
+    final points = <Offset>[
+      Offset(.16, .28), Offset(.28, .20), Offset(.39, .34),
+      Offset(.55, .22), Offset(.69, .31), Offset(.82, .24),
+      Offset(.20, .52), Offset(.34, .61), Offset(.47, .49),
+      Offset(.61, .58), Offset(.76, .52), Offset(.84, .68),
+      Offset(.27, .76), Offset(.48, .74), Offset(.68, .78),
+    ];
+    for (var i = 0; i < points.length; i++) {
+      final point = Offset(points[i].dx * s.width, points[i].dy * s.height);
+      final selected = i % 3 == 0;
+      c.drawCircle(
+        point,
+        selected ? 8 : 5,
+        _fill(
+          selected
+              ? AppColors.secondary
+              : Colors.white.withValues(alpha: .40),
+        ),
+      );
+    }
+    _text(
+      c,
+      'العينة موزعة بين المجتمع',
+      Offset(s.width * .34, s.height * .84),
+      fontSize: 10,
+      color: AppColors.secondary,
+    );
+  }
+
+  void _drawCompositeArea(Canvas c, Size s) {
+    final a = Rect.fromLTWH(
+      s.width * .18,
+      s.height * .22,
+      s.width * .30,
+      s.height * .50,
+    );
+    final b = Rect.fromLTWH(
+      s.width * .48,
+      s.height * .44,
+      s.width * .30,
+      s.height * .28,
+    );
+    c.drawRect(a, _fill(AppColors.secondary.withValues(alpha: .78)));
+    c.drawRect(b, _fill(AppColors.accent.withValues(alpha: .70)));
+    c.drawRect(a, _whiteStroke);
+    c.drawRect(b, _whiteStroke);
+    _text(
+      c,
+      'A1',
+      Offset(a.center.dx - 10, a.center.dy - 8),
+      color: AppColors.primaryDark,
+    );
+    _text(c, 'A2', Offset(b.center.dx - 10, b.center.dy - 8));
+    _text(
+      c,
+      'المساحة = A1 + A2',
+      Offset(s.width * .34, s.height * .80),
+      fontSize: 10,
+    );
+  }
+
+  void _drawLineGraph(Canvas c, Size s) {
+    final origin = Offset(s.width * .18, s.height * .78);
+    c.drawLine(origin, Offset(s.width * .86, origin.dy), _whiteStroke);
+    c.drawLine(origin, Offset(origin.dx, s.height * .16), _whiteStroke);
+    c.drawLine(
+      Offset(s.width * .27, s.height * .69),
+      Offset(s.width * .78, s.height * .25),
+      _stroke(AppColors.secondary, 4),
+    );
+    c.drawLine(
+      Offset(s.width * .47, s.height * .52),
+      Offset(s.width * .63, s.height * .52),
+      _stroke(AppColors.accent, 3),
+    );
+    c.drawLine(
+      Offset(s.width * .63, s.height * .52),
+      Offset(s.width * .63, s.height * .38),
+      _stroke(AppColors.accent, 3),
+    );
+    _text(
+      c,
+      'run',
+      Offset(s.width * .52, s.height * .56),
+      fontSize: 9,
+      color: AppColors.accent,
+    );
+    _text(
+      c,
+      'rise',
+      Offset(s.width * .65, s.height * .41),
+      fontSize: 9,
+      color: AppColors.accent,
     );
   }
 
