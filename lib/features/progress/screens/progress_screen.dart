@@ -5,6 +5,8 @@ import '../../../app/theme/app_theme.dart';
 import '../../../services/progress_service.dart';
 import '../../curriculum/data/grade2_math_data.dart';
 import '../../curriculum/models/curriculum_models.dart';
+import '../../lessons/screens/lesson_screen.dart';
+import '../../quizzes/data/grade2_math_quiz_registry.dart';
 
 class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
@@ -44,9 +46,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
         lessons.every((lesson) => _completed.contains(lesson.id));
   }
 
-  bool _chapterUnlocked(int index) {
-    if (index == 0) return true;
-    return _chapterComplete(grade2MathChapters[index - 1]);
+  Future<void> _openLesson(Lesson lesson) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => LessonScreen(lesson: lesson),
+      ),
+    );
+    await _load();
   }
 
   @override
@@ -73,6 +79,28 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final overallProgress =
         totalLessons == 0 ? 0.0 : completedLessons / totalLessons;
     final percent = (overallProgress * 100).round();
+
+    final weakLessons = <_WeakLessonInsight>[];
+    for (final chapter in grade2MathChapters) {
+      for (final lesson
+          in chapter.lessons.where((lesson) => lesson.isAvailable)) {
+        final mistakeCount = quizForGrade2MathLesson(lesson.id)
+            .where((question) => _mistakes.contains(question.id))
+            .length;
+        if (mistakeCount > 0) {
+          weakLessons.add(
+            _WeakLessonInsight(
+              lesson: lesson,
+              chapterTitle: chapter.title,
+              mistakeCount: mistakeCount,
+            ),
+          );
+        }
+      }
+    }
+    weakLessons.sort(
+      (a, b) => b.mistakeCount.compareTo(a.mistakeCount),
+    );
 
     return Scaffold(
       body: SafeArea(
@@ -157,6 +185,16 @@ class _ProgressScreenState extends State<ProgressScreen> {
                           ),
                         ],
                       ),
+                      if (weakLessons.isNotEmpty) ...[
+                        const SizedBox(height: 30),
+                        _WeakLessonsSection(
+                          lessons: weakLessons.take(5).toList(),
+                          surface: surface,
+                          textColor: text,
+                          mutedColor: muted,
+                          onOpenLesson: _openLesson,
+                        ).animate(delay: 80.ms).fadeIn(duration: 320.ms),
+                      ],
                       const SizedBox(height: 30),
                       Text(
                         'رحلة المادة',
@@ -167,7 +205,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       ),
                       const SizedBox(height: 7),
                       Text(
-                        'كل فصل يفتح بعد إكمال الفصل السابق.',
+                        'جميع الفصول متاحة، وهنا ترى مقدار تقدمك في كل فصل.',
                         style: TextStyle(
                           color: muted,
                           fontWeight: FontWeight.w600,
@@ -176,7 +214,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       const SizedBox(height: 22),
                       ...List.generate(grade2MathChapters.length, (index) {
                         final chapter = grade2MathChapters[index];
-                        final unlocked = _chapterUnlocked(index);
+                        const unlocked = true;
                         final complete = _chapterComplete(chapter);
                         final lessons = chapter.lessons
                             .where((lesson) => lesson.isAvailable)
@@ -208,6 +246,169 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   ),
                 ],
               ),
+      ),
+    );
+  }
+}
+
+class _WeakLessonInsight {
+  const _WeakLessonInsight({
+    required this.lesson,
+    required this.chapterTitle,
+    required this.mistakeCount,
+  });
+
+  final Lesson lesson;
+  final String chapterTitle;
+  final int mistakeCount;
+}
+
+class _WeakLessonsSection extends StatelessWidget {
+  const _WeakLessonsSection({
+    required this.lessons,
+    required this.surface,
+    required this.textColor,
+    required this.mutedColor,
+    required this.onOpenLesson,
+  });
+
+  final List<_WeakLessonInsight> lessons;
+  final Color surface;
+  final Color textColor;
+  final Color mutedColor;
+  final ValueChanged<Lesson> onOpenLesson;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(
+          color: AppColors.accent.withValues(alpha: 0.18),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: const Icon(
+                  Icons.troubleshoot_rounded,
+                  color: AppColors.accent,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'دروس تحتاج مراجعة أكثر',
+                      style: TextStyle(
+                        color: textColor,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      'مرتبة حسب عدد الأسئلة التي ما زالت في قائمة أخطائك.',
+                      style: TextStyle(
+                        color: mutedColor,
+                        height: 1.45,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          ...lessons.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 9),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => onOpenLesson(item.lesson),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 13,
+                      vertical: 11,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.accent.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 34,
+                          height: 34,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: AppColors.accent,
+                            borderRadius: BorderRadius.circular(11),
+                          ),
+                          child: Text(
+                            '${item.mistakeCount}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 11),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.lesson.title,
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                item.chapterTitle,
+                                style: TextStyle(
+                                  color: mutedColor,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_back_rounded,
+                          color: mutedColor,
+                          size: 18,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
