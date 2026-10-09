@@ -21,6 +21,18 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+class _ReviewRecommendation {
+  const _ReviewRecommendation({
+    required this.lesson,
+    required this.chapterTitle,
+    required this.mistakeCount,
+  });
+
+  final Lesson lesson;
+  final String chapterTitle;
+  final int mistakeCount;
+}
+
 class _HomeScreenState extends State<HomeScreen> {
   final ProgressService _progressService = ProgressService();
 
@@ -92,7 +104,45 @@ class _HomeScreenState extends State<HomeScreen> {
   bool get _isCourseComplete =>
       grade2MathChapters.every(_isChapterComplete);
 
+  _ReviewRecommendation? _reviewRecommendation() {
+    _ReviewRecommendation? best;
+
+    for (final chapter in grade2MathChapters) {
+      for (final lesson
+          in chapter.lessons.where((lesson) => lesson.isAvailable)) {
+        final mistakeCount = quizForGrade2MathLesson(lesson.id)
+            .where(
+              (question) => _mistakeQuestionIds.contains(question.id),
+            )
+            .length;
+
+        if (mistakeCount == 0) continue;
+
+        if (best == null || mistakeCount > best.mistakeCount) {
+          best = _ReviewRecommendation(
+            lesson: lesson,
+            chapterTitle: chapter.title,
+            mistakeCount: mistakeCount,
+          );
+        }
+      }
+    }
+
+    return best;
+  }
+
+  Future<void> _openReviewLesson(Lesson lesson) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => LessonScreen(lesson: lesson),
+      ),
+    );
+    await _loadProgress();
+  }
+
   Future<void> _continueLearning(Chapter chapter) async {
+    final reviewRecommendation = _reviewRecommendation();
+
     final lastLesson = _findLesson(chapter, _lastLessonId);
     final lesson = lastLesson == null ||
             _completedLessonIds.contains(lastLesson.id)
@@ -206,11 +256,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   overallCompleted: overallCompleted,
                   overallTotal: allLessons.length,
                   completedLessonIds: _completedLessonIds,
+                  reviewRecommendation: reviewRecommendation,
                   onContinue: courseComplete
                       ? _openCourseOverview
                       : () => _continueLearning(chapter),
                   onOpenCourse: _openCourseOverview,
                   onOpenChapter: _openChapter,
+                  onReviewLesson: _openReviewLesson,
                   onQuiz: () => _openQuiz(chapter),
                   onMistakes: () => _openMistakes(chapter),
                   onProgress: _openProgress,
@@ -235,9 +287,11 @@ class _StudyCanvas extends StatelessWidget {
     required this.overallCompleted,
     required this.overallTotal,
     required this.completedLessonIds,
+    required this.reviewRecommendation,
     required this.onContinue,
     required this.onOpenCourse,
     required this.onOpenChapter,
+    required this.onReviewLesson,
     required this.onQuiz,
     required this.onMistakes,
     required this.onProgress,
@@ -254,9 +308,11 @@ class _StudyCanvas extends StatelessWidget {
   final int overallCompleted;
   final int overallTotal;
   final Set<String> completedLessonIds;
+  final _ReviewRecommendation? reviewRecommendation;
   final VoidCallback onContinue;
   final VoidCallback onOpenCourse;
   final ValueChanged<Chapter> onOpenChapter;
+  final ValueChanged<Lesson> onReviewLesson;
   final VoidCallback onQuiz;
   final VoidCallback onMistakes;
   final VoidCallback onProgress;
@@ -323,6 +379,16 @@ class _StudyCanvas extends StatelessWidget {
               mutedColor: muted,
               onTap: onProgress,
             ).animate(delay: 130.ms).fadeIn(duration: 320.ms),
+            if (reviewRecommendation != null) ...[
+              const SizedBox(height: 14),
+              _ReviewRecommendationCard(
+                recommendation: reviewRecommendation!,
+                surface: surface,
+                textColor: text,
+                mutedColor: muted,
+                onTap: () => onReviewLesson(reviewRecommendation!.lesson),
+              ).animate(delay: 138.ms).fadeIn(duration: 320.ms),
+            ],
             const SizedBox(height: 18),
             _AllChaptersSection(
               completedLessonIds: completedLessonIds,
@@ -518,6 +584,99 @@ class _CoursePulse extends StatelessWidget {
                 Icons.arrow_back_rounded,
                 color: mutedColor,
                 size: 19,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ReviewRecommendationCard extends StatelessWidget {
+  const _ReviewRecommendationCard({
+    required this.recommendation,
+    required this.surface,
+    required this.textColor,
+    required this.mutedColor,
+    required this.onTap,
+  });
+
+  final _ReviewRecommendation recommendation;
+  final Color surface;
+  final Color textColor;
+  final Color mutedColor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(22),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: surface,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: AppColors.accent.withValues(alpha: 0.22),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.accent,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: const Icon(
+                  Icons.replay_circle_filled_rounded,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'مراجعة مقترحة لك',
+                      style: TextStyle(
+                        color: AppColors.accent,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 11,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      recommendation.lesson.title,
+                      style: TextStyle(
+                        color: textColor,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${recommendation.chapterTitle} • ${recommendation.mistakeCount} أخطاء تحتاج مراجعة',
+                      style: TextStyle(
+                        color: mutedColor,
+                        height: 1.4,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_back_rounded,
+                color: mutedColor,
               ),
             ],
           ),
