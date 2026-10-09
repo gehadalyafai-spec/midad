@@ -20,6 +20,7 @@ class ChapterScreen extends StatefulWidget {
 class _ChapterScreenState extends State<ChapterScreen> {
   final ProgressService _progressService = ProgressService();
   Set<String> _completedLessonIds = const <String>{};
+  int? _bestExamScore;
 
   @override
   void initState() {
@@ -29,8 +30,14 @@ class _ChapterScreenState extends State<ChapterScreen> {
 
   Future<void> _loadProgress() async {
     final completed = await _progressService.getCompletedLessonIds();
+    final bestExamScore = await _progressService.getExamBestScore(
+      '${widget.chapter.id}-chapter-exam',
+    );
     if (!mounted) return;
-    setState(() => _completedLessonIds = completed);
+    setState(() {
+      _completedLessonIds = completed;
+      _bestExamScore = bestExamScore;
+    });
   }
 
   Future<void> _openLesson(Lesson lesson) async {
@@ -46,8 +53,9 @@ class _ChapterScreenState extends State<ChapterScreen> {
     final questions = chapterExamQuestions(widget.chapter);
     if (questions.isEmpty) return;
 
+    final examId = '${widget.chapter.id}-chapter-exam';
     final examLesson = Lesson(
-      id: '${widget.chapter.id}-chapter-exam',
+      id: examId,
       title: 'اختبار الفصل: ${widget.chapter.title}',
       subtitle: 'اختبار شامل يراجع أهم أفكار دروس الفصل.',
     );
@@ -58,9 +66,11 @@ class _ChapterScreenState extends State<ChapterScreen> {
           lesson: examLesson,
           questions: questions,
           markLessonComplete: false,
+          examProgressKey: examId,
         ),
       ),
     );
+    await _loadProgress();
   }
 
   @override
@@ -173,6 +183,7 @@ class _ChapterScreenState extends State<ChapterScreen> {
                 const SizedBox(height: 8),
                 _ChapterExamCard(
                   chapterTitle: widget.chapter.title,
+                  bestScore: _bestExamScore,
                   completed: completed,
                   total: available.length,
                   surface: surface,
@@ -472,6 +483,7 @@ class _TimelineLesson extends StatelessWidget {
 class _ChapterExamCard extends StatelessWidget {
   const _ChapterExamCard({
     required this.chapterTitle,
+    this.bestScore,
     required this.completed,
     required this.total,
     required this.surface,
@@ -481,6 +493,7 @@ class _ChapterExamCard extends StatelessWidget {
   });
 
   final String chapterTitle;
+  final int? bestScore;
   final int completed;
   final int total;
   final Color surface;
@@ -555,6 +568,27 @@ class _ChapterExamCard extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                       ),
                     ),
+                    if (bestScore != null) ...[
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          'أفضل نتيجة: $bestScore%',
+                          style: const TextStyle(
+                            color: AppColors.secondary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
