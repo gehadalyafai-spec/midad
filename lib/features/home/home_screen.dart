@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../../app/theme/app_theme.dart';
 import '../../services/progress_service.dart';
@@ -1606,87 +1605,6 @@ class _MidadOpening extends StatelessWidget {
             ).animate(delay: 240.ms).fadeIn(),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _StudySkeleton extends StatelessWidget {
-  const _StudySkeleton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final base =
-        isDark ? const Color(0xFF20212C) : const Color(0xFFE2DED6);
-    final highlight =
-        isDark ? const Color(0xFF30313F) : const Color(0xFFF7F4EE);
-
-    return Shimmer.fromColors(
-      baseColor: base,
-      highlightColor: highlight,
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(22, 18, 22, 110),
-        children: const [
-          Row(
-            children: [
-              _Skeleton(width: 48, height: 48, radius: 14),
-              SizedBox(width: 12),
-              _Skeleton(width: 110, height: 42, radius: 10),
-            ],
-          ),
-          SizedBox(height: 34),
-          _Skeleton(height: 90, radius: 18),
-          SizedBox(height: 28),
-          _Skeleton(height: 230, radius: 32),
-          SizedBox(height: 28),
-          _Skeleton(height: 116, radius: 24),
-          SizedBox(height: 28),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 6,
-                child: _Skeleton(height: 290, radius: 28),
-              ),
-              SizedBox(width: 14),
-              Expanded(
-                flex: 5,
-                child: Column(
-                  children: [
-                    _Skeleton(height: 138, radius: 24),
-                    SizedBox(height: 14),
-                    _Skeleton(height: 138, radius: 24),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Skeleton extends StatelessWidget {
-  const _Skeleton({
-    required this.height,
-    this.width = double.infinity,
-    this.radius = 18,
-  });
-
-  final double height;
-  final double width;
-  final double radius;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(radius),
       ),
     );
   }
